@@ -117,32 +117,60 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO(ID_MESA,ID_USUARIO,CLIENTE,ID_STATUS_PEDIDO,TAXA_SERVICO,OBSERVACAO)");
-                sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO);");
-                var parameters = new OracleDynamicParameters();
-                parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("CLIENTE", model.Cliente, OracleDbType.Varchar2, ParameterDirection.Input);
-                parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
-                parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
-                parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-                await conn.ExecuteAsync(sql.ToString(), parameters);
+               // conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO(ID_MESA,ID_USUARIO,CLIENTE,ID_STATUS_PEDIDO,TAXA_SERVICO,OBSERVACAO)");
+                        sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO);");
+                        var parameters = new OracleDynamicParameters();
+                        parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
+                        parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+                        parameters.Add("CLIENTE", model.Cliente, OracleDbType.Varchar2, ParameterDirection.Input);
+                        parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
+                        parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
+                        parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
+                        model.Id = await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+                        if (model.Id <= 0)
+                            throw new Exception("Erro ao cadastrar o pedido");
+
+                        await SaveLogStatus(new LogPedidoStatus()
+                        {
+                            IdPedido=model.Id,
+                            IdStatusPedido = model.IdStatusPedido,
+                            IdUsuario= model.IdUsuario
+                        }, conn, transaction);
+
+                        PedidoItemRepository pedidoItemRepository = new PedidoItemRepository();
+                        foreach (var item in model.Itens)
+                        {
+                            item.IdPedido = model.Id;
+                            await pedidoItemRepository.Save(item,conn,transaction);
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
             }
         }
 
-        public async Task SaveLogStatus(LogPedidoStatus model)
+        public async Task SaveLogStatus(LogPedidoStatus model, IDbConnection conn, IDbTransaction transaction)
         {
-            using (IDbConnection conn = _connection.GetConnection())
-            {
-                StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_LOG_STATUS(ID_PEDIDO,ID_USUARIO,ID_STATUS_PEDIDO,OBSERVACAO)");
-                sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_STATUS_PEDIDO,:OBSERVACAO);");
-                var parameters = new OracleDynamicParameters();
-                parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-                await conn.ExecuteAsync(sql.ToString(), parameters);
-            }
+            StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_LOG_STATUS(ID_PEDIDO,ID_USUARIO,ID_STATUS_PEDIDO,OBSERVACAO)");
+            sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_STATUS_PEDIDO,:OBSERVACAO);");
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
+            parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
+            await conn.ExecuteAsync(sql.ToString(), parameters, commandType: CommandType.StoredProcedure,
+                                                           transaction: transaction);
         }
     }
 }
