@@ -15,14 +15,17 @@ namespace Infrastructure.Repository
     public class PedidoItemRepository : IPedidoItemRepository
     {
         private readonly IDonConnection _connection;
+        private readonly IUserSession _userSession;
 
-        public PedidoItemRepository()
+        public PedidoItemRepository(IUserSession userSession)
         {
+            _userSession = userSession;
         }
 
-        public PedidoItemRepository(IDonConnection connection)
+        public PedidoItemRepository(IDonConnection connection, IUserSession userSession)
         {
             _connection = connection;
+            _userSession = userSession;
         }
 
         public async Task ChangeState(long id, int status)
@@ -141,7 +144,7 @@ namespace Infrastructure.Repository
             sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_MENU,:ID_STATUS_PEDIDO_ITEM,:VALOR,:TEMPO_PREPARO, :OBSERVACAO);");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
-            parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_MENU", model.IdMenu, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_STATUS_PEDIDO_ITEM", model.IdStatusPedidoItem, OracleDbType.Int32, ParameterDirection.Input);
             parameters.Add("VALOR", model.Valor, OracleDbType.Decimal, ParameterDirection.Input);
@@ -164,7 +167,7 @@ namespace Infrastructure.Repository
             sql.Append("VALUES(:ID_PEDIDO_ITEM,:ID_USUARIO,:OBSERVACAO);");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO_ITEM", model.IdPedidoItem, OracleDbType.Long, ParameterDirection.Input);
-            parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
             await conn.ExecuteAsync(sql.ToString(), parameters, transaction);
         }

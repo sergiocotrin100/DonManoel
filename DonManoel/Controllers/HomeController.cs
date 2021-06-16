@@ -1,4 +1,5 @@
-﻿using DonManoel.Models;
+﻿using Core.Interfaces;
+using DonManoel.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,13 +10,12 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : MainController
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IUserSession _userSession;
+        public HomeController(IUserSession userSession)
         {
-            _logger = logger;
+            _userSession = userSession;
         }
 
         public IActionResult Index()

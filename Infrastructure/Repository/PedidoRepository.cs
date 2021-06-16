@@ -15,9 +15,11 @@ namespace Infrastructure.Repository
     public class PedidoRepository : IPedidoRepository
     {
         private readonly IDonConnection _connection;
-        public PedidoRepository(IDonConnection connection)
+        private readonly IUserSession _userSession;
+        public PedidoRepository(IDonConnection connection, IUserSession userSession)
         {
             _connection = connection;
+            _userSession = userSession;
         }
 
         public async Task ChangeState(long idpedido, int status)
@@ -126,7 +128,7 @@ namespace Infrastructure.Repository
                         sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO);");
                         var parameters = new OracleDynamicParameters();
                         parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
-                        parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+                        parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
                         parameters.Add("CLIENTE", model.Cliente, OracleDbType.Varchar2, ParameterDirection.Input);
                         parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
                         parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
@@ -138,11 +140,10 @@ namespace Infrastructure.Repository
                         await SaveLogStatus(new LogPedidoStatus()
                         {
                             IdPedido=model.Id,
-                            IdStatusPedido = model.IdStatusPedido,
-                            IdUsuario= model.IdUsuario
+                            IdStatusPedido = model.IdStatusPedido
                         }, conn, transaction);
 
-                        PedidoItemRepository pedidoItemRepository = new PedidoItemRepository();
+                        PedidoItemRepository pedidoItemRepository = new PedidoItemRepository(_userSession);
                         foreach (var item in model.Itens)
                         {
                             item.IdPedido = model.Id;
@@ -160,13 +161,13 @@ namespace Infrastructure.Repository
             }
         }
 
-        public async Task SaveLogStatus(LogPedidoStatus model, IDbConnection conn, IDbTransaction transaction)
+        private async Task SaveLogStatus(LogPedidoStatus model, IDbConnection conn, IDbTransaction transaction)
         {
             StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_LOG_STATUS(ID_PEDIDO,ID_USUARIO,ID_STATUS_PEDIDO,OBSERVACAO)");
             sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_STATUS_PEDIDO,:OBSERVACAO);");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
-            parameters.Add("ID_USUARIO", model.IdUsuario, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
             await conn.ExecuteAsync(sql.ToString(), parameters, commandType: CommandType.StoredProcedure,
