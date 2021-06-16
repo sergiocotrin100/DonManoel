@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
-    public class MesaRepository
+    public class MesaRepository : IMesaRepository
     {
         private readonly IDonConnection _connection;
 
@@ -21,8 +21,21 @@ namespace Infrastructure.Repository
             _connection = connection;
         }
 
-        public async Task<List<Mesa>> GetMesas()
+        public async Task<List<Mesa>> GetAll()
         {
+            var mesas = new List<Mesa>();
+            for (int i = 0; i < 12; i++)
+            {
+                mesas.Add(new Mesa()
+                {
+                    IdMesa = i,
+                    Nome = "Mesa " + i.ToString(),
+                    Numero = i,
+                    Uso = "N"
+                });
+            }
+            return mesas;
+
             using (IDbConnection conn = _connection.GetConnection())
             {
                 var cmd = new StringBuilder();

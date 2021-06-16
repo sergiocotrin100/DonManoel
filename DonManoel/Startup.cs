@@ -36,6 +36,9 @@ namespace DonManoel
         {
             services.AddScoped<IUserSession, UserSession>();
             services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+            services.AddTransient<IMesaRepository, MesaRepository>();
+            services.AddTransient<IPedidoItemRepository, PedidoItemRepository>();
+            services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddTransient<IDonConnection, DonConnection>();
             MemoryCacheTicketStore memoryCacheTicketStore = new MemoryCacheTicketStore();
             services.AddSingleton(memoryCacheTicketStore);

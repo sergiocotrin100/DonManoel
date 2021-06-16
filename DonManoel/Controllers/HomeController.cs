@@ -13,14 +13,16 @@ namespace DonManoel.Controllers
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;
-        public HomeController(IUserSession userSession)
+        private readonly IMesaRepository _mesa;
+        public HomeController(IUserSession userSession,IMesaRepository mesa)
         {
             _userSession = userSession;
+            _mesa = mesa;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(_mesa.GetAll().Result);
         }
 
         public IActionResult Privacy()
