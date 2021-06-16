@@ -1,4 +1,5 @@
-﻿using DonManoel.Models;
+﻿using Core.Interfaces;
+using DonManoel.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,18 +10,19 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : MainController
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IUserSession _userSession;
+        private readonly IMesaRepository _mesa;
+        public HomeController(IUserSession userSession,IMesaRepository mesa)
         {
-            _logger = logger;
+            _userSession = userSession;
+            _mesa = mesa;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(_mesa.GetAll().Result);
         }
 
         public IActionResult Privacy()

@@ -10,7 +10,6 @@ namespace Core.Interfaces
    public  interface IPedidoRepository
     {
         Task Save(Pedido model);
-        Task SaveLogStatus(LogPedidoStatus model);
         Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido);
         Task<List<Pedido>> GetPedidos(Pedido model);
         Task<Pedido> GetPedidoById(long idpedido);
