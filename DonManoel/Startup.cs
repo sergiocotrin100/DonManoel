@@ -34,6 +34,7 @@ namespace DonManoel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddScoped<IUserSession, UserSession>();
             services.AddTransient<IUsuarioRepository, UsuarioRepository>();
             services.AddTransient<IMesaRepository, MesaRepository>();
@@ -69,6 +70,15 @@ namespace DonManoel
             });
 
             services.AddControllersWithViews();
+
+            //services.AddProgressiveWebApp(new PwaOptions
+            //{
+            //    CacheId = "Worker 1.1",
+            //    Strategy = ServiceWorkerStrategy.CacheFirst,
+            //    RoutesToPreCache = "/Home/Index, /Shared/_Layout,/Shared/Error",
+
+            //    OfflineRoute = "index.html",
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
