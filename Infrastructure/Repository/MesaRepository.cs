@@ -26,12 +26,21 @@ namespace Infrastructure.Repository
             var mesas = new List<Mesa>();
             for (int i = 0; i < 12; i++)
             {
+                string uso = "N";
+                if (i % 2 == 0)
+                    uso = "S";
+
+                var data = DateTime.Now.AddHours(-i);
+                var valor = i * 10.45;
+
                 mesas.Add(new Mesa()
                 {
-                    IdMesa = i,
+                    Id = i,
                     Nome = "Mesa " + i.ToString(),
                     Numero = i,
-                    Uso = "N"
+                    Uso = uso,
+                    DataAberturaPedido = data,
+                    ValorPedido= valor
                 });
             }
             return mesas;
