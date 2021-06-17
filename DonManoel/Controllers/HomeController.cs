@@ -24,8 +24,8 @@ namespace DonManoel.Controllers
 
         public IActionResult Index()
         {
-            // return View(_mesa.GetAll().Result);
-            return View();
+            var result = _mesa.GetAll().Result;
+            return View(result);
         }
 
         public IActionResult Privacy()

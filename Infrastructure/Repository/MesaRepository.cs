@@ -1,9 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Dapper;
-using Infrastructure.Context;
-using Oracle.ManagedDataAccess.Client;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
