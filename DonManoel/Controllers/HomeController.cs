@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;
@@ -24,7 +24,8 @@ namespace DonManoel.Controllers
 
         public IActionResult Index()
         {
-            return View(_mesa.GetAll().Result);
+            var result = _mesa.GetAll().Result;
+            return View(result);
         }
 
         public IActionResult Privacy()
