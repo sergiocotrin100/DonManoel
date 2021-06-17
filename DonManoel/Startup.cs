@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebEssentials.AspNetCore.Pwa;
 
 namespace DonManoel
 {
@@ -71,6 +72,7 @@ namespace DonManoel
 
             services.AddControllersWithViews();
 
+            services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
             //{
             //    CacheId = "Worker 1.1",
