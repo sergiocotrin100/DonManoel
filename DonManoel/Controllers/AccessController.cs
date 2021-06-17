@@ -15,19 +15,23 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    [Route("[controller]/[action]")]
     [AllowAnonymous]
     public class AccessController : Controller
     {
-        private readonly IUsuarioRepository _usuario;
-        private readonly IUserSession _userSession;
-        private IHttpContextAccessor _accessor;
+        // private readonly IUsuarioRepository _usuario;
+        //private readonly IUserSession _userSession;
+        //private IHttpContextAccessor _accessor;
 
-        public AccessController(IUsuarioRepository usuario, IUserSession userSession, IHttpContextAccessor accessor)
+        //public AccessController(IUsuarioRepository usuario, IUserSession userSession, IHttpContextAccessor accessor)
+        //{
+        //    _usuario = usuario;
+        //    _accessor = accessor;
+        //    _userSession = userSession;
+        //}
+
+        public AccessController()
         {
-            _usuario = usuario;
-            _accessor = accessor;
-            _userSession = userSession;
+
         }
         public IActionResult Index()
         {
@@ -45,29 +49,29 @@ namespace DonManoel.Controllers
             return View(new LoginModel());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> LoginAsync(LoginModel form)
-        {
+        //[HttpPost]
+        //public async Task<IActionResult> LoginAsync(LoginModel form)
+        //{
 
-            if (ModelState.IsValid)
-            {
-                var usuario = await _usuario.Login(form.Usuario, form.Senha);
-                if (usuario != null && usuario.Id >0)
-                {
-                    await _LoginAsync(usuario);
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Dados de acesso inválidos.");
-                    return View(form);
-                }
+        //    if (ModelState.IsValid)
+        //    {
+        //        var usuario = await _usuario.Login(form.Usuario, form.Senha);
+        //        if (usuario != null && usuario.Id >0)
+        //        {
+        //            await _LoginAsync(usuario);
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError("", "Dados de acesso inválidos.");
+        //            return View(form);
+        //        }
 
-                return LocalRedirect("/Home");
-            }
+        //        return LocalRedirect("/Home");
+        //    }
 
-            return View(form);
+        //    return View(form);
 
-        }
+        //}
 
         private async Task _LoginAsync(Usuario usuario)
         {
@@ -77,16 +81,17 @@ namespace DonManoel.Controllers
                         new Claim("Id", usuario.Id.ToString()),
                         new Claim("Nome", usuario.Nome),
                         new Claim("Login", usuario.Login),
-                        new Claim("Email", usuario.Email)
+                        new Claim("Email", usuario.Email),
+                        new Claim(ClaimTypes.Role, usuario.Role),
                     };
 
-            claims.Add(new Claim(ClaimTypes.Role, usuario.Role));
+            //claims.Add(new Claim(ClaimTypes.Role, usuario.Role));
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = false,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(3),
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1),
                 AllowRefresh = true,
             };
             await HttpContext.SignInAsync(

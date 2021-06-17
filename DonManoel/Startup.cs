@@ -54,18 +54,37 @@ namespace DonManoel
 
             services.AddSignalR();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-            {
-                options.LogoutPath = new PathString("/Access/LogoutAsync");
-                options.LoginPath = new PathString("/Access/LoginAsync");
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+           .AddCookie(opt =>
+           {
+               opt.LoginPath = new PathString("/Access/LoginAsync");
+               opt.LogoutPath = new PathString("/Access/LogoutAsync");
+               opt.AccessDeniedPath = new PathString("/Erro/AcessoNegado");
+               opt.ExpireTimeSpan = TimeSpan.FromMinutes(600);
+               opt.Cookie = new CookieBuilder()
+               {
+                   Name = ".DonManuelCookie",
+                   //Expiration = new System.TimeSpan(0, 120, 0),
+                  
+                   //Se tiver um domínio...
+                   //Domain = ".site.com.br",
+               };
+           });
 
-               // options.LoginPath = "/Access/LoginAsync/";
-              //  options.AccessDeniedPath = new PathString("/Access/LoginAsync/");
-             //   options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-               options.SessionStore = memoryCacheTicketStore;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
-            });
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            //{
+            //    options.LogoutPath = new PathString("/Access/LogoutAsync");
+            //    options.LoginPath = new PathString("/Access/LoginAsync");
+
+            //   // options.LoginPath = "/Access/LoginAsync/";
+            //  //  options.AccessDeniedPath = new PathString("/Access/LoginAsync/");
+            // //   options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+            //   options.SessionStore = memoryCacheTicketStore;
+            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
+            //});
 
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -74,7 +93,7 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-            //services.AddControllersWithViews();
+            services.AddControllersWithViews();
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
@@ -107,15 +126,18 @@ namespace DonManoel
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            
             app.UseCookiePolicy();
 
             app.UseRouting();
+            app.UseSession();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseSession();
-            app.UseAuthentication();
+            app.UseMvc();
 
-           // app.UseCors("AllowSpecificOrigin");
+            // app.UseCors("AllowSpecificOrigin");
 
             app.UseEndpoints(endpoints =>
             {
