@@ -4,6 +4,7 @@ using CrossCutting;
 using DonManoel.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,7 +15,9 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    public class AccessController : MainController
+    [Route("[controller]/[action]")]
+    [AllowAnonymous]
+    public class AccessController : Controller
     {
         private readonly IUsuarioRepository _usuario;
         private readonly IUserSession _userSession;
@@ -31,6 +34,9 @@ namespace DonManoel.Controllers
             return View();
         }
 
+
+        [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> LoginAsync(bool deslogou = false)
         {
             ViewBag.deslogou = deslogou;

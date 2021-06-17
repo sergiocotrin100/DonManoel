@@ -1,5 +1,6 @@
 ﻿using Core.Interfaces;
 using DonManoel.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
+    [Authorize]
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;

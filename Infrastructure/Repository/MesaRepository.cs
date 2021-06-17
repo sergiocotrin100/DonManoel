@@ -23,7 +23,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<Mesa>> GetAll()
         {
-            var mesas = new List<Mesa>();
+            /*var mesas = new List<Mesa>();
             for (int i = 0; i < 12; i++)
             {
                 string uso = "N";
@@ -43,7 +43,7 @@ namespace Infrastructure.Repository
                     ValorPedido= valor
                 });
             }
-            return mesas;
+            return mesas;*/
 
             using (IDbConnection conn = _connection.GetConnection())
             {
@@ -53,12 +53,13 @@ namespace Infrastructure.Repository
                         M.ID,
                         M.NOME,
                         M.NUMERO,
-                        (
-                            SELECT 'S' FROM DOTNET_PEDIDO P
-                            WHERE P.ID_MESA = M.ID_MESA
-                            AND ROWNUM <2 
-                        ) USO
+                        CASE WHEN P.ID IS NOT NULL THEN 'S' ELSE 'N' END USO,
+                        P.DATA DATAABERTURAPEDIDO,
+                        P.VALOR_ITENS VALORPEDIDO,
+                        U.NOME ATENDENTE
                     FROM MESAS M
+                    LEFT JOIN DOTNET_PEDIDO P ON P.ID_MESA = M.ID AND P.ID_STATUS_PEDIDO NOT IN(5,6)
+                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                  ");
                 var parametros = new DynamicParameters();
                 var model = await conn.QueryAsync<Mesa>(cmd.ToString(), parametros);

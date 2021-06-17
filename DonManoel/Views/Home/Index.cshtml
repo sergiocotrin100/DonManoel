@@ -1,54 +1,53 @@
 ﻿@model List<Core.Entities.Mesa>
 
-
 <div class="text-center">
     <div class="row row-cols-1 row-cols-md-3 g-4">
         @foreach (var mesa in Model)
         {
-        <div class="col">
-            @if (mesa.EmUso)
-            {
-                <div class="box box-solid bg-secondary">
-                    <div class="box-header">
-                        <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <i class="fa fa-clock-o"></i> Tempo <br />
-                                @mesa.Tempo
-                            </div>
-                            <div class="col-sm-4">
-                                <i class="fa fa-calculator"></i> Sub-Total <br />
-                                <b>25,00</b>
-                            </div>
-                            <div class="col-sm-4">
-                                <i class="fa fa-user-o"></i> Atendente <br />
-                                Sérgio
+            <div class="col">
+                @if (mesa.EmUso)
+                {
+                    <div class="box box-solid bg-secondary">
+                        <div class="box-header">
+                            <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <i class="icon-Clock"></i> Tempo <br />
+                                    @mesa.Tempo
+                                </div>
+                                <div class="col-sm-4">
+                                    <i class="icon-Calculator"></i> Sub-Total <br />
+                                    <b>25,00</b>
+                                </div>
+                                <div class="col-sm-4">
+                                    <i class="icon-User"></i> Atendente <br />
+                                    Sérgio
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-            else
-            {
-                <div class="box box-solid bg-success">
-                    <div class="box-header">
-                        <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
-                    </div>
-                    <div class="box-body" style="font-size:30px;">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <i class="fa fa-flag"></i> 
-                                <span>Livre</span>
-                            </div>                            
+                }
+                else
+                {
+                    <div class="box box-solid bg-success">
+                        <div class="box-header">
+                            <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
+                        </div>
+                        <div class="box-body" style="font-size:30px;">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <i class="icon-Flag"></i>
+                                    <span>Livre</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
 
-        </div>
+            </div>
 
         }
     </div>
-    </div>
+</div>

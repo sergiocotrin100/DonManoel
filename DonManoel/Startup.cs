@@ -34,7 +34,6 @@ namespace DonManoel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddScoped<IUserSession, UserSession>();
             services.AddTransient<IUsuarioRepository, UsuarioRepository>();
             services.AddTransient<IMesaRepository, MesaRepository>();
@@ -58,7 +57,12 @@ namespace DonManoel
             {
                 options.LogoutPath = new PathString("/Access/LogoutAsync");
                 options.LoginPath = new PathString("/Access/LoginAsync");
-                options.SessionStore = memoryCacheTicketStore;
+
+               // options.LoginPath = "/Access/LoginAsync/";
+              //  options.AccessDeniedPath = new PathString("/Access/LoginAsync/");
+             //   options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+               options.SessionStore = memoryCacheTicketStore;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
             });
 
@@ -69,7 +73,7 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-            services.AddControllersWithViews();
+            //services.AddControllersWithViews();
 
             //services.AddProgressiveWebApp(new PwaOptions
             //{
@@ -108,6 +112,8 @@ namespace DonManoel
 
             app.UseSession();
             app.UseAuthentication();
+
+           // app.UseCors("AllowSpecificOrigin");
 
             app.UseEndpoints(endpoints =>
             {
