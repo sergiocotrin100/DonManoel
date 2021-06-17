@@ -20,28 +20,6 @@ namespace Infrastructure.Repository
 
         public async Task<List<Mesa>> GetAll()
         {
-            /*var mesas = new List<Mesa>();
-            for (int i = 0; i < 12; i++)
-            {
-                string uso = "N";
-                if (i % 2 == 0)
-                    uso = "S";
-
-                var data = DateTime.Now.AddHours(-i);
-                var valor = i * 10.45;
-
-                mesas.Add(new Mesa()
-                {
-                    Id = i,
-                    Nome = "Mesa " + i.ToString(),
-                    Numero = i,
-                    Uso = uso,
-                    DataAberturaPedido = data,
-                    ValorPedido= valor
-                });
-            }
-            return mesas;*/
-
             using (IDbConnection conn = _connection.GetConnection())
             {
                 var cmd = new StringBuilder();

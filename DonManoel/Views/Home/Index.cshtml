@@ -1,12 +1,14 @@
 ﻿@model List<Core.Entities.Mesa>
+@using CrossCutting
 
 <div class="text-center">
     <div class="row row-cols-1 row-cols-md-3 g-4">
         @foreach (var mesa in Model)
         {
-            <div class="col">
-                @if (mesa.EmUso)
-                {
+        <div class="col">
+            @if (mesa.EmUso)
+            {
+               <a asp-controller="Sales" asp-action="Order" asp-route-idmesa="@mesa.Id" asp-route-idorder="@mesa.IdPedido.Value">
                     <div class="box box-solid bg-secondary">
                         <div class="box-header">
                             <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
@@ -19,18 +21,20 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <i class="icon-Calculator"></i> Sub-Total <br />
-                                    <b>25,00</b>
+                                    <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
                                 </div>
                                 <div class="col-sm-4">
                                     <i class="icon-User"></i> Atendente <br />
-                                    Sérgio
+                                    @mesa.Atendente.FirstName()
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
-                else
-                {
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Sales" asp-action="Order" asp-route-idmesa="@mesa.Id" asp-route-idorder="">
                     <div class="box box-solid bg-success">
                         <div class="box-header">
                             <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
@@ -38,15 +42,16 @@
                         <div class="box-body" style="font-size:30px;">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <i class="icon-Flag"></i>
+                                    <img src="~/images/mesa.png" />
                                     <span>Livre</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
+                </a>
+            }
 
-            </div>
+        </div>
 
         }
     </div>

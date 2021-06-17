@@ -25,6 +25,7 @@ namespace Core.Entities
             }
         }
         public string Atendente { get; set; }
+        public long? IdPedido { get; set; }
         public DateTime? DataAberturaPedido { get; set; }
         public double? ValorPedido { get; set; }
         public string Tempo
@@ -42,5 +43,6 @@ namespace Core.Entities
                 return "";
             }
         }
+       
     }
 }

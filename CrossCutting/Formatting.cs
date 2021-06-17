@@ -29,6 +29,19 @@ namespace CrossCutting
 
             return result;
         }
+        public static string FormatMoney(this double value)
+        {
+            return value.FormatMoney(true);
+        }
+        public static string FormatMoney(this double value, bool withSimbolo)
+        {
+            var format = $"C2";
+            var result = value.ToString(format);
+            if (!withSimbolo)
+                return result.Replace("R$", "");
+
+            return result;
+        }
         public static string FormatText(this string value)
         {
             return value.ToUpper().Replace("Ã", "A").Replace("'", "").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n").Replace("''", "").Replace("%", "").Replace("=", "").Replace("|", "").Replace("Ç", "C").Replace(";", "").Replace("(", "").Replace(")", "").Replace("À", "A").Replace("Á", "A").Replace("Â", "A").Replace("Ä", "A").Replace("É", "E").Replace("È", "E").Replace("Ê", "E").Replace("Ë", "E").Replace("Í", "I").Replace("Ì", "I").Replace("Î", "I").Replace("Ó", "O").Replace("Ò", "O").Replace("Ô", "O").Replace("Õ", "O").Replace("Ö", "O").Replace("Ú", "U").Replace("Ù", "U").Replace("Ü", "U").Replace("Û", "U").Replace("<br>", ". ");
