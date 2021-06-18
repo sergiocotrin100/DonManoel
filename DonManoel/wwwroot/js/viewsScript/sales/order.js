@@ -25,6 +25,18 @@ function showMenuDetails(idmenu) {
     
 
     $("#modalDetalhesMenu #MenuDescricao").html(menu.Descricao);
+
+    $("#modalDetalhesMenu #tbReceita tbody").remove();
+   // $("#modalDetalhesMenu #tbReceita > tbody:result").append("<tr><td>row content</td></tr>");
+
+    //Try to get tbody first with jquery children. works faster!
+    var tbody = $('#tbReceita').children('tbody');
+
+    //Then if no tbody just select your table 
+    var table = tbody.length ? tbody : $('#tbReceita');
+
+    //Add row
+    table.append('<tr><td>hello</td></tr>');
     
 
     var myModal = new bootstrap.Modal(document.getElementById('modalDetalhesMenu'), {
@@ -32,7 +44,6 @@ function showMenuDetails(idmenu) {
         backdrop: "static"
     });
 
-    $(myModal).data('bs.modal').options.backdrop = 'static';
     $(myModal).modal({ backdrop: true, keyboard: false, show: true });    
 
 }
