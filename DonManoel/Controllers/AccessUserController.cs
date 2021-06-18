@@ -15,63 +15,53 @@ using System.Threading.Tasks;
 
 namespace DonManoel.Controllers
 {
-    [AllowAnonymous]
-    public class AccessController : Controller
+    [Route("[controller]")]
+    public class AccessUserController : Controller
     {
-        // private readonly IUsuarioRepository _usuario;
-        //private readonly IUserSession _userSession;
-        //private IHttpContextAccessor _accessor;
+        private readonly IUsuarioRepository _usuario;
+        private readonly IUserSession _userSession;
+        private IHttpContextAccessor _accessor;
 
-        //public AccessController(IUsuarioRepository usuario, IUserSession userSession, IHttpContextAccessor accessor)
-        //{
-        //    _usuario = usuario;
-        //    _accessor = accessor;
-        //    _userSession = userSession;
-        //}
-
-        public AccessController()
+        public AccessUserController(IUsuarioRepository usuario, IUserSession userSession, IHttpContextAccessor accessor)
         {
-
+            _usuario = usuario;
+            _accessor = accessor;
+            _userSession = userSession;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
-
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("LoginAsync")]
         public async Task<IActionResult> LoginAsync(bool deslogou = false)
         {
             ViewBag.deslogou = deslogou;
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return View(new LoginModel());
+            return View("LoginAsync",new LoginModel());
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> LoginAsync(LoginModel form)
-        //{
+        [AllowAnonymous]
+        [HttpPost("LoginAsync")]
+        public async Task<IActionResult> LoginAsync(LoginModel form)
+        {
+            if (ModelState.IsValid)
+            {
+                var usuario = await _usuario.Login(form.Usuario, form.Senha);
+                if (usuario != null && usuario.Id > 0)
+                {
+                    await _LoginAsync(usuario);
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Dados de acesso inválidos.");
+                    return View(form);
+                }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        var usuario = await _usuario.Login(form.Usuario, form.Senha);
-        //        if (usuario != null && usuario.Id >0)
-        //        {
-        //            await _LoginAsync(usuario);
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError("", "Dados de acesso inválidos.");
-        //            return View(form);
-        //        }
+                return LocalRedirect("/Home");
+            }
 
-        //        return LocalRedirect("/Home");
-        //    }
+            return View(form);
 
-        //    return View(form);
-
-        //}
+        }
 
         private async Task _LoginAsync(Usuario usuario)
         {
@@ -101,12 +91,14 @@ namespace DonManoel.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpPost("LogoutAsync")]
         public async Task<IActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             ViewData["Deslogou"] = 1;
 
-            RedirectToActionResult redirectResult = new RedirectToActionResult("LoginAsync", "Access", new { deslogou = true });
+            RedirectToActionResult redirectResult = new RedirectToActionResult("LoginAsync", "AccessUser", new { deslogou = true });
             return redirectResult;
         }
     }
