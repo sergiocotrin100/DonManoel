@@ -92,7 +92,7 @@ namespace DonManoel.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("LogoutAsync")]
+        [HttpGet("LogoutAsync")]
         public async Task<IActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

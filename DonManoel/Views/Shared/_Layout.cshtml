@@ -180,7 +180,7 @@
                         <a href="#"><i class="icon-Clipboard-check"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>Pedidos</a>
                         <ul>
                             <li><a asp-controller="Sales" asp-action="kitchen"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Cozinha</a></li>
-                            <li><a  asp-controller="Sales" asp-action="Tracking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Pedidos</a></li>
+                            <li><a asp-controller="Sales" asp-action="Tracking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Pedidos</a></li>
                         </ul>
                     </li>
                     <li>
@@ -329,6 +329,10 @@
 
         </div>
     }
+    else
+    {
+        @RenderBody()
+    }
 
     <!-- Vendor JS -->
     <script src="../js/vendors.min.js"></script>
@@ -341,6 +345,7 @@
     <script src="../js/menus.js"></script>
     <script src="../js/template.js"></script>
     <script>'serviceWorker' in navigator && navigator.serviceWorker.register('../serviceworker')</script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>

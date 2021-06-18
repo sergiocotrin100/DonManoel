@@ -1,4 +1,6 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
 @model LoginModel
 
 <form id="formLogin" method="post" asp-action="LoginAsync" class="md-float-material form-material">
@@ -74,25 +76,3 @@
     </div>
 </div>
 
-
-@*@section Scripts {*@
-    <script>
-    $(function () {
-        @if (ViewBag.deslogou != null && ViewBag.deslogou)
-        {
-            <text>
-        /*    new PNotify({
-                title: 'Sucesso',
-                text: 'Deslogado com Sucesso.',
-                type: 'success',
-                animate: {
-                    animate: true,
-                    in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
-                }
-            });*/
-            </text>
-         }
-        });
-    </script>
-@*}*@
