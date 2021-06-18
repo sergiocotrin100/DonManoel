@@ -1,6 +1,17 @@
 ﻿@model Core.Entities.Pedido
 @using CrossCutting
 
+@{
+    var model = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
+    List<Core.Entities.Categoria> lstCategorias = (List<Core.Entities.Categoria>)ViewBag.Categorias;
+    var categorias = Newtonsoft.Json.JsonConvert.SerializeObject(lstCategorias);
+}
+
+<script type="text/javascript">
+    var objPedido = JSON.parse('@Html.Raw(model)');
+    var lstCategorias = JSON.parse('@Html.Raw(categorias)');
+</script>
+
 
 <div class="content-header">
     <div class="d-flex align-items-center">
@@ -17,24 +28,11 @@
                                 <div class="menu-item"><img src="/images/food/dish-1.png" class="img-fluid w-p75" alt=""></div>
                                 <div class="menu-details text-center">
                                     <h4 class="mt-20 mb-10">@menu.Nome</h4>
-                                    @*<p>Food/Noodle</p>*@
                                 </div>
                                 <div class="act-btn d-flex justify-content-between">
                                     <div class="text-center mx-5">
-                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-eye-slash"></i></a>
-                                        <small class="d-block">Ver</small>
-                                    </div>
-                                    <div class="text-center mx-5">
-                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                        <small class="d-block">Editar</small>
-                                    </div>
-                                    <div class="text-center mx-5">
-                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                        <small class="d-block">Remover</small>
-                                    </div>
-                                    <div class="text-center mx-5">
-                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                        <small class="d-block">Duplicar</small>
+                                        <a href="#" onclick="showMenuDetails(@menu.Id)" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-eye-slash"></i></a>
+                                        <small class="d-block">Adicionar</small>
                                     </div>
                                 </div>
                             </div>
@@ -46,9 +44,27 @@
         </div>
     </div>
 
-    <div>
-        <h3 class="page-title" style="text-decoration:underline;">Pedido</h3>
+    @Html.Partial("_MenuDetalhes")
+    @Html.Partial("_ListaItens")
+</div>
 
 
+<div class="modal modal-right fade" id="modalDetalhesMenu" tabindex="-1" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your content comes here</p>
+            </div>
+            <div class="modal-footer modal-footer-uniform">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary float-end">Save changes</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<script src="~/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>

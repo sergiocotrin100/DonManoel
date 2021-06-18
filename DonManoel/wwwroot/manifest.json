@@ -1,7 +1,7 @@
 {
-  "name": "Don Manuel Restaurante",
-  "short_name": "Don Manuel",
-  "description": "Aplicativo do restaurante Don Manuel.",
+  "name": "Don Manoel Restaurante",
+  "short_name": "Don Manoel",
+  "description": "Aplicativo do restaurante Don Manoel.",
   "start_url": "./",
   "display": "standalone",
   "scope": "/",
@@ -57,15 +57,4 @@
       "type": "image/png"
     }
   ]
-  //"related_applications": [
-  //  {
-  //    "platform": "play",
-  //    "url": "https://play.google.com/store/apps/details?id=com.example.app1",
-  //    "id": "com.example.app1"
-  //  },
-  //  {
-  //    "platform": "itunes",
-  //    "url": "https://itunes.apple.com/app/example-app1/id123456789"
-  //  }
-  //]
 }
