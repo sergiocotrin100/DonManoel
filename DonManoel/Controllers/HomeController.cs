@@ -7,6 +7,7 @@ using System.Diagnostics;
 namespace DonManoel.Controllers
 {
     [Authorize]
+    [Route("[controller]")]
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;
@@ -16,22 +17,17 @@ namespace DonManoel.Controllers
             _userSession = userSession;
             _mesa = mesa;
         }
-
+        [HttpGet("Index")]
         public IActionResult Index()
         {
             var result = _mesa.GetAll().Result;
             return View(result);
         }
 
+        [HttpGet("Privacy")]
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

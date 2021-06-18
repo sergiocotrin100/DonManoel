@@ -52,20 +52,27 @@ namespace DonManoel
                 options.EnableEndpointRouting = false;
             }).AddRazorPagesOptions(options => { }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddSignalR();
+            //services.AddSignalR();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-            {
-                options.LogoutPath = new PathString("/Access/LogoutAsync");
-                options.LoginPath = new PathString("/Access/LoginAsync");
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+           .AddCookie(opt =>
+           {
+               opt.LoginPath = new PathString("/AccessUser/LoginAsync");
+               opt.LogoutPath = new PathString("/AccessUser/LogoutAsync");
+               opt.AccessDeniedPath = new PathString("/Erro/AcessoNegado");
+               opt.ExpireTimeSpan = TimeSpan.FromMinutes(600);
+               opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+               //opt.Cookie = new CookieBuilder()
+               //{
+               //    Name = ".DonManuelCookie",
+               //    //Expiration = new System.TimeSpan(0, 120, 0),
 
-               // options.LoginPath = "/Access/LoginAsync/";
-              //  options.AccessDeniedPath = new PathString("/Access/LoginAsync/");
-             //   options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+               //    //Se tiver um domínio...
+               //    //Domain = ".site.com.br",
+               //};
+           });
 
-               options.SessionStore = memoryCacheTicketStore;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
-            });
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -74,7 +81,7 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-            //services.AddControllersWithViews();
+            services.AddControllersWithViews();
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
@@ -96,26 +103,29 @@ namespace DonManoel
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Erro/PaginaErro");
                 app.UseHsts();
             }
 
-            app.UseCors(x => x
-             .AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader());
+            //app.UseCors(x => x
+            // .AllowAnyOrigin()
+            // .AllowAnyMethod()
+            // .AllowAnyHeader());
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            
             app.UseCookiePolicy();
 
             app.UseRouting();
+            app.UseSession();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseSession();
-            app.UseAuthentication();
+            app.UseMvc();
 
-           // app.UseCors("AllowSpecificOrigin");
+            // app.UseCors("AllowSpecificOrigin");
 
             app.UseEndpoints(endpoints =>
             {
