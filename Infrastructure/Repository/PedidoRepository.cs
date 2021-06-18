@@ -33,7 +33,7 @@ namespace Infrastructure.Repository
                 parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
                 await conn.ExecuteAsync(sql.ToString(), parameters);
             }
-        }        
+        }
 
         public async Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido)
         {
@@ -120,7 +120,7 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-               // conn.Open();
+                // conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
@@ -140,7 +140,7 @@ namespace Infrastructure.Repository
 
                         await SaveLogStatus(new LogPedidoStatus()
                         {
-                            IdPedido=model.Id,
+                            IdPedido = model.Id,
                             IdStatusPedido = model.IdStatusPedido
                         }, conn, transaction);
 
@@ -148,7 +148,7 @@ namespace Infrastructure.Repository
                         foreach (var item in model.Itens)
                         {
                             item.IdPedido = model.Id;
-                            await pedidoItemRepository.Save(item,conn,transaction);
+                            await pedidoItemRepository.Save(item, conn, transaction);
                         }
 
                         transaction.Commit();
@@ -225,8 +225,12 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
                     SELECT 
                         P.ID,
                         P.ID_USUARIO IDUSUARIO,
@@ -242,59 +246,27 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                     WHERE P.ID_STATUS_PEDIDO IN(1,2)
                  ");
-                var parametros = new DynamicParameters();
-                var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                        var parametros = new DynamicParameters();
+                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
+                        foreach (var pedido in pedidos.ToList())
+                        {
+                            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                            pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
 
-                foreach (var pedido in pedidos.ToList())
-                {
-                    cmd = new StringBuilder();
-                    cmd.AppendFormat(@"
-                    SELECT
-                        I.ID,
-                        I.ID_PEDIDO IDPEDIDO,
-                        I.ID_USUARIO IDUSUARIO,
-                        I.ID_MENU IDMENU,
-                        I.ID_STATUS_PEDIDO_ITEM IDSTATUSPEDIDOITEM,
-                        I.VALOR,
-                        I.TEMPO_PREPARO TEMPOPREPARO,
-                        I.OBSERVACAO,
-                        I.DATA
-                    FROM DOTNET_PEDIDO_ITENS I
-                    WHERE I.ID_PEDIDO = :ID_PEDIDO
-                 ");
-                    parametros = new DynamicParameters();
-                    parametros.Add("ID_PEDIDO", pedido.Id, DbType.Int64);
-                    var itens = await conn.QueryAsync<PedidoItem>(cmd.ToString(), parametros);
-
-                    foreach (var item in itens.ToList())
-                    {
-                        cmd = new StringBuilder();
-                        cmd.AppendFormat(@"
-                            SELECT 
-                                M.ID,
-                                M.NOME,
-                                M.DESCRICAO,
-                                M.ID_USUARIO IDUSUARIO,
-                                M.ATIVO,
-                                M.TEMPO_PREPARO TEMPOPREPARO,
-                                M.VALOR,
-                                M.ID_CATEGORIA IDCATEGORIA
-                            FROM MENU M
-                            WHERE M.ID = :ID_MENU
-                         ");
-                        parametros = new DynamicParameters();
-                        parametros.Add("ID_MENU", item.IdMenu, DbType.Int64);
-                        var menu = await conn.QueryAsync<Menu>(cmd.ToString(), parametros);
+                        }
+                        transaction.Commit();
+                        return pedidos.ToList();
+                       
                     }
-
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
                 }
-                
-               
-
-
-                return pedidos.ToList();
             }
         }
+
     }
 }

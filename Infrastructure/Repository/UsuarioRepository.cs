@@ -46,13 +46,13 @@ namespace Infrastructure.Repository
                         AND LOGIN = :USERNAME
                     )
 
-                    SELECT * FROM VW_USUARIOS WHERE SENHA=:PASSWORD;
+                    SELECT * FROM VW_USUARIOS WHERE SENHA=:PASSWORD
                 ");
                 var parametros = new DynamicParameters();
                 parametros.Add("USERNAME", username, DbType.String);
                 parametros.Add("PASSWORD", password, DbType.String);
-                var model = await conn.QueryFirstAsync<Usuario>(cmd.ToString(), parametros);
-                return model;
+                var usuarios = await conn.QueryAsync<Usuario>(cmd.ToString(), parametros);
+                return usuarios.FirstOrDefault();
             }
 
         }

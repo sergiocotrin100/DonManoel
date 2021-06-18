@@ -10,9 +10,8 @@ namespace Core.Interfaces
     public interface IPedidoItemRepository
     {
         Task Save(PedidoItem model);
-        Task<List<PedidoItem>> GetItens(long idpedido);
+        Task<List<PedidoItem>> GetItens(Pedido model);
         Task<PedidoItem> GetItemById(long idpedido);
         Task ChangeState(long idpedido, int status);
-        Task<PedidoItemExcecao> GetExcecao(long idpedidoitem);
     }
 }

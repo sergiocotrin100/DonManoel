@@ -62,7 +62,7 @@ namespace Core.Entities
                                 {
                                     return Settings.Role.Garcon;
                                 }
-                            case "GARÇON":
+                            case "GARÇOM":
                                 {
                                     return Settings.Role.Garcon;
                                 }

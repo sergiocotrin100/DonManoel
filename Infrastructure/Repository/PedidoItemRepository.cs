@@ -38,29 +38,7 @@ namespace Infrastructure.Repository
                 parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
                 await conn.ExecuteAsync(sql.ToString(), parameters);
             }
-        }
-
-        public async Task<PedidoItemExcecao> GetExcecao(long idpedidoitem)
-        {
-            using (IDbConnection conn = _connection.GetConnection())
-            {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
-                    SELECT 
-                        I.ID,
-                        I.ID_PEDIDO_ITEM IDPEDIDOITEM,
-                        I.ID_USUARIO IDUSUARIO,
-                        I.OBSERVACAO,
-                        I.DATA
-                    FROM DOTNET_PEDIDO_ITENS_EXCECAO I
-                    WHERE I.ID_PEDIDO_ITEM=:IDPEDIDOITEM
-                 ");
-                var parametros = new DynamicParameters();
-                parametros.Add(":IDPEDIDOITEM", idpedidoitem, DbType.Int64);
-                var model = await conn.QueryFirstAsync<PedidoItemExcecao>(cmd.ToString(), parametros);
-                return model;
-            }
-        }
+        }      
 
         public async Task<PedidoItem> GetItemById(long id)
         {
@@ -89,12 +67,34 @@ namespace Infrastructure.Repository
             }
         }
 
-        public async Task<List<PedidoItem>> GetItens(long idpedido)
+        public async Task<List<PedidoItem>> GetItens(Pedido model)
         {
+            var itens = new List<PedidoItem>();
             using (IDbConnection conn = _connection.GetConnection())
             {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        itens = await GetItens(model.Id, conn, transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+
+            return itens;
+        }
+
+        internal async Task<List<PedidoItem>> GetItens(long idpedido, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
                     SELECT 
                         I.ID,
                         I.ID_PEDIDO IDPEDIDO,
@@ -109,11 +109,59 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO_ITENS S ON S.ID = I.ID_STATUS_PEDIDO_ITEM
                     WHERE I.ID_PEDIDO=:IDPEDIDO
                  ");
-                var parametros = new DynamicParameters();
-                parametros.Add("IDPEDIDO", idpedido, DbType.String);
-                var model = await conn.QueryAsync<PedidoItem>(cmd.ToString(), parametros);
-                return model.ToList();
+            var parametros = new DynamicParameters();
+            parametros.Add("IDPEDIDO", idpedido, DbType.String);
+            var itens = await conn.QueryAsync<PedidoItem>(cmd.ToString(), parametros, transaction);
+
+            foreach (var item in itens.ToList())
+            {
+                item.Menu = await GetMenu(item.IdMenu, conn, transaction);
+                item.Excecao = await GetExcecao(item.Id, conn, transaction);
             }
+
+            return itens.ToList();
+        }
+
+        private async Task<Menu> GetMenu(long idmenu, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
+                            SELECT 
+                                M.ID,
+                                M.NOME,
+                                M.DESCRICAO,
+                                M.ID_USUARIO IDUSUARIO,
+                                M.ATIVO,
+                                M.TEMPO_PREPARO TEMPOPREPARO,
+                                M.VALOR,
+                                M.ID_CATEGORIA IDCATEGORIA
+                            FROM MENU M
+                            WHERE M.ID = :ID_MENU
+                         ");
+            var parametros = new DynamicParameters();
+            parametros.Add("ID_MENU", idmenu, DbType.Int64);
+            var menu = await conn.QuerySingleAsync<Menu>(cmd.ToString(), parametros,transaction);
+
+            return menu;
+        }
+
+        private async Task<List<PedidoItemExcecao>> GetExcecao(long idpedidoitem, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
+                    SELECT 
+                        I.ID,
+                        I.ID_PEDIDO_ITEM IDPEDIDOITEM,
+                        I.ID_USUARIO IDUSUARIO,
+                        I.OBSERVACAO,
+                        I.DATA
+                    FROM DOTNET_PEDIDO_ITENS_EXCECAO I
+                    WHERE I.ID_PEDIDO_ITEM=:IDPEDIDOITEM
+                 ");
+            var parametros = new DynamicParameters();
+            parametros.Add(":IDPEDIDOITEM", idpedidoitem, DbType.Int64);
+            var model = await conn.QueryAsync<PedidoItemExcecao>(cmd.ToString(), parametros,transaction);
+            return model.ToList();
         }
 
         public async Task Save(PedidoItem model)
@@ -154,11 +202,14 @@ namespace Infrastructure.Repository
             if (idpedidoitem <= 0)
                 throw new Exception("Ocorreu um erro ao cadastrar o item do pedido");
 
-            if(model.PedidoItemExcecao != null && !string.IsNullOrWhiteSpace(model.PedidoItemExcecao.Observacao))
+            foreach (var item in model.Excecao)
             {
-                model.PedidoItemExcecao.IdPedidoItem = idpedidoitem;
-                await SaveExcecao(model.PedidoItemExcecao, conn, transaction);
-            }         
+                if(!string.IsNullOrWhiteSpace(item.Observacao))
+                {
+                    item.IdPedidoItem = idpedidoitem;
+                    await SaveExcecao(item, conn, transaction);
+                }
+            }      
         }
 
         private async Task SaveExcecao(PedidoItemExcecao model, IDbConnection conn, IDbTransaction transaction)

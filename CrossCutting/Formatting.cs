@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 
 namespace CrossCutting
 {
@@ -149,13 +150,14 @@ namespace CrossCutting
 
         public static string FirstName(this string strNome)
         {
+            strNome = strNome.ToLower();
             if (!string.IsNullOrEmpty(strNome))
             {
                 string[] nomes = strNome.Split(' ');
                 if (nomes != null && nomes.Length > 0)
                     strNome = nomes[0];
             }
-            return strNome;
+            return strNome.First().ToString().ToUpper() + strNome.Substring(1);
         }
 
         public static string FormatCpfCnpj(this string strCpfCnpj)
