@@ -7,7 +7,7 @@
         <div class="me-auto">
             @foreach (var categoria in (List<Core.Entities.Categoria>)ViewBag.Categorias)
             {
-                <h3 class="page-title">@categoria.Nome</h3>
+                <h3 class="page-title" style="text-decoration:underline;">@categoria.Nome</h3>
 
                 @foreach (var menu in categoria.Menu)
                 {

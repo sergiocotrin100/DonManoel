@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace DonManoel.Controllers
 {
-   // [Authorize]
+  // [Authorize]
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;

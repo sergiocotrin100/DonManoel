@@ -71,6 +71,11 @@
                     <div class="navbar-custom-menu r-side">
                         <ul class="nav navbar-nav">
                             <li class="btn-group nav-item d-lg-inline-flex d-none">
+                                <a asp-controller="Home" asp-action="Index" class="waves-effect waves-light nav-link full-screen btn-info-light" title="Home">
+                                    <i class="icon-Home"><span class="path1"></span><span class="path2"></span></i>
+                                </a>
+                            </li>
+                            <li class="btn-group nav-item d-lg-inline-flex d-none">
                                 <a href="#" data-provide="fullscreen" class="waves-effect waves-light nav-link full-screen btn-info-light" title="Full Screen">
                                     <i class="icon-Expand-arrows"><span class="path1"></span><span class="path2"></span></i>
                                 </a>
@@ -165,12 +170,12 @@
             <!-- Sample menu definition -->
             <ul id="main-menu" class="sm sm-blue">
                 <li>
-                    <a href="#"><i class="icon-Home"></i>Início</a>
+                    <a asp-controller="Home" asp-action="Index"><i class="icon-Home"></i>Início</a>
                 </li>
                 <li>
                     <a href="#"><i class="icon-Clipboard-check"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>Pedidos</a>
                     <ul>
-                        <li><a href="order.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Fila Cozinha</a></li>
+                        <li><a href="order.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Acompanhamento Pedidos</a></li>
                         <li><a href="order_details.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Pedidos Finalizados</a></li>
                     </ul>
                 </li>

@@ -211,11 +211,12 @@ namespace Infrastructure.Repository
                  ");
 
                 var parametros = new DynamicParameters();
-                var model = await conn.QueryAsync<Categoria>(cmd.ToString(), parametros);
+                var categorias = await conn.QueryAsync<Categoria>(cmd.ToString(), parametros);
 
 
-                /*
-                 SELECT 
+                cmd = new StringBuilder();
+                cmd.AppendFormat(@"
+                    SELECT 
                         ID,
                         NOME,
                         DESCRICAO,
@@ -225,11 +226,16 @@ namespace Infrastructure.Repository
                         VALOR,
                         ID_CATEGORIA IDCATEGORIA    
                     FROM MENU
-                    WHERE ATIVO='S'
-                 * */
+                    WHERE ATIVO='S'                   
+                 ");
+                var menus = await conn.QueryAsync<Menu>(cmd.ToString(), parametros);
+                menus = menus.ToList();
 
-
-                return model.ToList();
+                foreach (var item in categorias)
+                {
+                    item.Menu = menus.Where(x => x.IdCategoria == item.Id).ToList();
+                }
+                return categorias.ToList();
             }
         }
     }
