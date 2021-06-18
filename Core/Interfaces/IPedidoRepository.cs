@@ -12,6 +12,7 @@ namespace Core.Interfaces
         Task Save(Pedido model);
         Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido);
         Task<List<Pedido>> GetPedidos(Pedido model);
+        Task<List<Pedido>> GetPedidosCozinha();
         Task<Pedido> GetPedidoById(long idpedido);
         Task ChangeState(long idpedido, int status);
         Task<List<Categoria>> GetCategorias();

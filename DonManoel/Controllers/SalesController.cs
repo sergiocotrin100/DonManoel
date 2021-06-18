@@ -27,7 +27,7 @@ namespace DonManoel.Controllers
         {
             Pedido model = new Pedido();
             model.IdMesa = idmesa;
-            if(idorder.HasValue && idorder.Value > 0)
+            if (idorder.HasValue && idorder.Value > 0)
             {
                 model = service.GetPedidoById(idorder.Value).Result;
             }
@@ -37,6 +37,19 @@ namespace DonManoel.Controllers
             return View(model);
         }
 
-        //tracking
+
+        [HttpGet]
+        public IActionResult kitchen()
+        {
+            var pedidos = service.GetPedidosCozinha();
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Tracking()
+        {
+            return View();
+        }
+
     }
 }

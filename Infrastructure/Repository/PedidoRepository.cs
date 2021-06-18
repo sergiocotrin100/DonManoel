@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using CrossCutting;
 using Dapper;
 using Infrastructure.Context;
 using Oracle.ManagedDataAccess.Client;
@@ -176,25 +177,6 @@ namespace Infrastructure.Repository
 
         public async Task<List<Categoria>> GetCategorias()
         {
-            //using (IDbConnection conn = _connection.GetConnection())
-            //{
-            //    var cmd = new StringBuilder();
-            //    cmd.AppendFormat(@"
-            //        SELECT 
-            //            ID,
-            //            ID_USUARIO IDUSUARIO,
-            //            NOME,
-            //            ATIVO,
-            //            ORDENACAO
-            //        FROM CATEGORIA 
-            //        WHERE ATIVO='S'
-            //        ORDER BY ORDENACAO
-            //     ");
-            //    var parametros = new DynamicParameters();
-            //    var model = await conn.QueryAsync<Categoria>(cmd.ToString(), parametros);
-            //    return model.ToList();
-            //}
-
             using (IDbConnection conn = _connection.GetConnection())
             {
                 var cmd = new StringBuilder();
@@ -236,6 +218,82 @@ namespace Infrastructure.Repository
                     item.Menu = menus.Where(x => x.IdCategoria == item.Id).ToList();
                 }
                 return categorias.ToList();
+            }
+        }
+
+        public async Task<List<Pedido>> GetPedidosCozinha()
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                var cmd = new StringBuilder();
+                cmd.AppendFormat(@"
+                    SELECT 
+                        P.ID,
+                        P.ID_USUARIO IDUSUARIO,
+                        P.ID_MESA IDMESA,
+                        P.CLIENTE,
+                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                        P.TAXA_SERVICO TAXASERVICO,
+                        P.VALOR_ITENS,
+                        P.VALOR_TOTAL VALORTOTAL,
+                        P.DATA,
+                        S.NOME AS STATUS
+                    FROM DOTNET_PEDIDO P
+                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    WHERE P.ID_STATUS_PEDIDO IN(1,2)
+                 ");
+                var parametros = new DynamicParameters();
+                var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+
+
+                foreach (var pedido in pedidos.ToList())
+                {
+                    cmd = new StringBuilder();
+                    cmd.AppendFormat(@"
+                    SELECT
+                        I.ID,
+                        I.ID_PEDIDO IDPEDIDO,
+                        I.ID_USUARIO IDUSUARIO,
+                        I.ID_MENU IDMENU,
+                        I.ID_STATUS_PEDIDO_ITEM IDSTATUSPEDIDOITEM,
+                        I.VALOR,
+                        I.TEMPO_PREPARO TEMPOPREPARO,
+                        I.OBSERVACAO,
+                        I.DATA
+                    FROM DOTNET_PEDIDO_ITENS I
+                    WHERE I.ID_PEDIDO = :ID_PEDIDO
+                 ");
+                    parametros = new DynamicParameters();
+                    parametros.Add("ID_PEDIDO", pedido.Id, DbType.Int64);
+                    var itens = await conn.QueryAsync<PedidoItem>(cmd.ToString(), parametros);
+
+                    foreach (var item in itens.ToList())
+                    {
+                        cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            SELECT 
+                                M.ID,
+                                M.NOME,
+                                M.DESCRICAO,
+                                M.ID_USUARIO IDUSUARIO,
+                                M.ATIVO,
+                                M.TEMPO_PREPARO TEMPOPREPARO,
+                                M.VALOR,
+                                M.ID_CATEGORIA IDCATEGORIA
+                            FROM MENU M
+                            WHERE M.ID = :ID_MENU
+                         ");
+                        parametros = new DynamicParameters();
+                        parametros.Add("ID_MENU", item.IdMenu, DbType.Int64);
+                        var menu = await conn.QueryAsync<Menu>(cmd.ToString(), parametros);
+                    }
+
+                }
+                
+               
+
+
+                return pedidos.ToList();
             }
         }
     }
