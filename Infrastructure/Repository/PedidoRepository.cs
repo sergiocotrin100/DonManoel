@@ -32,7 +32,7 @@ namespace Infrastructure.Repository
                 parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
                 await conn.ExecuteAsync(sql.ToString(), parameters);
             }
-        }
+        }        
 
         public async Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido)
         {
@@ -172,6 +172,65 @@ namespace Infrastructure.Repository
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
             await conn.ExecuteAsync(sql.ToString(), parameters, commandType: CommandType.StoredProcedure,
                                                            transaction: transaction);
+        }
+
+        public async Task<List<Categoria>> GetCategorias()
+        {
+            //using (IDbConnection conn = _connection.GetConnection())
+            //{
+            //    var cmd = new StringBuilder();
+            //    cmd.AppendFormat(@"
+            //        SELECT 
+            //            ID,
+            //            ID_USUARIO IDUSUARIO,
+            //            NOME,
+            //            ATIVO,
+            //            ORDENACAO
+            //        FROM CATEGORIA 
+            //        WHERE ATIVO='S'
+            //        ORDER BY ORDENACAO
+            //     ");
+            //    var parametros = new DynamicParameters();
+            //    var model = await conn.QueryAsync<Categoria>(cmd.ToString(), parametros);
+            //    return model.ToList();
+            //}
+
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                var cmd = new StringBuilder();
+                cmd.AppendFormat(@"
+                    SELECT 
+                        ID,
+                        ID_USUARIO IDUSUARIO,
+                        NOME,
+                        ATIVO,
+                        ORDENACAO
+                    FROM CATEGORIA 
+                    WHERE ATIVO='S'
+                    ORDER BY ORDENACAO                    
+                 ");
+
+                var parametros = new DynamicParameters();
+                var model = await conn.QueryAsync<Categoria>(cmd.ToString(), parametros);
+
+
+                /*
+                 SELECT 
+                        ID,
+                        NOME,
+                        DESCRICAO,
+                        ID_USUARIO IDUSUARIO,
+                        ATIVO,
+                        TEMPO_PREPARO TEMPOPREPARO,
+                        VALOR,
+                        ID_CATEGORIA IDCATEGORIA    
+                    FROM MENU
+                    WHERE ATIVO='S'
+                 * */
+
+
+                return model.ToList();
+            }
         }
     }
 }
