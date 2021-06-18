@@ -38,11 +38,12 @@ namespace DonManoel.Controllers
         }
 
 
+        [Route("Sales/kitchen")]
         [HttpGet]
         public IActionResult kitchen()
         {
             var pedidos = service.GetPedidosCozinha();
-            return View();
+            return View(pedidos);
         }
 
         [HttpGet]

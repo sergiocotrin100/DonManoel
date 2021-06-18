@@ -225,6 +225,7 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
+                conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
