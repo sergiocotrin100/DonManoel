@@ -142,7 +142,29 @@ namespace Infrastructure.Repository
             parametros.Add("ID_MENU", idmenu, DbType.Int64);
             var menu = await conn.QuerySingleAsync<Menu>(cmd.ToString(), parametros,transaction);
 
+            menu.Composicao = await GetMenuComposicao(idmenu, conn, transaction);
+
             return menu;
+        }
+
+        private async Task<List<MenuComposicao>> GetMenuComposicao(long idmenu, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
+                            SELECT 
+                                ID,
+                                ID_MENU IDMENU,
+                                DESCRICAO,
+                                CARNE,
+                                ID_USUARIO IDUSUARIO
+                            FROM MENU_COMPOSICAO
+                            WHERE ID_MENU = :ID_MENU
+                         ");
+            var parametros = new DynamicParameters();
+            parametros.Add("ID_MENU", idmenu, DbType.Int64);
+            var result = await conn.QueryAsync<MenuComposicao>(cmd.ToString(), parametros, transaction);
+
+            return result.ToList();
         }
 
         private async Task<List<PedidoItemExcecao>> GetExcecao(long idpedidoitem, IDbConnection conn, IDbTransaction transaction)
