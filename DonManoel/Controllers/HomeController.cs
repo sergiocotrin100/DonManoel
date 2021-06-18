@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace DonManoel.Controllers
 {
     [Authorize]
-    [Route("[controller]")]
+ 
     public class HomeController : MainController
     {
         private readonly IUserSession _userSession;
@@ -17,7 +17,7 @@ namespace DonManoel.Controllers
             _userSession = userSession;
             _mesa = mesa;
         }
-        [HttpGet("Index")]
+        [HttpGet]
         public IActionResult Index()
         {
             var result = _mesa.GetAll().Result;
