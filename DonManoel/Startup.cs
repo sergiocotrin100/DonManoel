@@ -74,14 +74,14 @@ namespace DonManoel
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddDistributedMemoryCache();
+            //services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(3);
                 options.Cookie.HttpOnly = true;
             });
 
-            services.AddControllersWithViews();
+            //services.AddControllersWithViews();
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
@@ -107,10 +107,10 @@ namespace DonManoel
                 app.UseHsts();
             }
 
-            //app.UseCors(x => x
-            // .AllowAnyOrigin()
-            // .AllowAnyMethod()
-            // .AllowAnyHeader());
+            app.UseCors(x => x
+             .AllowAnyOrigin()
+             .AllowAnyMethod()
+             .AllowAnyHeader());
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -124,8 +124,6 @@ namespace DonManoel
             app.UseAuthorization();
 
             app.UseMvc();
-
-            // app.UseCors("AllowSpecificOrigin");
 
             app.UseEndpoints(endpoints =>
             {
