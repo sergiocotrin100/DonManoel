@@ -18,6 +18,7 @@ namespace Core.Entities
         public int TempoPreparo { get; set; }
         public decimal Valor { get; set; }
         public string Observacao { get; set; }
+        public string PontoCarne { get; set; }
         public DateTime Data { get; set; }
         public List<PedidoItemExcecao> Excecao { get; set; }
         public Menu Menu { get; set; }

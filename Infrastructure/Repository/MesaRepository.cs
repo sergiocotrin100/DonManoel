@@ -31,7 +31,9 @@ namespace Infrastructure.Repository
                         CASE WHEN P.ID IS NOT NULL THEN 'S' ELSE 'N' END USO,
                         P.DATA DATAABERTURAPEDIDO,
                         P.VALOR_ITENS VALORPEDIDO,
-                        U.NOME ATENDENTE
+                        U.NOME ATENDENTE,
+                        P.ID IDPEDIDO,
+                        NVL(P.VALOR_ITENS,0) ValorPedido
                     FROM MESAS M
                     LEFT JOIN DOTNET_PEDIDO P ON P.ID_MESA = M.ID AND P.ID_STATUS_PEDIDO NOT IN(5,6)
                     LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO

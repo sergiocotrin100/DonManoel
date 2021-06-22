@@ -11,7 +11,7 @@
 
                 </p>
 
-                <div class="box">
+                <div class="box receita">
                     <div class="box-header bg-danger-light">
                         <h4 class="box-title">Receita</h4>
                     </div>
@@ -24,12 +24,14 @@
                             </table>
                         </div>
                     </div>
+                </div>
 
-                    <div class="box-header bg-danger-light ponto-carne hide">
+                <div class="box ponto-carne">
+                    <div class="box-header bg-danger-light">
                         <h4 class="box-title">Ponto da carne</h4>
                     </div>
 
-                    <div class="box-body ponto-carne">
+                    <div class="box-body">
                         <div class="table-responsive">
                             <table class="table simple mb-0">
                                 <tbody>
@@ -77,30 +79,21 @@
                             </table>
                         </div>
                     </div>
+                </div>
 
+                <div class="box">
                     <div class="box-header bg-danger-light">
                         <h4 class="box-title">Observação</h4>
                     </div>
 
                     <div class="box-body">
-                        <div class="table-responsive">
-                            <table class="table simple mb-0">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <textarea class="form-control" id="txtObservacao" name="txtObservacao" rows="2"> </textarea>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>                      
+                        <textarea class="form-control" id="txtObservacao" name="txtObservacao" rows="3"> </textarea>
                     </div>
+                </div>
 
-                    <div class="box-footer">
-                        <button type="button" class="btn btn-danger-light" data-bs-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-danger float-end">Adicionar</button>
-                    </div>
-
+                <div class="box-footer">
+                    <button type="button" class="btn btn-danger-light" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-danger float-end" id="btnAdd">Adicionar</button>
                 </div>
 
             </div>

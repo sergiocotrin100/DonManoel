@@ -1,10 +1,12 @@
 ﻿@model Core.Entities.Pedido
 @using CrossCutting
 
+
 @{
     var model = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
     List<Core.Entities.Categoria> lstCategorias = (List<Core.Entities.Categoria>)ViewBag.Categorias;
     var categorias = Newtonsoft.Json.JsonConvert.SerializeObject(lstCategorias);
+
 }
 
 <script type="text/javascript">
@@ -16,6 +18,7 @@
 <div class="content-header">
     <div class="d-flex align-items-center">
         <div class="me-auto">
+            <input type="hidden" id="hdIdMesa" value="@ViewBag.IdMesa" />
             @foreach (var categoria in (List<Core.Entities.Categoria>)ViewBag.Categorias)
             {
                 <h3 class="page-title" style="text-decoration:underline;">@categoria.Nome</h3>
@@ -47,10 +50,12 @@
     @Html.Partial("_MenuDetalhes")
     @Html.Partial("_ListaItens")
 
-   
+
 
 </div>
 
 
-
-<script src="~/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
+@section Scripts
+{
+    <script src="~/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
+}

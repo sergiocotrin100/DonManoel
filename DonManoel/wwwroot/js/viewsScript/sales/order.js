@@ -7,16 +7,8 @@ var CATEGORIAS = [];
 window.onload = getParams;
 
 $(document).ready(function () {
-    debugger;
-    $("input[name=chkComposicao]").change(function () {
-        debugger;
-        let id = $(this).data().code;
-        $.each(MENUSELECIONADO.Composicao, function (idx, receita) {
-            debugger;
-            if (receita.Id == id) {
-                receita.Selecionado = objeto.checked;
-            }
-        });
+    $("#btnAdd").click(function () {
+        addItem();
     });
 });
 
@@ -27,8 +19,20 @@ function getParams() {
     }
 }
 
+function setSelected(objeto) {
+    let id = $(objeto).data().code;   
+    $.each(MENUSELECIONADO.Composicao, function (idx, receita) {
+        if (receita.Id == id) {
+            receita.Selecionado = objeto.checked;
+        }
+    });
+}
+
 function showMenuDetails(idmenu) {
+    $("#txtObservacao").val("");
+    $(".receita").hide();
     $(".ponto-carne").hide();
+
     MENUSELECIONADO = getMenu(idmenu);    
     
     $("#modalDetalhesMenu #MenuDescricao").html(MENUSELECIONADO.Descricao);
@@ -39,19 +43,27 @@ function showMenuDetails(idmenu) {
 
     var table = tbody.length ? tbody : $('#modalDetalhesMenu #tbReceita');
     var contemCarne = false;
+    var contemComposicao = false;
     $.each(MENUSELECIONADO.Composicao, function (idx, receita) {
+        receita.Selecionado = true;
         if (contemCarne == false) {
             contemCarne = receita.ContemCarne;
         }
         table.append('<tr>'+
             '<td>' + receita.Descricao +'</td> '+
-            '<td class="text-end fw-700"> <input type="checkbox" name="chkComposicao" style="opacity: 1!important; position: inherit!important;" checked data-code="'+receita.Id+'"></td> '+
-        '</tr>');
+            '<td class="text-end fw-700"> <input type="checkbox" name="chkComposicao" onchange="setSelected(this)" style="opacity: 1!important; position: inherit!important;" checked data-code="'+receita.Id+'"></td> '+
+            '</tr>');
+
+        contemComposicao = true;
     });
 
     if (contemCarne) {
         $(".ponto-carne").show();
     }   
+
+    if (contemComposicao) {
+        $(".receita").show();
+    }      
 
     var myModal = new bootstrap.Modal(document.getElementById('modalDetalhesMenu'), {
         keyboard: false,
@@ -74,4 +86,28 @@ function getMenu(idMenu) {
 
     });
     return menu;
+}
+
+function addItem() {
+    var observacao = $("#txtObservacao").val();
+    var idmesa = $("#hdIdMesa").val();
+    MENUSELECIONADO.Valor = MENUSELECIONADO.ValorFormatado;
+
+    $.ajax({
+        type: "post",
+        dataType: 'json',
+        data: {
+            'idmesa': idmesa, 'pontoCarne': '', 'observacao': observacao, 'menu': MENUSELECIONADO
+        },
+        url: hostSite() + "Sales/AddItem",
+        success: function (data) {
+            if (data.success) {
+                
+            }
+            else {
+                
+            }
+        }
+    });
+
 }

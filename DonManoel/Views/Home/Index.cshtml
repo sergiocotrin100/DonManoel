@@ -9,7 +9,7 @@
         <div class="col">
             @if (mesa.EmUso)
             {
-               <a asp-controller="Sales" asp-action="Order" asp-route-idmesa="@mesa.Id" asp-route-idorder="@mesa.IdPedido.Value">
+               <a asp-controller="Sales" asp-action="Order" asp-route-idmesa="@mesa.Id" asp-route-idorder="@mesa.IdPedido">
                     <div class="box box-solid bg-secondary">
                         <div class="box-header">
                             <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>

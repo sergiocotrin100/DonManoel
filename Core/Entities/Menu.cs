@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CrossCutting;
 
 namespace Core.Entities
 {
@@ -12,6 +13,13 @@ namespace Core.Entities
         public string Ativo { get; set; }
         public int TempoPreparo { get; set; }
         public decimal Valor { get; set; }
+        public string ValorFormatado
+        {
+            get
+            {
+                return this.Valor.FormatMoney(false);
+            }
+        }
         public List<MenuComposicao> Composicao { get; set; }//receita
     }
 }
