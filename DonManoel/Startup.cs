@@ -1,14 +1,14 @@
-using AutoMapper;
+using Core.Entities;
 using Core.Interfaces;
 using DonManoel.Data;
 using Infrastructure;
 using Infrastructure.Context;
 using Infrastructure.Repository;
+using Infrastructure.Email;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -16,10 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebEssentials.AspNetCore.Pwa;
 
 namespace DonManoel
 {
@@ -41,6 +37,9 @@ namespace DonManoel
             services.AddTransient<IPedidoItemRepository, PedidoItemRepository>();
             services.AddTransient<IPedidoRepository, PedidoRepository>();
             services.AddTransient<IDonConnection, DonConnection>();
+            services.Configure<EmailConfiguracao>(Configuration.GetSection("EmailSettings"));
+            services.AddScoped<IEmail, Email>();
+            services.AddTransient<IResetSenhaRepository, ResetSenhaRepository>();
             MemoryCacheTicketStore memoryCacheTicketStore = new MemoryCacheTicketStore();
             services.AddSingleton(memoryCacheTicketStore);
 
@@ -85,12 +84,13 @@ namespace DonManoel
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
-            //{
+            //{ 
             //    CacheId = "Worker 1.1",
             //    Strategy = ServiceWorkerStrategy.CacheFirst,
             //    RoutesToPreCache = "/Home/Index, /Shared/_Layout,/Shared/Error",
 
             //    OfflineRoute = "index.html",
+                
             //});
         }
 

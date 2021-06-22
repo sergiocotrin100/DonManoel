@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Login";
     Layout = null;
 }
 @model LoginModel
@@ -62,7 +62,7 @@
                                         <!-- /.col -->
                                         <div class="col-6">
                                             <div class="fog-pwd text-end">
-                                                <a href="javascript:void(0)" class="hover-warning"><i class="ti-lock"></i> Esqueceu a senha?</a><br>
+                                                <a href="/AccessUser/ResetPassAsync" class="hover-warning"><i class="ti-lock"></i> Esqueceu a senha?</a><br>
                                             </div>
                                         </div>
                                         <!-- /.col -->
@@ -73,7 +73,11 @@
                                     </div>
                                 </form>
                                 <div class="text-center">
-                                    <p class="mt-15 mb-0">Não tem uma conta? <a href="auth_register.html" class="text-warning ms-5">Cadastre-se</a></p>
+                                    @*<p class="mt-15 mb-0">Não tem uma conta? <a href="auth_register.html" class="text-warning ms-5">Cadastre-se</a></p>*@
+                                    <div class="logo-lg">
+                                        <span class="light-logo"><img src="~/images/logo don manoel 160 x 55.png" alt="logo"></span>
+                                       
+                                    </div>
                                 </div>
                             </div>
                         </div>
