@@ -97,12 +97,17 @@ function addItem() {
         type: "post",
         dataType: 'json',
         data: {
-            'idmesa': idmesa, 'pontoCarne': '', 'observacao': observacao, 'menu': MENUSELECIONADO
+            'idmesa': idmesa, 'pontoCarne': $("input[name='pontocarne']:checked").val(), 'observacao': observacao, 'menu': MENUSELECIONADO
         },
         url: hostSite() + "Sales/AddItem",
         success: function (data) {
             if (data.success) {
-                
+                var myModal = new bootstrap.Modal(document.getElementById('modalDetalhesMenu'), {
+                    keyboard: false,
+                    backdrop: "static"
+                });
+
+                $(myModal).hide();
             }
             else {
                 

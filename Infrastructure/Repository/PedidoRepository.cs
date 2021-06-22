@@ -145,21 +145,21 @@ namespace Infrastructure.Repository
                         parameters = new OracleDynamicParameters();
                         parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
                         parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
-                        model = await conn.QueryFirstAsync<Pedido>(sql.ToString(), parameters);
+                        var pedido = await conn.QueryFirstAsync<Pedido>(sql.ToString(), parameters);
 
-                        if (model.Id <= 0)
+                        if (pedido.Id <= 0)
                             throw new Exception("Erro ao cadastrar o pedido");
 
                         await SaveLogStatus(new LogPedidoStatus()
                         {
-                            IdPedido = model.Id,
+                            IdPedido = pedido.Id,
                             IdStatusPedido = model.IdStatusPedido
                         }, conn, transaction);
 
                         PedidoItemRepository pedidoItemRepository = new PedidoItemRepository(_userSession);
                         foreach (var item in model.Itens)
                         {
-                            item.IdPedido = model.Id;
+                            item.IdPedido = pedido.Id;
                             await pedidoItemRepository.Save(item, conn, transaction);
                         }
 
@@ -184,8 +184,7 @@ namespace Infrastructure.Repository
             parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-            await conn.ExecuteAsync(sql.ToString(), parameters, commandType: CommandType.StoredProcedure,
-                                                           transaction: transaction);
+            await conn.ExecuteAsync(sql.ToString(), parameters,transaction);
         }
 
         public async Task<List<Categoria>> GetCategorias()

@@ -26,7 +26,7 @@ namespace DonManoel.Controllers
             return View();
         }
 
-        [Route("Sales/{idmesa}/{idorder?}")]
+        [Route("Sales/Order/{idmesa}/{idorder?}")]
         [HttpGet]
         public IActionResult Order(long idmesa, long? idorder)
         {
@@ -77,7 +77,7 @@ namespace DonManoel.Controllers
 
                 if(menu.Composicao.Exists(item => item.ContemCarne))
                 {
-                    item.PontoCarne = pontoCarne;
+                    item.PontoCarne = GetPontoCarne(pontoCarne.ToInt());
                 }
             }           
 
@@ -102,5 +102,36 @@ namespace DonManoel.Controllers
             return View();
         }
 
+        private string GetPontoCarne(int pontoCarne)
+        {
+            switch (pontoCarne)
+            {
+                case 1:
+                    {
+                        return "Selada";
+                    }
+                case 2:
+                    {
+                        return "Mau passada";
+                    }
+                case 3:
+                    {
+                        return "Ao ponto";
+                    }
+                case 4:
+                    {
+                        return "Ao ponto para bem";
+                    }
+                case 5:
+                    {
+                        return "Bem passada";
+                    }
+                default:
+                    return "";
+            }
+        }
+
     }
+
+    
 }

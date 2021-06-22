@@ -227,7 +227,7 @@ namespace Infrastructure.Repository
 
             sql = new StringBuilder();
             sql.AppendFormat(@"
-                            SELECT MAX(ID) ID FROM DOTNET_PEDIDO_ITENS WHERE ID_PEDIDO :ID_PEDIDO
+                            SELECT MAX(ID) ID FROM DOTNET_PEDIDO_ITENS WHERE ID_PEDIDO = :ID_PEDIDO
                         ");
             parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
