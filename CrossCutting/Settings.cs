@@ -25,12 +25,13 @@ namespace CrossCutting
         {
             public static class Pedido
             {
-                public const int AguardandoPreparacao = 1;
-                public const int EmPreparacao = 2;
-                public const int Pronto = 3;
-                public const int ContaFechada = 4;
-                public const int Pago = 5;
-                public const int Cancelado = 6;
+                public const int Pendente = 1;
+                public const int AguardandoPreparacao = 2;
+                public const int EmPreparacao = 3;
+                public const int Pronto = 4;
+                public const int ContaFechada = 5;
+                public const int Pago = 6;
+                public const int Cancelado = 7;
             }
 
             public static class PedidoItem

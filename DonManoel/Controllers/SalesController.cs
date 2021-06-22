@@ -11,10 +11,11 @@ namespace DonManoel.Controllers
     {
         private readonly IUserSession _userSession;
         private readonly IPedidoRepository service;
-        public SalesController(IUserSession userSession, IPedidoRepository service)
+        public SalesController(IUserSession userSession, IPedidoRepository service):base(userSession,service)
         {
             _userSession = userSession;
             this.service = service;
+            
         }
         public IActionResult Index()
         {

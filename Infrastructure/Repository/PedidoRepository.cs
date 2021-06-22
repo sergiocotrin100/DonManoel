@@ -216,6 +216,25 @@ namespace Infrastructure.Repository
                 foreach (var item in categorias)
                 {
                     item.Menu = menus.Where(x => x.IdCategoria == item.Id).ToList();
+
+                    foreach (var menu in item.Menu)
+                    {
+                        cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            SELECT 
+                                ID,
+                                ID_MENU IDMENU,
+                                DESCRICAO,
+                                CARNE,
+                                ID_USUARIO IDUSUARIO
+                            FROM MENU_COMPOSICAO
+                            WHERE ID_MENU = :ID_MENU
+                         ");
+                        parametros = new DynamicParameters();
+                        parametros.Add("ID_MENU", menu.Id, DbType.Int64);
+                        var result = await conn.QueryAsync<MenuComposicao>(cmd.ToString(), parametros);
+                        menu.Composicao = result.ToList();
+                    }
                 }
                 return categorias.ToList();
             }
@@ -269,5 +288,59 @@ namespace Infrastructure.Repository
             }
         }
 
+        public async Task<int> GetQuantidadePedidosPendentes(long? idusuario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<Pedido>> GetPedidosPendentes(long? idusuario)
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                    SELECT 
+                        P.ID,
+                        P.ID_USUARIO IDUSUARIO,
+                        P.ID_MESA IDMESA,
+                        P.CLIENTE,
+                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                        P.TAXA_SERVICO TAXASERVICO,
+                        P.VALOR_ITENS,
+                        P.VALOR_TOTAL VALORTOTAL,
+                        P.DATA,
+                        S.NOME AS STATUS
+                    FROM DOTNET_PEDIDO P
+                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    WHERE P.ID_STATUS_PEDIDO IN(1)
+                    AND (P.ID_USUARIO = :IDUSUARIO OR :IDUSUARIO = 0)
+                 ");
+                        var parametros = new DynamicParameters();
+                        parametros.Add("IDUSUARIO", idusuario.HasValue ? idusuario.Value : 0, DbType.Int32, ParameterDirection.Input);
+                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+
+                        foreach (var pedido in pedidos.ToList())
+                        {
+                            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                            pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
+
+                        }
+                        transaction.Commit();
+                        return pedidos.ToList();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace Core.Interfaces
         Task<Pedido> GetPedidoById(long idpedido);
         Task ChangeState(long idpedido, int status);
         Task<List<Categoria>> GetCategorias();
+        Task<int> GetQuantidadePedidosPendentes(long? idusuario);
+        Task<List<Pedido>> GetPedidosPendentes(long? idusuario);
     }
 }

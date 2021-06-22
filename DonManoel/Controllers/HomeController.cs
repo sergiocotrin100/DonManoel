@@ -12,10 +12,12 @@ namespace DonManoel.Controllers
     {
         private readonly IUserSession _userSession;
         private readonly IMesaRepository _mesa;
-        public HomeController(IUserSession userSession,IMesaRepository mesa)
+        private readonly IPedidoRepository service;
+        public HomeController(IUserSession userSession,IMesaRepository mesa, IPedidoRepository service) : base(userSession, service)
         {
             _userSession = userSession;
             _mesa = mesa;
+            this.service = service;
         }
         [HttpGet]
         public IActionResult Index()
