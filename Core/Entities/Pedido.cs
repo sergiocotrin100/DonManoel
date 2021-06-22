@@ -15,6 +15,7 @@ namespace Core.Entities
         public decimal ValorTaxaServico { get; set; }
         public decimal ValorTotal { get; set; }
         public string Observacao { get; set; }
+        public string Status { get; set; }
         public DateTime Data { get; set; }
         public List<PedidoItem> Itens { get; set; }
         public List<LogPedidoStatus> LogStatus { get; set; }

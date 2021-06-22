@@ -92,7 +92,7 @@ namespace DonManoel.Controllers
         [HttpGet("kitchen")]
         public IActionResult kitchen()
         {
-            var pedidos = service.GetPedidosCozinha();
+            var pedidos = service.GetPedidosCozinha().Result;
             return View(pedidos);
         }
 
