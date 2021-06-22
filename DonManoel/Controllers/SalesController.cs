@@ -12,6 +12,7 @@ using System;
 
 namespace DonManoel.Controllers
 {
+    [Route("[controller]")]
     public class SalesController : MainController
     {
         private readonly IUserSession _userSession;
@@ -26,7 +27,7 @@ namespace DonManoel.Controllers
             return View();
         }
 
-        [Route("Sales/Order/{idmesa}/{idorder?}")]
+        [Route("Order/{idmesa}/{idorder?}")]
         [HttpGet]
         public IActionResult Order(long idmesa, long? idorder)
         {
@@ -46,7 +47,7 @@ namespace DonManoel.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddItem(int idmesa, string pontoCarne, string observacao, Menu menu)
+        public async Task<JsonResult> AddItem(int idmesa, string pontoCarne, string observacao, Menu menu)
         {
             Pedido model = await service.GetPedidoAbertoByMesa(idmesa);
             if (model == null || model.Id == 0)
@@ -84,7 +85,7 @@ namespace DonManoel.Controllers
             model.Itens.Add(item);
 
             long idpedido = await service.Save(model);
-           return RedirectToAction("Order", new { idmesa = idmesa, idorder = idpedido});
+            return Json(true);
         }
 
 
