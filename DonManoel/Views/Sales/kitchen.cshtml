@@ -15,31 +15,20 @@
     <table class="table b-1 border-danger">
         <thead class="bg-danger">
             <tr>
-                <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-
+                <th>Pedido</th>
+                <th>Atendente</th>
+                <th>Tempo</th>
             </tr>
         </thead>
         <tbody>
+            @foreach (Core.Entities.Pedido pedido in Model)
+            {
             <tr>
-                <td>1</td>
-                <td>Nigam</td>
-                <td>Eichmann</td>
-
+                <td>@pedido.IdMesa.ToString("000")</td>
+                <td>@pedido.Atendente.FirstName()</td>
+                <td>@pedido.Tempo</td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>Deshmukh</td>
-                <td>Prohaska</td>
-
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Roshan</td>
-                <td>Rogahn</td>
-
-            </tr>
+            }
         </tbody>
     </table>
 </div>
