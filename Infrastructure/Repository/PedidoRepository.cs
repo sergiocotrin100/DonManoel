@@ -273,10 +273,15 @@ namespace Infrastructure.Repository
                         P.VALOR_ITENS,
                         P.VALOR_TOTAL VALORTOTAL,
                         P.DATA,
-                        S.NOME AS STATUS
+                        S.NOME AS STATUS,
+                        U.NOME ATENDENTE,
+                        (
+                            SELECT SUM(TEMPO_PREPARO)/COUNT(*) FROM DOTNET_PEDIDO_ITENS WHERE ID_PEDIDO=P.ID
+                        )TEMPOPREPARO
                     FROM DOTNET_PEDIDO P
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
-                    WHERE P.ID_STATUS_PEDIDO IN(1,2)
+                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
+                    WHERE P.ID_STATUS_PEDIDO IN(2,3)
                  ");
                         var parametros = new DynamicParameters();
                         var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
@@ -326,9 +331,11 @@ namespace Infrastructure.Repository
                         P.VALOR_ITENS,
                         P.VALOR_TOTAL VALORTOTAL,
                         P.DATA,
-                        S.NOME AS STATUS
+                        S.NOME AS STATUS,
+                        U.NOME ATENDENTE
                     FROM DOTNET_PEDIDO P
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                     WHERE P.ID_STATUS_PEDIDO IN(1)
                     AND (P.ID_USUARIO = :IDUSUARIO OR :IDUSUARIO = 0)
                  ");
@@ -371,9 +378,11 @@ namespace Infrastructure.Repository
                         P.VALOR_ITENS,
                         P.VALOR_TOTAL VALORTOTAL,
                         P.DATA,
-                        S.NOME AS STATUS
+                        S.NOME AS STATUS,
+                        U.NOME ATENDENTE
                     FROM DOTNET_PEDIDO P
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                     WHERE P.ID_MESA=:IDMESA
                     AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5)
                  ");

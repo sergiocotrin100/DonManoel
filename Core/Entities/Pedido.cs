@@ -17,7 +17,19 @@ namespace Core.Entities
         public string Observacao { get; set; }
         public string Status { get; set; }
         public DateTime Data { get; set; }
+        public int TempoPreparo { get; set; }
         public List<PedidoItem> Itens { get; set; }
         public List<LogPedidoStatus> LogStatus { get; set; }
+        public bool IsAtrasado
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    TimeSpan time = DateTime.Now - this.Data;
+                }
+                return false;
+            }
+        }
     }
 }
