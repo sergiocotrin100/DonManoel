@@ -10,5 +10,11 @@ namespace DonManoel.Models
 
         [Required(ErrorMessage = "O campo Senha é obrigatório")]
         public string Senha { get; set; }
+
+        public string ConfirmarSenha { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+
+        public string Token { get; set; }
     }
 }
