@@ -13,6 +13,7 @@ using System;
 namespace DonManoel.Controllers
 {
     [Route("[controller]")]
+    [Authorize]
     public class SalesController : MainController
     {
         private readonly IUserSession _userSession;
@@ -27,9 +28,8 @@ namespace DonManoel.Controllers
             return View();
         }
 
-        [Route("Order/{idmesa}/{idorder?}")]
-        [HttpGet]
-        public IActionResult Order(long idmesa, long? idorder)
+        [HttpGet("Order")]
+        public IActionResult Order([FromQuery]long idmesa, [FromQuery] long? idorder)
         {
             Pedido model = new Pedido();
             model.IdMesa = idmesa;
@@ -89,15 +89,14 @@ namespace DonManoel.Controllers
         }
 
 
-        [Route("Sales/kitchen")]
-        [HttpGet]
+        [HttpGet("kitchen")]
         public IActionResult kitchen()
         {
             var pedidos = service.GetPedidosCozinha();
             return View(pedidos);
         }
 
-        [HttpGet]
+        [HttpGet("Tracking")]
         public IActionResult Tracking()
         {
             return View();

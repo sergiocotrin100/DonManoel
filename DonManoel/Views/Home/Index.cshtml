@@ -9,7 +9,7 @@
         <div class="col">
             @if (mesa.EmUso)
             {
-                <a href="/Sales/Order/@mesa.Id/@mesa.IdPedido">
+                <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
                     <div class="box box-solid bg-secondary">
                         <div class="box-header">
                             <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
@@ -35,7 +35,7 @@
             }
             else
             {
-                <a href="/Sales/Order/@mesa.Id">
+                <a href="/Sales/Order?idmesa=@mesa.Id">
                     <div class="box box-solid bg-danger">
                         <div class="box-header">
                             <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
