@@ -80,6 +80,15 @@
                                     </a>
                                 </li>
                                 <li class="btn-group nav-item d-lg-inline-flex d-none">
+                                    @{
+                                              var lstPedidos = (List<Core.Entities.Pedido>)ViewBag.PedidosPendentes;
+                                    }
+                                    <span class="label label-primary">@lstPedidos.Count</span>
+                                    <a asp-controller="Sales" asp-action="Index" class="waves-effect waves-light nav-link full-screen btn-danger-light" title="Pedidos Pendentes">
+                                        <i class="icon-Dinner"><span class="path1"></span><span class="path2"></span></i>
+                                    </a>
+                                </li>
+                                <li class="btn-group nav-item d-lg-inline-flex d-none">
                                     <a href="#" data-provide="fullscreen" class="waves-effect waves-light nav-link full-screen btn-info-light" title="Full Screen">
                                         <i class="icon-Expand-arrows"><span class="path1"></span><span class="path2"></span></i>
                                     </a>

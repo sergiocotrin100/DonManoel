@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Entities
 {
@@ -13,5 +9,18 @@ namespace Core.Entities
         public long IdUsuario { get; set; }
         public string Descricao { get; set; }
         public string Carne { get; set; }
+        public bool ContemCarne
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    if (!string.IsNullOrWhiteSpace(this.Carne))
+                        return this.Carne.Equals("S", StringComparison.OrdinalIgnoreCase) || this.Carne.Equals("1", StringComparison.OrdinalIgnoreCase);
+                }
+                return false;
+            }
+        }
+        public bool Selecionado { get; set; }
     }
 }

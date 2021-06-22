@@ -1,1 +1,107 @@
-﻿
+﻿<div class="modal modal-right fade" id="modalDetalhesMenu" tabindex="-1" aria-hidden="true" style="display: none;" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detahes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <hr />
+                <p id="MenuDescricao">
+
+                </p>
+
+                <div class="box receita">
+                    <div class="box-header bg-danger-light">
+                        <h4 class="box-title">Receita</h4>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="table-responsive">
+                            <table class="table simple mb-0" id="tbReceita">
+                                <tbody id="result">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box ponto-carne">
+                    <div class="box-header bg-danger-light">
+                        <h4 class="box-title">Ponto da carne</h4>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="table-responsive">
+                            <table class="table simple mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <img class="img-fluid" src="~/images/carne/selada.PNG" style="height:60px;" />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name="pontocarne" value="1" style="position:inherit !important; opacity:1 !important;" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img class="img-fluid" src="~/images/carne/mau_passada.PNG" style="height:60px;" />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name="pontocarne" value="2" style="position:inherit !important; opacity:1 !important;" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img class="img-fluid" src="~/images/carne/ao_ponto.PNG" style="height:60px;" />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name="pontocarne" value="3" checked style="position:inherit !important; opacity:1 !important;" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img class="img-fluid" src="~/images/carne/ao_ponto_para_bem.PNG" style="height:60px;" />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name="pontocarne" value="4" style="position:inherit !important; opacity:1 !important;" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img class="img-fluid" src="~/images/carne/bem_passada.PNG" style="height:60px;" />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name="pontocarne" value="5" style="position:inherit !important; opacity:1 !important;" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="box-header bg-danger-light">
+                        <h4 class="box-title">Observação</h4>
+                    </div>
+
+                    <div class="box-body">
+                        <textarea class="form-control" id="txtObservacao" name="txtObservacao" rows="3"> </textarea>
+                    </div>
+                </div>
+
+                <div class="box-footer">
+                    <button type="button" class="btn btn-danger-light" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-danger float-end" id="btnAdd">Adicionar</button>
+                </div>
+
+            </div>
+            <div class="modal-footer modal-footer-uniform">
+                <div class="box-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

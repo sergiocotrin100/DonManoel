@@ -1,10 +1,12 @@
 ﻿@model Core.Entities.Pedido
 @using CrossCutting
 
+
 @{
     var model = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
     List<Core.Entities.Categoria> lstCategorias = (List<Core.Entities.Categoria>)ViewBag.Categorias;
     var categorias = Newtonsoft.Json.JsonConvert.SerializeObject(lstCategorias);
+
 }
 
 <script type="text/javascript">
@@ -16,6 +18,7 @@
 <div class="content-header">
     <div class="d-flex align-items-center">
         <div class="me-auto">
+            <input type="hidden" id="hdIdMesa" value="@ViewBag.IdMesa" />
             @foreach (var categoria in (List<Core.Entities.Categoria>)ViewBag.Categorias)
             {
                 <h3 class="page-title" style="text-decoration:underline;">@categoria.Nome</h3>
@@ -31,7 +34,7 @@
                                 </div>
                                 <div class="act-btn d-flex justify-content-between">
                                     <div class="text-center mx-5">
-                                        <a href="#" onclick="showMenuDetails(@menu.Id)" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-eye-slash"></i></a>
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalhesMenu" onclick="showMenuDetails(@menu.Id)" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-eye-slash"></i></a>
                                         <small class="d-block">Adicionar</small>
                                     </div>
                                 </div>
@@ -46,25 +49,13 @@
 
     @Html.Partial("_MenuDetalhes")
     @Html.Partial("_ListaItens")
+
+
+
 </div>
 
 
-<div class="modal modal-right fade" id="modalDetalhesMenu" tabindex="-1" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Your content comes here</p>
-            </div>
-            <div class="modal-footer modal-footer-uniform">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary float-end">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="~/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
+@section Scripts
+{
+    <script src="~/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
+}

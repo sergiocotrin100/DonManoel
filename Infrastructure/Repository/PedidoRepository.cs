@@ -82,7 +82,7 @@ namespace Infrastructure.Repository
                     WHERE P.ID=:ID
                  ");
                 var parametros = new DynamicParameters();
-                parametros.Add("ID", idpedido, DbType.String);
+                parametros.Add("ID", idpedido, DbType.Int64);
                 var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
                 return model;
             }
@@ -116,17 +116,17 @@ namespace Infrastructure.Repository
             }
         }
 
-        public async Task Save(Pedido model)
+        public async Task<long> Save(Pedido model)
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                // conn.Open();
+                 conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
                     {
                         StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO(ID_MESA,ID_USUARIO,CLIENTE,ID_STATUS_PEDIDO,TAXA_SERVICO,OBSERVACAO)");
-                        sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO);");
+                        sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO)");
                         var parameters = new OracleDynamicParameters();
                         parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
                         parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
@@ -134,7 +134,19 @@ namespace Infrastructure.Repository
                         parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
                         parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
                         parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-                        model.Id = await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+                        var result = await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+                        if (result <= 0)
+                            throw new Exception("Erro ao cadastrar o pedido");
+
+                        sql = new StringBuilder();
+                        sql.AppendFormat(@"
+                            SELECT MAX(ID) ID FROM DOTNET_PEDIDO WHERE ID_MESA=:ID_MESA AND ID_USUARIO = :ID_USUARIO
+                        ");
+                        parameters = new OracleDynamicParameters();
+                        parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
+                        parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
+                        model = await conn.QueryFirstAsync<Pedido>(sql.ToString(), parameters);
+
                         if (model.Id <= 0)
                             throw new Exception("Erro ao cadastrar o pedido");
 
@@ -160,12 +172,13 @@ namespace Infrastructure.Repository
                     }
                 }
             }
+            return model.Id;
         }
 
         private async Task SaveLogStatus(LogPedidoStatus model, IDbConnection conn, IDbTransaction transaction)
         {
             StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_LOG_STATUS(ID_PEDIDO,ID_USUARIO,ID_STATUS_PEDIDO,OBSERVACAO)");
-            sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_STATUS_PEDIDO,:OBSERVACAO);");
+            sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_STATUS_PEDIDO,:OBSERVACAO)");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
@@ -216,6 +229,25 @@ namespace Infrastructure.Repository
                 foreach (var item in categorias)
                 {
                     item.Menu = menus.Where(x => x.IdCategoria == item.Id).ToList();
+
+                    foreach (var menu in item.Menu)
+                    {
+                        cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            SELECT 
+                                ID,
+                                ID_MENU IDMENU,
+                                DESCRICAO,
+                                CARNE,
+                                ID_USUARIO IDUSUARIO
+                            FROM MENU_COMPOSICAO
+                            WHERE ID_MENU = :ID_MENU
+                         ");
+                        parametros = new DynamicParameters();
+                        parametros.Add("ID_MENU", menu.Id, DbType.Int64);
+                        var result = await conn.QueryAsync<MenuComposicao>(cmd.ToString(), parametros);
+                        menu.Composicao = result.ToList();
+                    }
                 }
                 return categorias.ToList();
             }
@@ -269,5 +301,88 @@ namespace Infrastructure.Repository
             }
         }
 
+        public async Task<int> GetQuantidadePedidosPendentes(long? idusuario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<Pedido>> GetPedidosPendentes(long? idusuario)
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                    SELECT 
+                        P.ID,
+                        P.ID_USUARIO IDUSUARIO,
+                        P.ID_MESA IDMESA,
+                        P.CLIENTE,
+                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                        P.TAXA_SERVICO TAXASERVICO,
+                        P.VALOR_ITENS,
+                        P.VALOR_TOTAL VALORTOTAL,
+                        P.DATA,
+                        S.NOME AS STATUS
+                    FROM DOTNET_PEDIDO P
+                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    WHERE P.ID_STATUS_PEDIDO IN(1)
+                    AND (P.ID_USUARIO = :IDUSUARIO OR :IDUSUARIO = 0)
+                 ");
+                        var parametros = new DynamicParameters();
+                        parametros.Add("IDUSUARIO", idusuario.HasValue ? idusuario.Value : 0, DbType.Int32, ParameterDirection.Input);
+                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+
+                        foreach (var pedido in pedidos.ToList())
+                        {
+                            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                            pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
+
+                        }
+                        transaction.Commit();
+                        return pedidos.ToList();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
+        public async Task<Pedido> GetPedidoAbertoByMesa(int idMesa)
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                var cmd = new StringBuilder();
+                cmd.AppendFormat(@"
+                    SELECT 
+                        P.ID,
+                        P.ID_USUARIO IDUSUARIO,
+                        P.ID_MESA IDMESA,
+                        P.CLIENTE,
+                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                        P.TAXA_SERVICO TAXASERVICO,
+                        P.VALOR_ITENS,
+                        P.VALOR_TOTAL VALORTOTAL,
+                        P.DATA,
+                        S.NOME AS STATUS
+                    FROM DOTNET_PEDIDO P
+                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                    WHERE P.ID_MESA=:IDMESA
+                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5)
+                 ");
+                var parametros = new DynamicParameters();
+                parametros.Add("IDMESA", idMesa, DbType.Int32);
+                var model = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                return model.FirstOrDefault();
+            }
+        }
     }
 }

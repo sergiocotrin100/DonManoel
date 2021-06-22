@@ -142,7 +142,29 @@ namespace Infrastructure.Repository
             parametros.Add("ID_MENU", idmenu, DbType.Int64);
             var menu = await conn.QuerySingleAsync<Menu>(cmd.ToString(), parametros,transaction);
 
+            menu.Composicao = await GetMenuComposicao(idmenu, conn, transaction);
+
             return menu;
+        }
+
+        private async Task<List<MenuComposicao>> GetMenuComposicao(long idmenu, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
+                            SELECT 
+                                ID,
+                                ID_MENU IDMENU,
+                                DESCRICAO,
+                                CARNE,
+                                ID_USUARIO IDUSUARIO
+                            FROM MENU_COMPOSICAO
+                            WHERE ID_MENU = :ID_MENU
+                         ");
+            var parametros = new DynamicParameters();
+            parametros.Add("ID_MENU", idmenu, DbType.Int64);
+            var result = await conn.QueryAsync<MenuComposicao>(cmd.ToString(), parametros, transaction);
+
+            return result.ToList();
         }
 
         private async Task<List<PedidoItemExcecao>> GetExcecao(long idpedidoitem, IDbConnection conn, IDbTransaction transaction)
@@ -168,7 +190,7 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                // conn.Open();
+                conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
@@ -188,8 +210,8 @@ namespace Infrastructure.Repository
 
         internal async Task Save(PedidoItem model, IDbConnection conn, IDbTransaction transaction)
         {
-            StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_ITENS(ID_PEDIDO,ID_USUARIO,ID_MENU,ID_STATUS_PEDIDO_ITEM,VALOR,TEMPO_PREPARO,OBSERVACAO)");
-            sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_MENU,:ID_STATUS_PEDIDO_ITEM,:VALOR,:TEMPO_PREPARO, :OBSERVACAO);");
+            StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_ITENS(ID_PEDIDO,ID_USUARIO,ID_MENU,ID_STATUS_PEDIDO_ITEM,VALOR,TEMPO_PREPARO,OBSERVACAO,PONTO_CARNE)");
+            sql.Append("VALUES(:ID_PEDIDO,:ID_USUARIO,:ID_MENU,:ID_STATUS_PEDIDO_ITEM,:VALOR,:TEMPO_PREPARO, :OBSERVACAO, :PONTO_CARNE)");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
@@ -198,15 +220,27 @@ namespace Infrastructure.Repository
             parameters.Add("VALOR", model.Valor, OracleDbType.Decimal, ParameterDirection.Input);
             parameters.Add("TEMPO_PREPARO", model.TempoPreparo, OracleDbType.Int32, ParameterDirection.Input);
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-            long idpedidoitem =  await conn.ExecuteAsync(sql.ToString(), parameters, transaction);
-            if (idpedidoitem <= 0)
+            parameters.Add("PONTO_CARNE", model.PontoCarne, OracleDbType.Varchar2, ParameterDirection.Input);
+            var result =  await conn.ExecuteAsync(sql.ToString(), parameters, transaction);
+            if (result <= 0)
                 throw new Exception("Ocorreu um erro ao cadastrar o item do pedido");
+
+            sql = new StringBuilder();
+            sql.AppendFormat(@"
+                            SELECT MAX(ID) ID FROM DOTNET_PEDIDO_ITENS WHERE ID_PEDIDO :ID_PEDIDO
+                        ");
+            parameters = new OracleDynamicParameters();
+            parameters.Add("ID_PEDIDO", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
+            var peditotem = await conn.QueryFirstAsync<PedidoItem>(sql.ToString(), parameters);
+
+            if (peditotem.Id <= 0)
+                throw new Exception("Erro ao cadastrar o pedido");
 
             foreach (var item in model.Excecao)
             {
                 if(!string.IsNullOrWhiteSpace(item.Observacao))
                 {
-                    item.IdPedidoItem = idpedidoitem;
+                    item.IdPedidoItem = peditotem.Id;
                     await SaveExcecao(item, conn, transaction);
                 }
             }      
@@ -215,7 +249,7 @@ namespace Infrastructure.Repository
         private async Task SaveExcecao(PedidoItemExcecao model, IDbConnection conn, IDbTransaction transaction)
         {
             StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO_ITENS_EXCECAO(ID_PEDIDO_ITEM,ID_USUARIO,OBSERVACAO)");
-            sql.Append("VALUES(:ID_PEDIDO_ITEM,:ID_USUARIO,:OBSERVACAO);");
+            sql.Append("VALUES(:ID_PEDIDO_ITEM,:ID_USUARIO,:OBSERVACAO)");
             var parameters = new OracleDynamicParameters();
             parameters.Add("ID_PEDIDO_ITEM", model.IdPedidoItem, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);

@@ -4,6 +4,11 @@ using DonManoel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using CrossCutting;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace DonManoel.Controllers
 {
@@ -11,7 +16,7 @@ namespace DonManoel.Controllers
     {
         private readonly IUserSession _userSession;
         private readonly IPedidoRepository service;
-        public SalesController(IUserSession userSession, IPedidoRepository service)
+        public SalesController(IUserSession userSession, IPedidoRepository service):base(userSession,service)
         {
             _userSession = userSession;
             this.service = service;
@@ -34,7 +39,52 @@ namespace DonManoel.Controllers
 
             ViewBag.Categorias = service.GetCategorias().Result;
 
+            ViewBag.IdMesa = idmesa;
+
             return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddItem(int idmesa, string pontoCarne, string observacao, Menu menu)
+        {
+            Pedido model = await service.GetPedidoAbertoByMesa(idmesa);
+            if (model == null || model.Id == 0)
+                model = new Pedido();
+
+            model.IdUsuario = _userSession.Id;
+            model.IdMesa = idmesa;
+            model.IdStatusPedido = Settings.Status.Pedido.Pendente;
+            if (model.Itens == null) model.Itens = new List<PedidoItem>();
+            PedidoItem item = new PedidoItem();
+            item.IdMenu = menu.Id;
+            item.IdStatusPedidoItem = Settings.Status.PedidoItem.Solicitado;
+            item.IdUsuario = _userSession.Id;
+            item.Observacao = observacao;            
+            item.TempoPreparo = menu.TempoPreparo;
+            item.Valor = menu.Valor;
+            item.Excecao = new List<PedidoItemExcecao>();
+            if(menu.Composicao != null && menu.Composicao.Count>0)
+            {
+                foreach (var excecao in menu.Composicao.Where(x => x.Selecionado == false).ToList())
+                {
+                    item.Excecao.Add(new PedidoItemExcecao()
+                    {
+                        IdUsuario = _userSession.Id,
+                        Observacao = excecao.Descricao
+                    });
+                }
+
+                if(menu.Composicao.Exists(item => item.ContemCarne))
+                {
+                    item.PontoCarne = pontoCarne;
+                }
+            }           
+
+            model.Itens.Add(item);
+
+            long idpedido = await service.Save(model);
+           return RedirectToAction("Order", new { idmesa = idmesa, idorder = idpedido});
         }
 
 
