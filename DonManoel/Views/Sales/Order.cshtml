@@ -21,28 +21,28 @@
             <input type="hidden" id="hdIdMesa" value="@ViewBag.IdMesa" />
             @foreach (var categoria in (List<Core.Entities.Categoria>)ViewBag.Categorias)
             {
-                <h3 class="page-title" style="text-decoration:underline;">@categoria.Nome</h3>
-
-                @foreach (var menu in categoria.Menu)
-                {
-                    <div class="col-xxxl-3 col-xl-4 col-lg-6 col-12">
-                        <div class="box food-box">
-                            <div class="box-body text-center">
-                                <div class="menu-item"><img src="/images/food/dish-1.png" class="img-fluid w-p75" alt=""></div>
-                                <div class="menu-details text-center">
-                                    <h4 class="mt-20 mb-10">@menu.Nome</h4>
-                                </div>
-                                <div class="act-btn d-flex justify-content-between">
-                                    <div class="text-center mx-5">
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalhesMenu" onclick="showMenuDetails(@menu.Id)" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-eye-slash"></i></a>
-                                        <small class="d-block">Adicionar</small>
+                <h3 class="page-title" style="">@categoria.Nome</h3><hr />
+                <div class="row">
+                    @foreach (var menu in categoria.Menu)
+                    {
+                        <div class="col-xxxl-3 col-xl-4 col-lg-6 col-12">
+                            <div class="box food-box">
+                                <div class="box-body text-center">
+                                    <div class="menu-item"><img src="/images/food/dish-1.png" class="img-fluid w-p75" alt=""></div>
+                                    <div class="menu-details text-center">
+                                        <h5 class="mt-20 mb-10">@menu.Nome</h5>
+                                    </div>
+                                    <div class="act-btn d-flex justify-content-between">
+                                        <div class="text-center mx-5">
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalhesMenu" onclick="showMenuDetails(@menu.Id)" class="waves-effect waves-circle btn btn-circle btn-success-light btn-xs mb-5"><i class="fa fa-plus fa-2x"></i></a>
+                                            <small class="d-block">Adicionar</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-
+                    }
+                </div>
             }
         </div>
     </div>
