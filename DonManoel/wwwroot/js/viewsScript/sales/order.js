@@ -101,17 +101,7 @@ function addItem() {
         },
         url: hostSite() + "Sales/AddItem",
         success: function (data) {
-            if (data.success) {
-                var myModal = new bootstrap.Modal(document.getElementById('modalDetalhesMenu'), {
-                    keyboard: false,
-                    backdrop: "static"
-                });
-
-                $(myModal).hide();
-            }
-            else {
-                
-            }
+            window.location.reload();
         }
     });
 
