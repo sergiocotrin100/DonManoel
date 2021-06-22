@@ -12,8 +12,8 @@
 
 
 <div class="table-responsive">
-    <table class="table b-1 border-danger">
-        <thead class="bg-danger">
+    <table class="table b-1 border-secondary">
+        <thead class="bg-secondary">
             <tr>
                 <th>Pedido</th>
                 <th>Atendente</th>
@@ -23,11 +23,23 @@
         <tbody>
             @foreach (Core.Entities.Pedido pedido in Model)
             {
-            <tr>
-                <td>@pedido.IdMesa.ToString("000")</td>
-                <td>@pedido.Atendente.FirstName()</td>
-                <td>@pedido.Tempo</td>
-            </tr>
+                if (pedido.IsAtrasado)
+                {
+                    <tr class="bg-danger">
+                        <td>Mesa @pedido.IdMesa.ToString("000")</td>
+                        <td>@pedido.Atendente.FirstName()</td>
+                        <td>@pedido.Tempo</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@pedido.IdMesa.ToString("000")</td>
+                        <td>@pedido.Atendente.FirstName()</td>
+                        <td>@pedido.Tempo</td>
+                    </tr>
+                }
+
             }
         </tbody>
     </table>

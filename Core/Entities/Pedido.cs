@@ -18,6 +18,7 @@ namespace Core.Entities
         public string Status { get; set; }
         public DateTime Data { get; set; }
         public int TempoPreparo { get; set; }
+        public string Atendente { get; set; }
         public List<PedidoItem> Itens { get; set; }
         public List<LogPedidoStatus> LogStatus { get; set; }
         public bool IsAtrasado
@@ -27,8 +28,21 @@ namespace Core.Entities
                 if(this.Id>0)
                 {
                     TimeSpan time = DateTime.Now - this.Data;
+                    return true;
                 }
                 return false;
+            }
+        }
+        public string Tempo
+        {
+            get
+            {
+                if(this.Id > 0)
+                {
+                    TimeSpan time = DateTime.Now - this.Data;
+                    return $"{time.Hours.ToString("00")}:{time.Minutes.ToString("00")}";
+                }
+                return string.Empty;
             }
         }
     }
