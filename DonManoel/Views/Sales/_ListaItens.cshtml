@@ -52,7 +52,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                      
+
                                     </tr>
                                 }
                                 else
@@ -65,26 +65,26 @@
                                                 <p>@excecao.Observacao</p>
                                             }
 
-                                        <div class="act-btn d-flex justify-content-between">
-                                            <div class="text-center mx-5">
-                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                <small class="d-block">Editar</small>
+                                            <div class="act-btn d-flex justify-content-between">
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
+                                                    <small class="d-block">Editar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                    <small class="d-block">Cancelar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                    <small class="d-block">Duplicar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                    <small class="d-block">Entregue</small>
+                                                </div>
                                             </div>
-                                            <div class="text-center mx-5">
-                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                <small class="d-block">Cancelar</small>
-                                            </div>
-                                            <div class="text-center mx-5">
-                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                <small class="d-block">Duplicar</small>
-                                            </div>
-                                            <div class="text-center mx-5">
-                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                <small class="d-block">Entregue</small>
-                                            </div>
-                                        </div>
                                         </td>
-                                      
+
                                     </tr>
                                 }
 
@@ -92,7 +92,18 @@
 
                         </tbody>
                     </table>
-                    <button id="btnEnviarPedido" class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Enviar Pedido</button>
+
+                    @if (Model.CanCancel)
+                    {
+                        <button id="btnCancelarPedido" class="btn btn-danger pull-right"><i class="fa fa fa-trash"></i> Cacelar</button>
+                    }
+
+                    @if (Model.CanSend)
+                    {
+                        <button id="btnEnviarPedido" class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
+                    }
+
+
                     <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                 </div>
 

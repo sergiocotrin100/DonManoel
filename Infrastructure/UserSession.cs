@@ -21,7 +21,7 @@ namespace Infrastructure
         public string Email => _accessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
         public string Login => _accessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Login")?.Value;
         public long Id => Convert.ToInt64(_accessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
-
+        public string Role => _accessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
         public bool IsAuthenticated()
         {
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
@@ -30,7 +30,7 @@ namespace Infrastructure
         public IEnumerable<Claim> GetClaimsIdentity()
         {
             return _accessor.HttpContext.User.Claims;
-        }
+        } 
 
     }
 }

@@ -146,7 +146,7 @@ function enviarPedido() {
                         success: function (data) {
                             debugger;
                             if (data) {
-                                toastr.success("Solicitação cancelada com sucesso!", "Sucesso");
+                                toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
@@ -161,4 +161,42 @@ function enviarPedido() {
             }
         }
     });    
+}
+
+function cancelarPedido() {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente cancelar esse pedido?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedido': $("#hdIdPedido").val(), 'status': 7
+                        },
+                        url: hostSite() + "Sales/ChangeStatus",
+                        success: function (data) {
+                            if (data) {
+                                toastr.success("Pedido cancelado com sucesso!", "Sucesso");
+                                window.location.reload();
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao cancelar o pedido", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });
 }

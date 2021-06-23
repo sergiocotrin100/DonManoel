@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using CrossCutting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -24,8 +25,10 @@ namespace DonManoel.Controllers
             try
             {
                 ViewData["version"] = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-          
-                ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(userSession.Id).Result;
+                if(userSession.Role == Settings.Role.Garcon)
+                    ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(userSession.Id).Result;
+                else
+                    ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(null).Result;
             }
             catch
             {

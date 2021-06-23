@@ -10,6 +10,7 @@ namespace Core.Interfaces
         string Name { get; }
         string Email { get; }
         string Login { get; }
+        string Role { get; }
         bool IsAuthenticated();
         IEnumerable<Claim> GetClaimsIdentity();
     }

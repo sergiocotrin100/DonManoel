@@ -22,6 +22,32 @@ namespace Core.Entities
         public string Atendente { get; set; }
         public List<PedidoItem> Itens { get; set; }
         public List<LogPedidoStatus> LogStatus { get; set; }
+        public bool CanCancel
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    return (this.IdStatusPedido == (int)Settings.Status.Pedido.Pendente 
+                        || this.IdStatusPedido == (int)Settings.Status.Pedido.AguardandoPreparacao
+                        || this.IdStatusPedido == (int)Settings.Status.Pedido.EmPreparacao
+                        );
+                }
+                return false;
+            }
+        }
+        public bool CanSend
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    return (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago);
+                }
+                return false;
+            }
+        }
+       
         public bool IsAtrasado
         {
             get
@@ -29,7 +55,7 @@ namespace Core.Entities
                 if (this.Id > 0)
                 {
                     TimeSpan time = DateTime.Now - this.Data;
-
+                    //precisa terminar de implementar
                 }
                 return false;
             }
