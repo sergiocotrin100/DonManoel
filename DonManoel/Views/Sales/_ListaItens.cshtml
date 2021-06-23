@@ -5,7 +5,7 @@
     <div class="col-xxxl-8 col-12">
         <div class="box">
             <div class="box-header bg-danger">
-                @if (Model.Itens.Count > 1)
+                @if (Model.Itens != null && Model.Itens.Count > 1)
                 {
                     <h4 class="box-title">PEDIDO (@Model.Itens.Count ITEMS)</h4>
                 }
@@ -25,70 +25,75 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Itens)
+
+                            @if (Model.Itens != null && Model.Itens.Count > 0)
                             {
-                                if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                                foreach (var item in Model.Itens)
                                 {
-                                    <tr class="bg-success">
-                                        <td>
-                                            <h5>@item.Menu.Nome</h5>
-                                            @foreach (var excecao in item.Excecao)
-                                            {
-                                                <p>@excecao.Observacao</p>
-                                            }
+                                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                                    {
+                                        <tr class="bg-success">
+                                            <td>
+                                                <h5>@item.Menu.Nome</h5>
+                                                @foreach (var excecao in item.Excecao)
+                                                {
+                                                    <p>@excecao.Observacao</p>
+                                                }
 
-                                            <div class="act-btn d-flex justify-content-between">
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                    <small class="d-block">Editar</small>
+                                                <div class="act-btn d-flex justify-content-between">
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
+                                                        <small class="d-block">Editar</small>
+                                                    </div>
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                        <small class="d-block">Excluir</small>
+                                                    </div>
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                        <small class="d-block">Duplicar</small>
+                                                    </div>
                                                 </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                    <small class="d-block">Excluir</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                    <small class="d-block">Duplicar</small>
-                                                </div>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                    </tr>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td>
+                                                <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
+                                                @foreach (var excecao in item.Excecao)
+                                                {
+                                                    <p>@excecao.Observacao</p>
+                                                }
+
+                                                <div class="act-btn d-flex justify-content-between">
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
+                                                        <small class="d-block">Editar</small>
+                                                    </div>
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                        <small class="d-block">Cancelar</small>
+                                                    </div>
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                        <small class="d-block">Duplicar</small>
+                                                    </div>
+                                                    <div class="text-center mx-5">
+                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                        <small class="d-block">Entregue</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    }
+
                                 }
-                                else
-                                {
-                                    <tr>
-                                        <td>
-                                            <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
-                                            @foreach (var excecao in item.Excecao)
-                                            {
-                                                <p>@excecao.Observacao</p>
-                                            }
-
-                                            <div class="act-btn d-flex justify-content-between">
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                    <small class="d-block">Editar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                    <small class="d-block">Cancelar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                    <small class="d-block">Duplicar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                    <small class="d-block">Entregue</small>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                }
-
                             }
+
 
                         </tbody>
                     </table>

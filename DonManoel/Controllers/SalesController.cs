@@ -53,6 +53,9 @@ namespace DonManoel.Controllers
             if (model == null || model.Id == 0)
                 model = new Pedido();
 
+            if(model.IdStatusPedido == (int)Settings.Status.Pedido.Cancelado || model.IdStatusPedido == (int)Settings.Status.Pedido.Pago)
+                model = new Pedido();
+
             model.IdUsuario = _userSession.Id;
             model.IdMesa = idmesa;
             model.IdStatusPedido = Settings.Status.Pedido.Pendente;

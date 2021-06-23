@@ -118,6 +118,8 @@ function addItem() {
         },
         url: hostSite() + "Sales/AddItem",
         success: function (data) {
+            //Sales/Order?idmesa=13&idorder=25&viewitens=1
+
             window.location.reload();
         }
     });
@@ -144,9 +146,8 @@ function enviarPedido() {
                         },
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
-                            debugger;
                             if (data) {
-                                toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
+                            //    toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
@@ -183,8 +184,8 @@ function cancelarPedido() {
                         },
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
-                            if (data) {
-                                toastr.success("Pedido cancelado com sucesso!", "Sucesso");
+                             if (data) {
+                             //   toastr.success("Pedido cancelado com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
