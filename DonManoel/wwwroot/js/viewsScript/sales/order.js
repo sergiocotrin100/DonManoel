@@ -7,9 +7,26 @@ var CATEGORIAS = [];
 window.onload = getParams;
 
 $(document).ready(function () {
+
+    let viewitens = getURLParameters("viewitens");
+    if (!isNullOrEmpty(viewitens)) {
+        $('html, body').animate({
+            scrollTop: $('#itens').offset().top
+        }, 100);
+    }
+
     $("#btnAdd").click(function () {
         addItem();
     });
+
+    $("#btnEnviarPedido").click(function () {
+        enviarPedido();
+    });
+    
+    $("#btnCancelarPedido").click(function () {
+        cancelarPedido();
+    });
+    
 });
 
 function getParams() {
@@ -105,4 +122,43 @@ function addItem() {
         }
     });
 
+}
+
+function enviarPedido() {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente enviar esse pedido para a cozinha?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedido': $("#hdIdPedido").val(), 'status': 3
+                        },
+                        url: hostSite() + "Sales/ChangeStatus",
+                        success: function (data) {
+                            debugger;
+                            if (data) {
+                                toastr.success("Solicitação cancelada com sucesso!", "Sucesso");
+                                window.location.reload();
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao enviar o pedido para a cozinha", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });    
 }

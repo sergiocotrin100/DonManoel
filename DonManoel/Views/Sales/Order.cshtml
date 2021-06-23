@@ -17,8 +17,9 @@
 
 <div class="content-header">
     <div class="d-flex align-items-center">
-        <div class="me-auto">
+        <div class="me-auto" id="menu">
             <input type="hidden" id="hdIdMesa" value="@ViewBag.IdMesa" />
+            <input type="hidden" id="hdIdPedido" value="@ViewBag.IdPedido" />
             @foreach (var categoria in (List<Core.Entities.Categoria>)ViewBag.Categorias)
             {
                 <h3 class="page-title" style="">@categoria.Nome</h3><hr />
@@ -48,7 +49,7 @@
     </div>
 
     @Html.Partial("_MenuDetalhes")
-    @Html.Partial("_ListaItens")
+    @Html.Partial("_ListaItens", Model)
 
 
 

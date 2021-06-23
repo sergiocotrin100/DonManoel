@@ -35,8 +35,8 @@ namespace Infrastructure.Repository
                         P.ID IDPEDIDO,
                         NVL(P.VALOR_ITENS,0) ValorPedido
                     FROM MESAS M
-                    LEFT JOIN DOTNET_PEDIDO P ON P.ID_MESA = M.ID AND P.ID_STATUS_PEDIDO NOT IN(5,6)
-                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO 
+                    LEFT JOIN DOTNET_PEDIDO P ON P.ID_MESA = M.ID AND P.ID_STATUS_PEDIDO NOT IN(6,7)
+                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                  ");
                 var parametros = new DynamicParameters();
                 var model = await conn.QueryAsync<Mesa>(cmd.ToString(), parametros);

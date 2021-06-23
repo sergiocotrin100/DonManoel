@@ -15,9 +15,18 @@
     <table class="table b-1 border-secondary">
         <thead class="bg-secondary">
             <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th class="text-center" colspan="2">Prato Adulto</th>
+                <th class="text-center" colspan="2">Prato Kids</th>
+            </tr>
+            <tr>
                 <th>Pedido</th>
                 <th>Atendente</th>
-                <th>Tempo</th>
+                <th class="text-center" >Prazo</th>
+                <th class="text-center" >Tempo</th>
+                <th class="text-center" >Prazo</th>
+                <th class="text-center" >Tempo</th>
             </tr>
         </thead>
         <tbody>
@@ -25,19 +34,25 @@
             {
                 if (pedido.IsAtrasado)
                 {
-                    <tr class="bg-danger">
-                        <td>Mesa @pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td>@pedido.Tempo</td>
-                    </tr>
+            <tr class="bg-danger">
+                <td>Mesa @pedido.IdMesa.ToString("000")</td>
+                <td>@pedido.Atendente.FirstName()</td>
+                <td class="text-center" >@pedido.Tempo</td>
+                <td class="text-center" >@pedido.Tempo</td>
+                <td class="text-center" >@pedido.Tempo</td>
+                <td class="text-center" >@pedido.Tempo</td>
+            </tr>
                 }
                 else
                 {
-                    <tr>
-                        <td>@pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td>@pedido.Tempo</td>
-                    </tr>
+        <tr>
+            <td>@pedido.IdMesa.ToString("000")</td>
+            <td>@pedido.Atendente.FirstName()</td>
+            <td class="text-center" >@pedido.Tempo</td>
+            <td class="text-center" >@pedido.Tempo</td>
+            <td class="text-center" >@pedido.Tempo</td>
+            <td class="text-center" >@pedido.Tempo</td>
+        </tr>
                 }
 
             }

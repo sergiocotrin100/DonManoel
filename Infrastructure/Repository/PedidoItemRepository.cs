@@ -104,7 +104,7 @@ namespace Infrastructure.Repository
                         I.VALOR,
                         I.TEMPO_PREPARO TEMPOPREPARO,
                         I.DATA,
-                        S.NOME AS STATUS
+                        S.NOME AS STATUS                       
                     FROM DOTNET_PEDIDO_ITENS I
                     INNER JOIN DOTNET_STATUS_PEDIDO_ITENS S ON S.ID = I.ID_STATUS_PEDIDO_ITEM
                     WHERE I.ID_PEDIDO=:IDPEDIDO
@@ -134,8 +134,10 @@ namespace Infrastructure.Repository
                                 M.ATIVO,
                                 M.TEMPO_PREPARO TEMPOPREPARO,
                                 M.VALOR,
-                                M.ID_CATEGORIA IDCATEGORIA
+                                M.ID_CATEGORIA IDCATEGORIA,
+                                C.TIPO AS TIPOCATEGORIA
                             FROM MENU M
+                            INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
                             WHERE M.ID = :ID_MENU
                          ");
             var parametros = new DynamicParameters();

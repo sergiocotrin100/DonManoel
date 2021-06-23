@@ -27,11 +27,31 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID;");
-                var parameters = new OracleDynamicParameters();
-                parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
-                await conn.ExecuteAsync(sql.ToString(), parameters);
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
+                        var parameters = new OracleDynamicParameters();
+                        parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
+                        parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
+                        await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+                        await SaveLogStatus(new LogPedidoStatus()
+                        {
+                            IdPedido = idpedido,
+                            IdStatusPedido = status
+                        }, conn, transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
             }
         }
 
@@ -64,28 +84,49 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
-                    SELECT 
-                        P.ID,
-                        P.ID_USUARIO IDUSUARIO,
-                        P.ID_MESA IDMESA,
-                        P.CLIENTE,
-                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
-                        P.TAXA_SERVICO TAXASERVICO,
-                        P.VALOR_ITENS,
-                        P.VALOR_TOTAL VALORTOTAL,
-                        P.DATA,
-                        S.NOME AS STATUS
-                    FROM DOTNET_PEDIDO P
-                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
-                    WHERE P.ID=:ID
-                 ");
-                var parametros = new DynamicParameters();
-                parametros.Add("ID", idpedido, DbType.Int64);
-                var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
-                return model;
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"                           
+                            SELECT 
+                                P.ID,
+                                P.ID_USUARIO IDUSUARIO,
+                                P.ID_MESA IDMESA,
+                                P.CLIENTE,
+                                P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                                P.TAXA_SERVICO TAXASERVICO,
+                                P.VALOR_ITENS,
+                                P.VALOR_TOTAL VALORTOTAL,
+                                P.DATA,
+                                S.NOME AS STATUS,
+                                U.NOME ATENDENTE    
+                            FROM DOTNET_PEDIDO P
+                            INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                            LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
+                            WHERE P.ID=:ID
+                         ");
+                        var parametros = new DynamicParameters();
+                        parametros.Add("ID", idpedido, DbType.Int64);
+                        var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
+
+                        PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                        model.Itens = await repository.GetItens(model.Id, conn, transaction);
+                        transaction.Commit();
+
+                        return model;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
             }
+
         }
 
         public async Task<List<Pedido>> GetPedidos(Pedido item)
@@ -120,46 +161,53 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                 conn.Open();
+                conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
                     {
-                        StringBuilder sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO(ID_MESA,ID_USUARIO,CLIENTE,ID_STATUS_PEDIDO,TAXA_SERVICO,OBSERVACAO)");
-                        sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO)");
-                        var parameters = new OracleDynamicParameters();
-                        parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
-                        parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
-                        parameters.Add("CLIENTE", model.Cliente, OracleDbType.Varchar2, ParameterDirection.Input);
-                        parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
-                        parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
-                        parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-                        var result = await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
-                        if (result <= 0)
-                            throw new Exception("Erro ao cadastrar o pedido");
+                        StringBuilder sql = new StringBuilder();
 
-                        sql = new StringBuilder();
-                        sql.AppendFormat(@"
+                        if (model.Id == 0)
+                        {
+                            sql = new StringBuilder(@"INSERT INTO DOTNET_PEDIDO(ID_MESA,ID_USUARIO,CLIENTE,ID_STATUS_PEDIDO,TAXA_SERVICO,OBSERVACAO)");
+                            sql.Append("VALUES(:ID_MESA,:ID_USUARIO,:CLIENTE,:ID_STATUS_PEDIDO,:TAXA_SERVICO, :OBSERVACAO)");
+                            var parameters = new OracleDynamicParameters();
+                            parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
+                            parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
+                            parameters.Add("CLIENTE", model.Cliente, OracleDbType.Varchar2, ParameterDirection.Input);
+                            parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
+                            parameters.Add("TAXA_SERVICO", model.TaxaServico, OracleDbType.Int32, ParameterDirection.Input);
+                            parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
+                            var result = await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+                            if (result <= 0)
+                                throw new Exception("Erro ao cadastrar o pedido");
+
+                            sql = new StringBuilder();
+                            sql.AppendFormat(@"
                             SELECT MAX(ID) ID FROM DOTNET_PEDIDO WHERE ID_MESA=:ID_MESA AND ID_USUARIO = :ID_USUARIO
                         ");
-                        parameters = new OracleDynamicParameters();
-                        parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
-                        parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
-                        var pedido = await conn.QueryFirstAsync<Pedido>(sql.ToString(), parameters);
+                            parameters = new OracleDynamicParameters();
+                            parameters.Add("ID_MESA", model.IdMesa, OracleDbType.Long, ParameterDirection.Input);
+                            parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
+                            var pedido = await conn.QueryFirstAsync<Pedido>(sql.ToString(), parameters, transaction: transaction);
 
-                        if (pedido.Id <= 0)
-                            throw new Exception("Erro ao cadastrar o pedido");
+                            if (pedido.Id <= 0)
+                                throw new Exception("Erro ao cadastrar o pedido");
 
-                        await SaveLogStatus(new LogPedidoStatus()
-                        {
-                            IdPedido = pedido.Id,
-                            IdStatusPedido = model.IdStatusPedido
-                        }, conn, transaction);
+                            model.Id = pedido.Id;
+
+                            await SaveLogStatus(new LogPedidoStatus()
+                            {
+                                IdPedido = model.Id,
+                                IdStatusPedido = model.IdStatusPedido
+                            }, conn, transaction);
+                        }
 
                         PedidoItemRepository pedidoItemRepository = new PedidoItemRepository(_userSession);
                         foreach (var item in model.Itens)
                         {
-                            item.IdPedido = pedido.Id;
+                            item.IdPedido = model.Id;
                             await pedidoItemRepository.Save(item, conn, transaction);
                         }
 
@@ -184,7 +232,7 @@ namespace Infrastructure.Repository
             parameters.Add("ID_USUARIO", _userSession.Id, OracleDbType.Long, ParameterDirection.Input);
             parameters.Add("ID_STATUS_PEDIDO", model.IdStatusPedido, OracleDbType.Int32, ParameterDirection.Input);
             parameters.Add("OBSERVACAO", model.Observacao, OracleDbType.Varchar2, ParameterDirection.Input);
-            await conn.ExecuteAsync(sql.ToString(), parameters,transaction);
+            await conn.ExecuteAsync(sql.ToString(), parameters, transaction);
         }
 
         public async Task<List<Categoria>> GetCategorias()
@@ -263,26 +311,36 @@ namespace Infrastructure.Repository
                     {
                         var cmd = new StringBuilder();
                         cmd.AppendFormat(@"
-                    SELECT 
-                        P.ID,
-                        P.ID_USUARIO IDUSUARIO,
-                        P.ID_MESA IDMESA,
-                        P.CLIENTE,
-                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
-                        P.TAXA_SERVICO TAXASERVICO,
-                        P.VALOR_ITENS,
-                        P.VALOR_TOTAL VALORTOTAL,
-                        P.DATA,
-                        S.NOME AS STATUS,
-                        U.NOME ATENDENTE,
-                        (
-                            SELECT SUM(TEMPO_PREPARO)/COUNT(*) FROM DOTNET_PEDIDO_ITENS WHERE ID_PEDIDO=P.ID
-                        )TEMPOPREPARO
-                    FROM DOTNET_PEDIDO P
-                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
-                    LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
-                    WHERE P.ID_STATUS_PEDIDO IN(2,3)
-                 ");
+                            WITH ITENS AS
+                            (
+                                SELECT I.* FROM DOTNET_PEDIDO_ITENS I
+                                INNER JOIN MENU M ON M.ID = I.ID_MENU
+                                INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
+                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 1
+                                AND C.TIPO = 'C'
+                            )
+                            
+                            SELECT 
+                                P.ID,
+                                P.ID_USUARIO IDUSUARIO,
+                                P.ID_MESA IDMESA,
+                                P.CLIENTE,
+                                P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                                P.TAXA_SERVICO TAXASERVICO,
+                                P.VALOR_ITENS,
+                                P.VALOR_TOTAL VALORTOTAL,
+                                P.DATA,
+                                S.NOME AS STATUS,
+                                U.NOME ATENDENTE    
+                            FROM DOTNET_PEDIDO P
+                            INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                            LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
+                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5,6)
+                            AND P.ID IN
+                            (
+                                SELECT ID_PEDIDO FROM ITENS
+                            )
+                         ");
                         var parametros = new DynamicParameters();
                         var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
@@ -290,11 +348,10 @@ namespace Infrastructure.Repository
                         {
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
-
                         }
                         transaction.Commit();
                         return pedidos.ToList();
-                       
+
                     }
                     catch (Exception ex)
                     {
@@ -305,12 +362,69 @@ namespace Infrastructure.Repository
             }
         }
 
-        public async Task<int> GetQuantidadePedidosPendentes(long? idusuario)
+        public async Task<List<Pedido>> GetPedidosBar()
         {
-            throw new NotImplementedException();
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            WITH ITENS AS
+                            (
+                                SELECT I.* FROM DOTNET_PEDIDO_ITENS I
+                                INNER JOIN MENU M ON M.ID = I.ID_MENU
+                                INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
+                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 1
+                                AND C.TIPO = 'B'
+                            )
+                            
+                            SELECT 
+                                P.ID,
+                                P.ID_USUARIO IDUSUARIO,
+                                P.ID_MESA IDMESA,
+                                P.CLIENTE,
+                                P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                                P.TAXA_SERVICO TAXASERVICO,
+                                P.VALOR_ITENS,
+                                P.VALOR_TOTAL VALORTOTAL,
+                                P.DATA,
+                                S.NOME AS STATUS,
+                                U.NOME ATENDENTE    
+                            FROM DOTNET_PEDIDO P
+                            INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                            LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
+                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5,6)
+                            AND P.ID IN
+                            (
+                                SELECT ID_PEDIDO FROM ITENS
+                            )
+                         ");
+                        var parametros = new DynamicParameters();
+                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+
+                        foreach (var pedido in pedidos.ToList())
+                        {
+                            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                            pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
+                        }
+                        transaction.Commit();
+                        return pedidos.ToList();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
         }
 
-        public async Task<List<Pedido>> GetPedidosPendentes(long? idusuario)
+        public async Task<List<Pedido>> GetMeusPedidos(long? idusuario)
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
@@ -336,7 +450,7 @@ namespace Infrastructure.Repository
                     FROM DOTNET_PEDIDO P
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                     LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
-                    WHERE P.ID_STATUS_PEDIDO IN(1)
+                    WHERE P.ID_STATUS_PEDIDO IN(1,2,3,4,5)
                     AND (P.ID_USUARIO = :IDUSUARIO OR :IDUSUARIO = 0)
                  ");
                         var parametros = new DynamicParameters();
@@ -384,7 +498,7 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                     LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                     WHERE P.ID_MESA=:IDMESA
-                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5)
+                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5,6)
                  ");
                 var parametros = new DynamicParameters();
                 parametros.Add("IDMESA", idMesa, DbType.Int32);

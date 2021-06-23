@@ -14,6 +14,7 @@ namespace Core.Entities
         public string Ativo { get; set; }
         public string Nome { get; set; }
         public int Ordenacao { get; set; }
+        public string Tipo { get; set; }
         public virtual ICollection<Menu> Menu { get; set; }
     }
 }

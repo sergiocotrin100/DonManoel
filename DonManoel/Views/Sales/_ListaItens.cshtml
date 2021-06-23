@@ -1,9 +1,19 @@
-﻿
-<div class="row">
+﻿@model Core.Entities.Pedido
+@using CrossCutting
+
+<div class="row" id="itens">
     <div class="col-xxxl-8 col-12">
         <div class="box">
-            <div class="box-header bg-primary">
-                <h4 class="box-title">PEDIDO (6 ITEMS)</h4>
+            <div class="box-header bg-danger">
+                @if (Model.Itens.Count > 1)
+                {
+                    <h4 class="box-title">PEDIDO (@Model.Itens.Count ITEMS)</h4>
+                }
+                else
+                {
+                    <h4 class="box-title">PEDIDO (1 ITEM)</h4>
+                }
+
             </div>
 
             <div class="box-body">
@@ -11,97 +21,79 @@
                     <table class="table product-overview">
                         <thead>
                             <tr>
-                                <th>Image</th>
-                                <th>Product info</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th style="text-align:center">Total</th>
-                                <th style="text-align:center">Action</th>
+                                <th>Item</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><img src="../images/product/product-1.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td width="70">
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td width="100" align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td><img src="../images/product/product-2.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td>
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td><img src="../images/product/product-3.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td>
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td><img src="../images/product/product-4.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td>
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td><img src="../images/product/product-5.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td>
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
-                            <tr>
-                                <td><img src="../images/product/product-6.png" alt="" width="80"></td>
-                                <td>
-                                    <h5>Product Name Here</h5>
-                                    <p>Lorem Ipsum available the majority have suffered alteration in some.</p>
-                                </td>
-                                <td>$270</td>
-                                <td>
-                                    <input type="number" class="form-control" placeholder="1" min="0" max="5">
-                                </td>
-                                <td align="center" class="fw-900">$270</td>
-                                <td align="center"><a href="javascript:void(0)" class="btn btn-circle btn-danger btn-xs" title="" data-bs-toggle="tooltip" data-bs-original-title="Delete"><i class="ti-trash"></i></a></td>
-                            </tr>
+                            @foreach (var item in Model.Itens)
+                            {
+                                if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                                {
+                                    <tr class="bg-success">
+                                        <td>
+                                            <h5>@item.Menu.Nome</h5>
+                                            @foreach (var excecao in item.Excecao)
+                                            {
+                                                <p>@excecao.Observacao</p>
+                                            }
+
+                                            <div class="act-btn d-flex justify-content-between">
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
+                                                    <small class="d-block">Editar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                    <small class="d-block">Excluir</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                    <small class="d-block">Duplicar</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                      
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>
+                                            <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
+                                            @foreach (var excecao in item.Excecao)
+                                            {
+                                                <p>@excecao.Observacao</p>
+                                            }
+
+                                        <div class="act-btn d-flex justify-content-between">
+                                            <div class="text-center mx-5">
+                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
+                                                <small class="d-block">Editar</small>
+                                            </div>
+                                            <div class="text-center mx-5">
+                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                <small class="d-block">Cancelar</small>
+                                            </div>
+                                            <div class="text-center mx-5">
+                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                <small class="d-block">Duplicar</small>
+                                            </div>
+                                            <div class="text-center mx-5">
+                                                <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                <small class="d-block">Entregue</small>
+                                            </div>
+                                        </div>
+                                        </td>
+                                      
+                                    </tr>
+                                }
+
+                            }
+
                         </tbody>
                     </table>
-                    <button class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
-                    <button class="btn btn-info"><i class="fa fa-arrow-left"></i> Continue shopping</button>
+                    <button id="btnEnviarPedido" class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Enviar Pedido</button>
+                    <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                 </div>
 
             </div>

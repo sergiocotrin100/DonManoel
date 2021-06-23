@@ -24,12 +24,13 @@ namespace DonManoel.Controllers
             try
             {
                 ViewData["version"] = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                ViewBag.PedidosPendentes = serviceOrder.GetPedidosPendentes(userSession.Id).Result;
+          
+                ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(userSession.Id).Result;
             }
             catch
             {
                 ViewData["version"] = DateTime.Now.Ticks.ToString();
-                ViewBag.PedidosPendentes = new List<Pedido>();
+                ViewBag.MeusPedidos = new List<Pedido>();
             }
 
             base.OnActionExecuting(filterContext);

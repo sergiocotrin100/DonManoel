@@ -12,6 +12,7 @@ namespace Core.Entities
         public long IdUsuario { get; set; }
         public string Ativo { get; set; }
         public int TempoPreparo { get; set; }
+        public string TipoCategoria { get; set; }
         public decimal Valor { get; set; }
         public string ValorFormatado
         {
@@ -20,6 +21,6 @@ namespace Core.Entities
                 return this.Valor.FormatMoney(false);
             }
         }
-        public List<MenuComposicao> Composicao { get; set; }//receita
+        public List<MenuComposicao> Composicao { get; set; }
     }
 }

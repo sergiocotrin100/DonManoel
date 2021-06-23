@@ -39,7 +39,14 @@ namespace CrossCutting
                 public const int Solicitado = 1;
                 public const int Substituído = 2;
                 public const int Cancelado = 3;
+                public const int Pronto = 4;
             }
+        }
+
+        public static class TipoCategoria
+        {
+            public const string Cozinha = "C";
+            public const string Bar = "B";
         }
     }
 }

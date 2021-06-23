@@ -41,12 +41,12 @@ namespace DonManoel.Controllers
             ViewBag.Categorias = service.GetCategorias().Result;
 
             ViewBag.IdMesa = idmesa;
+            ViewBag.IdPedido = model.Id;
 
             return View(model);
         }
 
-
-        [HttpPost]
+        [HttpPost("AddItem")]
         public async Task<JsonResult> AddItem(int idmesa, string pontoCarne, string observacao, Menu menu)
         {
             Pedido model = await service.GetPedidoAbertoByMesa(idmesa);
@@ -56,7 +56,7 @@ namespace DonManoel.Controllers
             model.IdUsuario = _userSession.Id;
             model.IdMesa = idmesa;
             model.IdStatusPedido = Settings.Status.Pedido.Pendente;
-            if (model.Itens == null) model.Itens = new List<PedidoItem>();
+            model.Itens = new List<PedidoItem>();
             PedidoItem item = new PedidoItem();
             item.IdMenu = menu.Id;
             item.IdStatusPedidoItem = Settings.Status.PedidoItem.Solicitado;
@@ -87,7 +87,6 @@ namespace DonManoel.Controllers
             long idpedido = await service.Save(model);
             return Json(true);
         }
-
 
         [HttpGet("kitchen")]
         public IActionResult kitchen()
@@ -129,6 +128,13 @@ namespace DonManoel.Controllers
                 default:
                     return "";
             }
+        }
+
+        [HttpPost("ChangeStatus")]
+        public async Task<JsonResult> ChangeStatus(long idpedido, int status)
+        {
+            await service.ChangeState(idpedido, status);
+            return Json(true);
         }
 
     }
