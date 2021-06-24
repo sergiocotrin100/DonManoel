@@ -57,7 +57,7 @@ namespace CrossCutting
 
                     return Encoding.UTF8.GetString(ms.ToArray());
                 }
-                catch(Exception ex)
+                catch
                 {
                     throw new Exception("Segurança : Não permitido acesso a informação.\nCredenciais de segurança inválidos.");
                 }

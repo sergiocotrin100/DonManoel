@@ -31617,10 +31617,12 @@ textarea.form-control {
   position: relative; }
 
 .box-body {
-  padding: 1.5rem;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-  border-radius: 10px; }
+    /*1.5rem*/
+    padding: 1rem;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    border-radius: 10px;
+}
   .box-body .box-title {
     display: inline-block;
     margin: 0;

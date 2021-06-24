@@ -50,7 +50,7 @@ namespace DonManoel
             {
                 options.EnableEndpointRouting = false;
             }).AddRazorPagesOptions(options => { }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
+            
             //services.AddSignalR();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -80,7 +80,8 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-            //services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions

@@ -46,10 +46,9 @@ namespace Infrastructure.Repository
 
                         transaction.Commit();
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
                 }
             }
@@ -87,6 +86,7 @@ namespace Infrastructure.Repository
                 conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
+                    Pedido model = new Pedido();
                     try
                     {
                         var cmd = new StringBuilder();
@@ -110,20 +110,17 @@ namespace Infrastructure.Repository
                          ");
                         var parametros = new DynamicParameters();
                         parametros.Add("ID", idpedido, DbType.Int64);
-                        var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
+                         model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
 
                         PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                         model.Itens = await repository.GetItens(model.Id, conn, transaction);
                         transaction.Commit();
-
-                        return model;
-
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
+                    return model;
                 }
             }
 
@@ -213,10 +210,9 @@ namespace Infrastructure.Repository
 
                         transaction.Commit();
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
                 }
             }
@@ -307,6 +303,7 @@ namespace Infrastructure.Repository
                 conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
+                    IEnumerable<Pedido> listPedidos = new List<Pedido>();
                     try
                     {
                         var cmd = new StringBuilder();
@@ -342,22 +339,20 @@ namespace Infrastructure.Repository
                             )
                          ");
                         var parametros = new DynamicParameters();
-                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                       listPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
-                        foreach (var pedido in pedidos.ToList())
+                        foreach (var pedido in listPedidos.ToList())
                         {
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
                         }
                         transaction.Commit();
-                        return pedidos.ToList();
-
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
+                    return listPedidos.ToList();
                 }
             }
         }
@@ -369,6 +364,7 @@ namespace Infrastructure.Repository
                 conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
+                    IEnumerable<Pedido> listaPedidos = new List<Pedido>();
                     try
                     {
                         var cmd = new StringBuilder();
@@ -404,22 +400,20 @@ namespace Infrastructure.Repository
                             )
                          ");
                         var parametros = new DynamicParameters();
-                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                        listaPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
-                        foreach (var pedido in pedidos.ToList())
+                        foreach (var pedido in listaPedidos.ToList())
                         {
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
                         }
                         transaction.Commit();
-                        return pedidos.ToList();
-
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
+                    return listaPedidos.ToList();
                 }
             }
         }
@@ -431,6 +425,7 @@ namespace Infrastructure.Repository
                 conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
+                    IEnumerable<Pedido> listaPedidos = new List<Pedido>();
                     try
                     {
                         var cmd = new StringBuilder();
@@ -455,23 +450,21 @@ namespace Infrastructure.Repository
                  ");
                         var parametros = new DynamicParameters();
                         parametros.Add("IDUSUARIO", idusuario.HasValue ? idusuario.Value : 0, DbType.Int32, ParameterDirection.Input);
-                        var pedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                        listaPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
-                        foreach (var pedido in pedidos.ToList())
+                        foreach (var pedido in listaPedidos.ToList())
                         {
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
 
                         }
                         transaction.Commit();
-                        return pedidos.ToList();
-
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         transaction.Rollback();
-                        throw ex;
                     }
+                    return listaPedidos.ToList();
                 }
             }
         }
