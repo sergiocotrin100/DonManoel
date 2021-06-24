@@ -12,6 +12,5 @@ namespace Core.Interfaces
         Task Save(PedidoItem model);
         Task<List<PedidoItem>> GetItens(Pedido model);
         Task<PedidoItem> GetItemById(long idpedido);
-        Task ChangeState(long idpedido, int status);
     }
 }

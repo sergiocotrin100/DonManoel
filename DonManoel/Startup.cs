@@ -80,7 +80,8 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+              services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            //services.AddControllersWithViews();
 
 
             services.AddProgressiveWebApp();

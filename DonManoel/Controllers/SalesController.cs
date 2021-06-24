@@ -18,10 +18,13 @@ namespace DonManoel.Controllers
     {
         private readonly IUserSession _userSession;
         private readonly IPedidoRepository service;
-        public SalesController(IUserSession userSession, IPedidoRepository service):base(userSession,service)
+        private readonly IPedidoItemRepository serviceItem;
+        
+        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem) :base(userSession,service)
         {
             _userSession = userSession;
             this.service = service;
+            this.serviceItem = serviceItem;
         }
         public IActionResult Index()
         {
@@ -139,6 +142,24 @@ namespace DonManoel.Controllers
             await service.ChangeState(idpedido, status);
             return Json(true);
         }
+
+        [HttpPost("ChangeStatusItem")]
+        public async Task<JsonResult> ChangeStatusItem(long idpedidoitem, int status)
+        {
+            await service.ChangeStateItem(idpedidoitem, status);
+            return Json(true);
+        }
+
+        [HttpPost("DuplicateItem")]
+        public async Task<JsonResult> DuplicateItem(long idpedidoitem)
+        {
+            var model    = await serviceItem.GetItemById(idpedidoitem);
+            model.Id = 0;
+            model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
+            await serviceItem.Save(model);
+            return Json(true);
+        }
+        
 
     }
 

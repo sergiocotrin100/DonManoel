@@ -20,6 +20,7 @@ namespace Core.Entities
         public string Observacao { get; set; }
         public string PontoCarne { get; set; }
         public DateTime Data { get; set; }
+        public DateTime? DataAtualizacao { get; set; }
         public List<PedidoItemExcecao> Excecao { get; set; }
         public Menu Menu { get; set; }
     }
