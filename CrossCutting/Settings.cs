@@ -37,9 +37,10 @@ namespace CrossCutting
             public static class PedidoItem
             {
                 public const int Solicitado = 1;
-                public const int Substituído = 2;
-                public const int Cancelado = 3;
-                public const int Pronto = 4;
+                public const int Enviado = 2;
+                public const int Substituído = 3;
+                public const int Cancelado = 4;
+                public const int Pronto = 5;
             }
         }
 

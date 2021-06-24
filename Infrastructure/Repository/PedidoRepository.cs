@@ -44,6 +44,15 @@ namespace Infrastructure.Repository
                             IdStatusPedido = status
                         }, conn, transaction);
 
+                        if(status == (int)Settings.Status.Pedido.EmPreparacao)
+                        {
+                            sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS WHERE ID_PEDIDO=:ID AND ID_STATUS_PEDIDO_ITEM =1");
+                            parameters = new OracleDynamicParameters();
+                            parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
+                            parameters.Add("STATUS", (int)Settings.Status.PedidoItem.Enviado, OracleDbType.Int32, ParameterDirection.Input);
+                            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+                        }
+
                         transaction.Commit();
                     }
                     catch 
@@ -313,7 +322,7 @@ namespace Infrastructure.Repository
                                 SELECT I.* FROM DOTNET_PEDIDO_ITENS I
                                 INNER JOIN MENU M ON M.ID = I.ID_MENU
                                 INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
-                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 1
+                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 2
                                 AND C.TIPO = 'C'
                             )
                             
@@ -374,7 +383,7 @@ namespace Infrastructure.Repository
                                 SELECT I.* FROM DOTNET_PEDIDO_ITENS I
                                 INNER JOIN MENU M ON M.ID = I.ID_MENU
                                 INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
-                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 1
+                                WHERE  I.ID_STATUS_PEDIDO_ITEM = 2
                                 AND C.TIPO = 'B'
                             )
                             

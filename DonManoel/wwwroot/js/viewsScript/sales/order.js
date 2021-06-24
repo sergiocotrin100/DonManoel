@@ -118,9 +118,8 @@ function addItem() {
         },
         url: hostSite() + "Sales/AddItem",
         success: function (data) {
-            //Sales/Order?idmesa=13&idorder=25&viewitens=1
-
-            window.location.reload();
+            var url = hostSite() + "Sales/Order?idmesa=" + idmesa + "&idorder=" + data + "&viewitens=1";
+            window.location.href = url;
         }
     });
 

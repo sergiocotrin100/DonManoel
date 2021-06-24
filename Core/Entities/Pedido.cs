@@ -28,10 +28,16 @@ namespace Core.Entities
             {
                 if (this.Id > 0)
                 {
-                    return (this.IdStatusPedido == (int)Settings.Status.Pedido.Pendente 
+                    if(this.IdStatusPedido == (int)Settings.Status.Pedido.Pendente 
                         || this.IdStatusPedido == (int)Settings.Status.Pedido.AguardandoPreparacao
                         || this.IdStatusPedido == (int)Settings.Status.Pedido.EmPreparacao
-                        );
+                        )
+                    {
+                        if (this.Itens == null || this.Itens.Count == 0) return true;
+
+                        bool existeItemEntregue = this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto);
+                        return !existeItemEntregue;
+                    }
                 }
                 return false;
             }
@@ -42,7 +48,11 @@ namespace Core.Entities
             {
                 if (this.Id > 0)
                 {
-                    return (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago);
+                    if(this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago)
+                    {
+                        if (this.Itens == null || this.Itens.Count == 0) return true;
+                        return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado);
+                    }
                 }
                 return false;
             }

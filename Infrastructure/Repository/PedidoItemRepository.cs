@@ -32,13 +32,32 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS WHERE ID=:ID;");
-                var parameters = new OracleDynamicParameters();
-                parameters.Add("ID", id, OracleDbType.Long, ParameterDirection.Input);
-                parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
-                await conn.ExecuteAsync(sql.ToString(), parameters);
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                         await ChangeState(id, status, conn, transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
             }
-        }      
+        }
+
+        internal async Task ChangeState(long id, int status, IDbConnection conn, IDbTransaction transaction)
+        {
+            StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS WHERE ID=:ID;");
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("ID", id, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
+            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+        }
 
         public async Task<PedidoItem> GetItemById(long id)
         {
@@ -72,6 +91,7 @@ namespace Infrastructure.Repository
             var itens = new List<PedidoItem>();
             using (IDbConnection conn = _connection.GetConnection())
             {
+                conn.Open();
                 using (IDbTransaction transaction = conn.BeginTransaction())
                 {
                     try
