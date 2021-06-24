@@ -88,7 +88,7 @@ namespace DonManoel.Controllers
             model.Itens.Add(item);
 
             long idpedido = await service.Save(model);
-            return Json(true);
+            return Json(idpedido);
         }
 
         [HttpGet("kitchen")]
