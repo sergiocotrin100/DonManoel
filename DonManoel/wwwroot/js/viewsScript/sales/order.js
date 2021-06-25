@@ -369,8 +369,7 @@ function fecharConta() {
                                 if (isNullOrEmpty(PEDIDO.TaxaServico) || PEDIDO.TaxaServico == 0)
                                     $("#modalImpressao #taxaservicoimpressao").html("-");
                                 else {
-                                    var valortaxa = (PEDIDO.TaxaServico * totalitens) / 100;
-                                    $("#modalImpressao #taxaservicoimpressao").html(formatMoney(valortaxa));
+                                    $("#modalImpressao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, PEDIDO.TaxaServico)));
                                 }
 
                                 var total = valortaxa + totalitens;

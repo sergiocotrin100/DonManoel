@@ -93,3 +93,44 @@
         }
     </div>
 </div>
+
+
+<script>
+    function setPedidoPago(idpedido) {
+            $.confirm({
+                title: 'Atenção!',
+                icon: 'fa fa-dollar',
+                animation: 'scale',
+                closeAnimation: 'scale',
+                content: 'Pedido foi recebido pelo caixa?',
+                buttons: {
+                    Sim: {
+                        btnClass: 'btn-danger',
+                        keys: ['enter', 'shift'],
+                        action: function () {
+                            $.ajax({
+                                type: "post",
+                                dataType: 'json',
+                                data: {
+                                    'idpedido': idpedido, 'status': 6
+                                },
+                                url: hostSite() + "Sales/ChangeStatus",
+                                success: function (data) {
+                                    if (data.success) {
+                                        toastr.success("Pedido recebido com sucesso!", "Sucesso");
+                                        window.location.reload();
+                                    }
+                                    else {
+                                        toastr.error(data.message, "Erro");
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    Não: function () {
+
+                    }
+                }
+            });
+        }
+</script>
