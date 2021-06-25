@@ -31502,13 +31502,15 @@ textarea.form-control {
   border-radius: 10px; }
 
 .box-header {
-  color: #172b4c;
-  display: block;
-  padding: 1.5rem;
-  position: relative;
-  border-bottom: 1px solid rgba(72, 94, 144, 0.16);
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px; }
+    color: #172b4c;
+    display: block;
+    /* padding: 1.5rem;*/
+    padding: 0.7rem;
+    position: relative;
+    border-bottom: 1px solid rgba(72, 94, 144, 0.16);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
   .box-header.without-border {
     border-bottom: none; }
   .box-header.with-border {
@@ -31539,10 +31541,12 @@ textarea.form-control {
     border-top-right-radius: 10px; }
 
 .box-footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
-  padding: 1.5rem;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px; }
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    /*padding: 1.5rem;*/
+    padding: 0.7rem;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
   .box-footer > *:last-child {
     margin-bottom: 0; }
   .box-footer img {
