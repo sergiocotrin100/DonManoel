@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CrossCutting;
 
 namespace Core.Entities
 {
@@ -21,7 +22,30 @@ namespace Core.Entities
         public string PontoCarne { get; set; }
         public DateTime Data { get; set; }
         public DateTime? DataAtualizacao { get; set; }
+        public int Quantidade { get; set; }
         public List<PedidoItemExcecao> Excecao { get; set; }
         public Menu Menu { get; set; }
+        public string ValorFormatado
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    return this.Valor.FormatMoney(false);
+                }
+                return "";
+            }
+        }
+        public string ValorTotalFormatado
+        {
+            get
+            {
+                if (this.Id > 0 && this.Quantidade>0)
+                {
+                    return (this.Quantidade * this.Valor).FormatMoney(false);
+                }
+                return "";
+            }
+        }
     }
 }

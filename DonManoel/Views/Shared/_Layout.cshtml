@@ -371,7 +371,7 @@
     }
 
     <!-- Modal -->
-    <div class="modal modal-fill fade" data-backdrop="false" id="modalImpressao" tabindex="-1" style="width:300px !important;">
+    <div class="modal modal-fill fade" data-backdrop="false" id="modalImpressao" tabindex="-1" style="width:288px !important;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -380,7 +380,7 @@
                 </div>
                 <div class="modal-body">
                     <br />
-                    <div id="divImpressao" style="background-color: #FFFF66;width:260px;">
+                    <div id="divImpressao" style="background-color: #FFFF66;width:258px;">
 
                         <p>
                             <br />
@@ -389,42 +389,46 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; SEM VALOR FISCAL<br>
                             ----------------------------------------------<br>
                             &nbsp;&nbsp;&nbsp; Data: <span id="datapedidoimpressao"></span>&nbsp; Hora: <span id="horapedidoimpressao"></span> <br />
-                            &nbsp;&nbsp;&nbsp; Nº VENDA <span id="numeropedidoimpressao"></span> MESA: <span id="numeromesaimpressao"></span><br />
+                            &nbsp;&nbsp;&nbsp; Nº VENDA <span id="numeropedidoimpressao" style="font-weight: bold;"></span> MESA: <span id="numeromesaimpressao" style="font-weight: bold;"></span><br />
                             ----------------------------------------------<br />
                             <table id="tableItensImpressao">
                                 <thead>
                                     <tr>
-                                        <th>Qtde</th>
+                                        <th >Qtde</th>
                                         <th>Descrição</th>
-                                        <th>Unit.</th>
-                                        <th>Total</th>
+                                        <th style="text-align: right;">Unit.</th>
+                                        <th style="text-align: right;">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @*<tr>
-                                        <td>2</td>
-                                        <td style="max-width: 17ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">xyahfasdfhj fasdfahdsj hfsjad</td>
-                                        <td>10,90</td>
-                                        <td>21,18</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td style="max-width: 17ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">xyahfasdfhj fasdfahdsj hfsjad</td>
-                                        <td>10,90</td>
-                                        <td>21,18</td>
-                                    </tr>*@
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="4" style="text-align:right;">
-                                            R$ 198,45
+                                            Sub-Total: <span id="subtotalimpressao"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align:right;">
+                                            Taxa de Serviço: <span id="taxaservicoimpressao"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <hr />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align: right;font-weight: bold;">
+                                            Valor Total: <span id="totalimpressao"></span>
                                         </td>
                                     </tr>
                                 </tfoot>
                             </table>
-                            ----------------------------------------------<br />
+                           
                         </p>
                         <p>
+                            ----------------------------------------------<br />
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OBRIGADO PELA PREFERÊNCIA<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VOLTE SEMPRE
                         </p>
