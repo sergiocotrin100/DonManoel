@@ -50,7 +50,7 @@ namespace DonManoel
             {
                 options.EnableEndpointRouting = false;
             }).AddRazorPagesOptions(options => { }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            
+
             //services.AddSignalR();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -91,7 +91,7 @@ namespace DonManoel
             //    RoutesToPreCache = "/Home/Index, /Shared/_Layout,/Shared/Error",
 
             //    OfflineRoute = "index.html",
-                
+
             //});
         }
 
@@ -115,7 +115,7 @@ namespace DonManoel
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.UseCookiePolicy();
 
             app.UseRouting();
@@ -129,9 +129,7 @@ namespace DonManoel
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllerRoute(name: "pedido",pattern: "{controller=Sales}/{action=Order}/{idmesa}/{idorder?}");
-
-
-                endpoints.MapControllerRoute(name: "default",pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
