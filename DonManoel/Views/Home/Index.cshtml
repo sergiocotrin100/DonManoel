@@ -63,8 +63,7 @@
                             <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido">
                             <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceito</label>
                             <div class="text-end flex-grow">
-                                <button class="btn btn-sm btn-primary">Pagar</button>
-                                @*<button class="btn btn-sm btn-secondary">Cancel</button>*@
+                                <button class="btn btn-sm btn-success" onclick="setPedidoPago(@mesa.IdPedido)"><i class="fa fa-dollar"></i> Pagar</button>
                             </div>
                         </div>
                     </div>
