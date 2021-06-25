@@ -5,9 +5,18 @@
     <div class="col-xxxl-8 col-12">
         <div class="box">
             <div class="box-header bg-danger">
-                @if (Model.Itens != null && Model.Itens.Count > 1)
+                @{
+                    var lstItens = Model.Itens;
+                    if (lstItens == null)
+                        lstItens = new List<Core.Entities.PedidoItem>();
+                    else
+                        lstItens = Model.Itens.Where(item => item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto
+                        || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado
+                        || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado).ToList();
+                }
+                @if (lstItens.Count > 1)
                 {
-                    <h4 class="box-title">PEDIDO (@Model.Itens.Count ITEMS)</h4>
+                    <h4 class="box-title">PEDIDO (@lstItens.Count ITEMS)</h4>
                 }
                 else
                 {
@@ -26,120 +35,108 @@
                         </thead>
                         <tbody>
 
-                            @if (Model.Itens != null && Model.Itens.Count > 0)
+                            @foreach (var item in Model.Itens)
                             {
-                                foreach (var item in Model.Itens)
+                                if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
                                 {
-                                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
-                                    {
-                                        <tr class="bg-success">
-                                            <td>
-                                                <div class="bg-success rounded-circle w-30 h-30 l-h-30 text-center">
-                                                    <i class="fa fa-cutlery"></i>
-                                                </div>
-                                                <div class="d-flex">
-                                                    <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
-                                                </div>
-                                                @foreach (var excecao in item.Excecao)
-                                                {
-                                                    <p>@excecao.Observacao</p>
-                                                }
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: green;"></i>
+                                                &nbsp;
+                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                            </div>
 
-                                                <div class="act-btn d-flex justify-content-between">
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                        <small class="d-block">Editar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                        <small class="d-block">Excluir</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                        <small class="d-block">Duplicar</small>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                            @foreach (var excecao in item.Excecao)
+                                            {
+                                                <p>@excecao.Observacao</p>
+                                            }
 
-                                        </tr>
-                                    }
-                                    else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="bg-info rounded-circle w-30 h-30 l-h-30 text-center">
-                                                    <i class="fa fa-cutlery"></i>
+                                            <div class="act-btn d-flex justify-content-between">
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                    <small class="d-block">Cancelar</small>
                                                 </div>
-                                                <div class="d-flex">
-                                                    <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                    <small class="d-block">Duplicar</small>
                                                 </div>
-
-                                                @foreach (var excecao in item.Excecao)
-                                                {
-                                                    <p>@excecao.Observacao</p>
-                                                }
-
-                                                <div class="act-btn d-flex justify-content-between">
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                        <small class="d-block">Editar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                        <small class="d-block">Cancelar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                        <small class="d-block">Duplicar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                        <small class="d-block">Entregue</small>
-                                                    </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                    <small class="d-block">Entregue</small>
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
 
-                                        </tr>
-                                    }
-                                    else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="bg-warning rounded-circle w-30 h-30 l-h-30 text-center">
-                                                    <i class="fa fa-cutlery"></i>                                                   
+                                    </tr>
+                                }
+                                else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: orange;"></i>
+                                                &nbsp;
+                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                            </div>
+
+
+                                            @foreach (var excecao in item.Excecao)
+                                            {
+                                                <p>@excecao.Observacao</p>
+                                            }
+
+                                            <div class="act-btn d-flex justify-content-between">
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                    <small class="d-block">Cancelar</small>
                                                 </div>
-                                                <div class="d-flex">
-                                                    <h5 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h5>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                    <small class="d-block">Duplicar</small>
                                                 </div>
-                                                
-                                                @foreach (var excecao in item.Excecao)
-                                                {
-                                                    <p>@excecao.Observacao</p>
-                                                }
-
-                                                <div class="act-btn d-flex justify-content-between">
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-warning-light btn-xs mb-5"><i class="fa fa-edit"></i></a>
-                                                        <small class="d-block">Editar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                        <small class="d-block">Cancelar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                        <small class="d-block">Duplicar</small>
-                                                    </div>
-                                                    <div class="text-center mx-5">
-                                                        <a href="#" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                        <small class="d-block">Entregue</small>
-                                                    </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="setItemEntregue(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                    <small class="d-block">Entregue</small>
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
 
-                                        </tr>
-                                    }
+                                    </tr>
+                                }
+                                else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                &nbsp;
+                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                            </div>
 
+                                            @foreach (var excecao in item.Excecao)
+                                            {
+                                                <p>@excecao.Observacao</p>
+                                            }
+
+                                            <div class="act-btn d-flex justify-content-between">
+
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                    <small class="d-block">Cancelar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                    <small class="d-block">Duplicar</small>
+                                                </div>
+                                                <div class="text-center mx-5">
+                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                    <small class="d-block">Entregue</small>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                    </tr>
                                 }
                             }
 
@@ -157,6 +154,10 @@
                         <button id="btnEnviarPedido" class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
                     }
 
+                    @if (Model.CanFecharPedido)
+                    {
+                        <button id="btnFecharPedido" class="btn btn-primary pull-right"><i class="fa fa fa-dollar"></i> Pagar</button>
+                    }
 
                     <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                 </div>

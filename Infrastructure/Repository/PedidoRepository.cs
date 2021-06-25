@@ -32,26 +32,7 @@ namespace Infrastructure.Repository
                 {
                     try
                     {
-                        StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
-                        var parameters = new OracleDynamicParameters();
-                        parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
-                        parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
-                        await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
-
-                        await SaveLogStatus(new LogPedidoStatus()
-                        {
-                            IdPedido = idpedido,
-                            IdStatusPedido = status
-                        }, conn, transaction);
-
-                        if(status == (int)Settings.Status.Pedido.EmPreparacao)
-                        {
-                            sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS WHERE ID_PEDIDO=:ID AND ID_STATUS_PEDIDO_ITEM =1");
-                            parameters = new OracleDynamicParameters();
-                            parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
-                            parameters.Add("STATUS", (int)Settings.Status.PedidoItem.Enviado, OracleDbType.Int32, ParameterDirection.Input);
-                            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
-                        }
+                        await ChangeState(idpedido, status, conn, transaction);
 
                         transaction.Commit();
                     }
@@ -59,6 +40,99 @@ namespace Infrastructure.Repository
                     {
                         transaction.Rollback();
                     }
+                }
+            }
+        }
+
+        internal async Task ChangeState(long idpedido, int status, IDbConnection conn, IDbTransaction transaction)
+        {
+            StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
+            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+            await SaveLogStatus(new LogPedidoStatus()
+            {
+                IdPedido = idpedido,
+                IdStatusPedido = status
+            }, conn, transaction);
+
+            if (status == (int)Settings.Status.Pedido.EmPreparacao)
+            {
+                sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS WHERE ID_PEDIDO=:ID AND ID_STATUS_PEDIDO_ITEM =1");
+                parameters = new OracleDynamicParameters();
+                parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
+                parameters.Add("STATUS", (int)Settings.Status.PedidoItem.Enviado, OracleDbType.Int32, ParameterDirection.Input);
+                await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+            }
+        }
+
+        public async Task ChangeStateItem(long idpedidoitem, int status)
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        await ChangeStateItem(idpedidoitem, status, conn, transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
+        internal async Task ChangeStateItem(long idpedidoitem, int status, IDbConnection conn, IDbTransaction transaction)
+        {
+            StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS, DATA_ATUALIZACAO = SYSDATE WHERE ID=:ID");
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("ID", idpedidoitem, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
+            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+            if (status == (int)Settings.Status.PedidoItem.Pronto)
+            {
+                PedidoItemRepository pedidoitem = new PedidoItemRepository(_userSession);
+                PedidoItem model = await pedidoitem.GetItemById(idpedidoitem, conn, transaction);
+
+                sql = new StringBuilder();
+                sql.AppendFormat(@"
+                    SELECT 
+                        I.ID_STATUS_PEDIDO_ITEM IDSTATUSPEDIDOITEM
+                    FROM DOTNET_PEDIDO_ITENS I
+                    WHERE I.ID_PEDIDO=:IDPEDIDO
+                 ");
+                var parametros = new DynamicParameters();
+                parametros.Add("IDPEDIDO", model.IdPedido, DbType.Int64);
+                var itens = await conn.QueryAsync<PedidoItem>(sql.ToString(), parametros, transaction);
+
+                int statusPedidoVenda = 0;
+                if (itens.ToList().Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado))
+                    statusPedidoVenda = (int)Settings.Status.Pedido.EmPreparacao;
+                else
+                    statusPedidoVenda = (int)Settings.Status.Pedido.Pronto;
+
+                if (statusPedidoVenda > 0)
+                {
+                    sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
+                    parameters = new OracleDynamicParameters();
+                    parameters.Add("ID", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
+                    parameters.Add("STATUS", statusPedidoVenda, OracleDbType.Int32, ParameterDirection.Input);
+                    await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+                    await SaveLogStatus(new LogPedidoStatus()
+                    {
+                        IdPedido = model.IdPedido,
+                        IdStatusPedido = status
+                    }, conn, transaction);
                 }
             }
         }

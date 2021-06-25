@@ -48,7 +48,7 @@ namespace Core.Entities
             {
                 if (this.Id > 0)
                 {
-                    if(this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago)
+                    if (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago)
                     {
                         if (this.Itens == null || this.Itens.Count == 0) return true;
                         return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado);
@@ -57,7 +57,23 @@ namespace Core.Entities
                 return false;
             }
         }
-       
+
+        public bool CanFecharPedido
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    if (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago && this.IdStatusPedido != (int)Settings.Status.Pedido.Pendente)
+                    {
+                        if (this.Itens == null || this.Itens.Count == 0) return false;
+                        return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado || x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado || x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto);
+                    }
+                }
+                return false;
+            }
+        }
+
         public bool IsAtrasado
         {
             get

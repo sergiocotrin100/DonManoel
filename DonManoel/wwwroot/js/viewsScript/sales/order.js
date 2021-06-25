@@ -1,5 +1,4 @@
 ﻿
-
 var MENUSELECIONADO = [];
 var PEDIDO = null;
 var CATEGORIAS = [];
@@ -26,6 +25,11 @@ $(document).ready(function () {
     $("#btnCancelarPedido").click(function () {
         cancelarPedido();
     });
+
+    $("#btnFecharPedido").click(function () {
+        fecharConta();
+    });
+
     
 });
 
@@ -189,6 +193,161 @@ function cancelarPedido() {
                             }
                             else {
                                 toastr.error("Ocorreu um erro ao cancelar o pedido", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });
+}
+
+
+function cancelarItem(id) {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente cancelar esse item?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedidoitem': id, 'status': 4
+                        },
+                        url: hostSite() + "Sales/ChangeStatusItem",
+                        success: function (data) {
+                             if (data) {
+                             //   toastr.success("Item cancelado com sucesso!", "Sucesso");
+                                window.location.reload();
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao cancelar o item do pedido", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });
+}
+
+function setItemEntregue(id) {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Esse item foi entregue?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedidoitem': id, 'status': 5
+                        },
+                        url: hostSite() + "Sales/ChangeStatusItem",
+                        success: function (data) {
+                             if (data) {
+                             //   toastr.success("Item entregue com sucesso!", "Sucesso");
+                                window.location.reload();
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao marcar o item como entregue", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });
+}
+
+function duplicarItem(id) {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente duplicar esse item?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedidoitem': id
+                        },
+                        url: hostSite() + "Sales/DuplicateItem",
+                        success: function (data) {
+                             if (data) {
+                             //   toastr.success("Item duplicado com sucesso!", "Sucesso");
+                                window.location.reload();
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao duplicar o item do pedido", "Erro");
+                            }
+                        }
+                    });
+                }
+            },
+            Não: function () {
+
+            }
+        }
+    });
+}
+
+
+function fecharConta() {
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-dollar',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente fechar a conta?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'json',
+                        data: {
+                            'idpedido': $("#hdIdPedido").val(), 'status': 5
+                        },
+                        url: hostSite() + "Sales/ChangeStatus",
+                        success: function (data) {
+                             if (data) {
+                               // window.location.reload();
+                                    debugger;
+                                   jQuery('#modalImpressao').modal('show')
+                            }
+                            else {
+                                toastr.error("Ocorreu um erro ao fechar a conta", "Erro");
                             }
                         }
                     });
