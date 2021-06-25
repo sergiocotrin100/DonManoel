@@ -21,7 +21,7 @@ $(document).ready(function () {
     $("#btnEnviarPedido").click(function () {
         enviarPedido();
     });
-    
+
     $("#btnCancelarPedido").click(function () {
         cancelarPedido();
     });
@@ -30,7 +30,7 @@ $(document).ready(function () {
         fecharConta();
     });
 
-    
+
 });
 
 function getParams() {
@@ -41,7 +41,7 @@ function getParams() {
 }
 
 function setSelected(objeto) {
-    let id = $(objeto).data().code;   
+    let id = $(objeto).data().code;
     $.each(MENUSELECIONADO.Composicao, function (idx, receita) {
         if (receita.Id == id) {
             receita.Selecionado = objeto.checked;
@@ -54,8 +54,8 @@ function showMenuDetails(idmenu) {
     $(".receita").hide();
     $(".ponto-carne").hide();
 
-    MENUSELECIONADO = getMenu(idmenu);    
-    
+    MENUSELECIONADO = getMenu(idmenu);
+
     $("#modalDetalhesMenu #MenuDescricao").html(MENUSELECIONADO.Descricao);
     $("#tbReceita tr").remove();
     $("#modalDetalhesMenu #tbReceita tbody").remove();
@@ -70,9 +70,9 @@ function showMenuDetails(idmenu) {
         if (contemCarne == false) {
             contemCarne = receita.ContemCarne;
         }
-        table.append('<tr>'+
-            '<td>' + receita.Descricao +'</td> '+
-            '<td class="text-end fw-700"> <input type="checkbox" name="chkComposicao" onchange="setSelected(this)" style="opacity: 1!important; position: inherit!important;" checked data-code="'+receita.Id+'"></td> '+
+        table.append('<tr>' +
+            '<td>' + receita.Descricao + '</td> ' +
+            '<td class="text-end fw-700"> <input type="checkbox" name="chkComposicao" onchange="setSelected(this)" style="opacity: 1!important; position: inherit!important;" checked data-code="' + receita.Id + '"></td> ' +
             '</tr>');
 
         contemComposicao = true;
@@ -80,18 +80,18 @@ function showMenuDetails(idmenu) {
 
     if (contemCarne) {
         $(".ponto-carne").show();
-    }   
+    }
 
     if (contemComposicao) {
         $(".receita").show();
-    }      
+    }
 
     var myModal = new bootstrap.Modal(document.getElementById('modalDetalhesMenu'), {
         keyboard: false,
         backdrop: "static"
     });
 
-    $(myModal).modal({ backdrop: true, keyboard: false, show: true });    
+    $(myModal).modal({ backdrop: true, keyboard: false, show: true });
 
 }
 
@@ -122,8 +122,12 @@ function addItem() {
         },
         url: hostSite() + "Sales/AddItem",
         success: function (data) {
-            var url = hostSite() + "Sales/Order?idmesa=" + idmesa + "&idorder=" + data + "&viewitens=1";
-            window.location.href = url;
+            if (data.success) {
+                var url = hostSite() + "Sales/Order?idmesa=" + idmesa + "&idorder=" + data.result + "&viewitens=1";
+                window.location.href = url;
+            } else {
+                toastr.error(data.message, "Erro");
+            }
         }
     });
 
@@ -149,12 +153,12 @@ function enviarPedido() {
                         },
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
-                            if (data) {
-                            //    toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
+                            if (data.success) {
+                                toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao enviar o pedido para a cozinha", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });
@@ -164,7 +168,7 @@ function enviarPedido() {
 
             }
         }
-    });    
+    });
 }
 
 function cancelarPedido() {
@@ -187,12 +191,12 @@ function cancelarPedido() {
                         },
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
-                             if (data) {
-                             //   toastr.success("Pedido cancelado com sucesso!", "Sucesso");
+                            if (data.success) {
+                                toastr.success("Pedido cancelado com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao cancelar o pedido", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });
@@ -204,7 +208,6 @@ function cancelarPedido() {
         }
     });
 }
-
 
 function cancelarItem(id) {
     $.confirm({
@@ -226,12 +229,12 @@ function cancelarItem(id) {
                         },
                         url: hostSite() + "Sales/ChangeStatusItem",
                         success: function (data) {
-                             if (data) {
-                             //   toastr.success("Item cancelado com sucesso!", "Sucesso");
+                            if (data.success) {
+                                toastr.success("Item cancelado com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao cancelar o item do pedido", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });
@@ -264,12 +267,12 @@ function setItemEntregue(id) {
                         },
                         url: hostSite() + "Sales/ChangeStatusItem",
                         success: function (data) {
-                             if (data) {
-                             //   toastr.success("Item entregue com sucesso!", "Sucesso");
+                            if (data.success) {
+                                toastr.success("Item entregue com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao marcar o item como entregue", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });
@@ -302,12 +305,12 @@ function duplicarItem(id) {
                         },
                         url: hostSite() + "Sales/DuplicateItem",
                         success: function (data) {
-                             if (data) {
-                             //   toastr.success("Item duplicado com sucesso!", "Sucesso");
+                            if (data.success) {
+                                toastr.success("Item duplicado com sucesso!", "Sucesso");
                                 window.location.reload();
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao duplicar o item do pedido", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });
@@ -319,7 +322,6 @@ function duplicarItem(id) {
         }
     });
 }
-
 
 function fecharConta() {
     $.confirm({
@@ -341,13 +343,15 @@ function fecharConta() {
                         },
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
-                             if (data) {
-                               // window.location.reload();
-                                    debugger;
-                                   jQuery('#modalImpressao').modal('show')
+                            if (data.success) {
+                                // window.location.reload();
+                                debugger;
+                                $("#modalImpressao #numeropedido").html(data.result.id.toString().padStart('00000'));
+                                $("#modalImpressao #numeromesa").html(data.result.idMesa.toString().padStart('00'));
+                                jQuery('#modalImpressao').modal('show')
                             }
                             else {
-                                toastr.error("Ocorreu um erro ao fechar a conta", "Erro");
+                                toastr.error(data.message, "Erro");
                             }
                         }
                     });

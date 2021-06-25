@@ -52,46 +52,53 @@ namespace DonManoel.Controllers
         [HttpPost("AddItem")]
         public async Task<JsonResult> AddItem(int idmesa, string pontoCarne, string observacao, Menu menu)
         {
-            Pedido model = await service.GetPedidoAbertoByMesa(idmesa);
-            if (model == null || model.Id == 0)
-                model = new Pedido();
-
-            if(model.IdStatusPedido == (int)Settings.Status.Pedido.Cancelado || model.IdStatusPedido == (int)Settings.Status.Pedido.Pago)
-                model = new Pedido();
-
-            model.IdUsuario = _userSession.Id;
-            model.IdMesa = idmesa;
-            model.IdStatusPedido = Settings.Status.Pedido.Pendente;
-            model.Itens = new List<PedidoItem>();
-            PedidoItem item = new PedidoItem();
-            item.IdMenu = menu.Id;
-            item.IdStatusPedidoItem = Settings.Status.PedidoItem.Solicitado;
-            item.IdUsuario = _userSession.Id;
-            item.Observacao = observacao;            
-            item.TempoPreparo = menu.TempoPreparo;
-            item.Valor = menu.Valor;
-            item.Excecao = new List<PedidoItemExcecao>();
-            if(menu.Composicao != null && menu.Composicao.Count>0)
+            try
             {
-                foreach (var excecao in menu.Composicao.Where(x => x.Selecionado == false).ToList())
+                Pedido model = await service.GetPedidoAbertoByMesa(idmesa);
+                if (model == null || model.Id == 0)
+                    model = new Pedido();
+
+                if (model.IdStatusPedido == (int)Settings.Status.Pedido.Cancelado || model.IdStatusPedido == (int)Settings.Status.Pedido.Pago)
+                    model = new Pedido();
+
+                model.IdUsuario = _userSession.Id;
+                model.IdMesa = idmesa;
+                model.IdStatusPedido = Settings.Status.Pedido.Pendente;
+                model.Itens = new List<PedidoItem>();
+                PedidoItem item = new PedidoItem();
+                item.IdMenu = menu.Id;
+                item.IdStatusPedidoItem = Settings.Status.PedidoItem.Solicitado;
+                item.IdUsuario = _userSession.Id;
+                item.Observacao = observacao;
+                item.TempoPreparo = menu.TempoPreparo;
+                item.Valor = menu.Valor;
+                item.Excecao = new List<PedidoItemExcecao>();
+                if (menu.Composicao != null && menu.Composicao.Count > 0)
                 {
-                    item.Excecao.Add(new PedidoItemExcecao()
+                    foreach (var excecao in menu.Composicao.Where(x => x.Selecionado == false).ToList())
                     {
-                        IdUsuario = _userSession.Id,
-                        Observacao = excecao.Descricao
-                    });
+                        item.Excecao.Add(new PedidoItemExcecao()
+                        {
+                            IdUsuario = _userSession.Id,
+                            Observacao = excecao.Descricao
+                        });
+                    }
+
+                    if (menu.Composicao.Exists(item => item.ContemCarne))
+                    {
+                        item.PontoCarne = GetPontoCarne(pontoCarne.ToInt());
+                    }
                 }
 
-                if(menu.Composicao.Exists(item => item.ContemCarne))
-                {
-                    item.PontoCarne = GetPontoCarne(pontoCarne.ToInt());
-                }
-            }           
+                model.Itens.Add(item);
 
-            model.Itens.Add(item);
-
-            long idpedido = await service.Save(model);
-            return Json(idpedido);
+                long idpedido = await service.Save(model);
+                return Json(new { success = true, message = "", result = idpedido });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpGet("kitchen")]
@@ -139,27 +146,48 @@ namespace DonManoel.Controllers
         [HttpPost("ChangeStatus")]
         public async Task<JsonResult> ChangeStatus(long idpedido, int status)
         {
-            await service.ChangeState(idpedido, status);
-            return Json(true);
+            try
+            {
+                await service.ChangeState(idpedido, status);
+                var result = await service.GetPedidoById(idpedido);
+                return Json(new { success = true, message = "", result = result });
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost("ChangeStatusItem")]
         public async Task<JsonResult> ChangeStatusItem(long idpedidoitem, int status)
-        {
-            await service.ChangeStateItem(idpedidoitem, status);
-            return Json(true);
+        {           
+            try
+            {
+                await service.ChangeStateItem(idpedidoitem, status);
+                return Json(new { success = true, message = ""});
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost("DuplicateItem")]
         public async Task<JsonResult> DuplicateItem(long idpedidoitem)
         {
-            var model    = await serviceItem.GetItemById(idpedidoitem);
-            model.Id = 0;
-            model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
-            await serviceItem.Save(model);
-            return Json(true);
-        }
-        
+            try
+            {
+                var model = await serviceItem.GetItemById(idpedidoitem);
+                model.Id = 0;
+                model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
+                await serviceItem.Save(model);
+                return Json(new { success = true, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }        
 
     }
 
