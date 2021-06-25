@@ -10,63 +10,64 @@
                 @if (mesa.EmUso)
                 {
                     //<a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
-                <div class="box box-solid bg-secondary">
-                    <div class="box-header">
-                        <div class="col-sm-12" style="display:inline-flex">
-                            <div class="col-sm-4">
-                                <h4 class="box-title">
-                                    <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido"> <strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></a>
-                                </h4>
-                            </div>
-                            <div class="col-sm-5"></div>
-                            <div class="col-sm-3">
-                                <div class="header-elements" style="float:left">
-                                    <span class="badge bg-danger badge-pill">Mesa Ocupada</span>
-                                    @*<span class="badge bg-danger badge-pill">Pedido na cozinha</span>
-                        <span class="badge bg-danger badge-pill">Mesa Pediu Conta</span>*@
+                    <div class="box box-solid bg-secondary">
+                        <div class="box-header">
+                            <div class="col-sm-12" style="display:inline-flex">
+                                <div class="col-sm-4">
+                                    <h4 class="box-title">
+                                        <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido"> <strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-5">&nbsp;</div>
+                                <div class="col-sm-3">
+                                    <div class="header-elements" style="float:left">
+                                        <span class="badge bg-danger badge-pill">Mesa Ocupada</span>
+                                        @*<span class="badge bg-danger badge-pill">Pedido na cozinha</span>
+                                            <span class="badge bg-danger badge-pill">Mesa Pediu Conta</span>*@
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="col-sm-12" style="display: inline-flex;">
-                              
-                                <div class=" col-sm-4" style="padding: 0px 15px 0px 0px;">
-                                    <i class="icon-Calculator"></i> Sub-Total <br />
-                                    <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                        <div class="box-body">
+                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
+                                <div class="row">
+                                    <div class="col-sm-12" style="display: inline-flex;">
+
+                                        <div class=" col-sm-4" style="padding: 0px 15px 0px 0px;">
+                                            <i class="icon-Calculator"></i> Sub-Total <br />
+                                            <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                                        </div>
+                                        <div class=" col-sm-4" style="padding: 0px 15px 0px 0px;">
+                                            <i class="icon-Calculator"></i> Total <br />
+                                            <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                                        </div>
+                                        <div class=" col-sm-4">
+                                            <i class="icon-User"></i> Atendente <br />
+                                            @mesa.Atendente.FirstName()
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class=" col-sm-4" style="padding: 0px 15px 0px 0px;">
-                                    <i class="icon-Calculator"></i> Total <br />
-                                    <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
-                                </div>
-                                <div class=" col-sm-4">
-                                    <i class="icon-User"></i> Atendente <br />
-                                    @mesa.Atendente.FirstName()
-                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="icon-Clock"></i> Tempo de uso da mesa:
+                                        @mesa.Tempo
+                                    </li>
+                                    <li class="list-group-item">Total: R$ 34.543,45</li>
+                                </ul>
+                            </a>
+                        </div>
+                        <div class="box-footer flexbox">
+                            <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido">
+                            <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceito</label>
+                            <div class="text-end flex-grow">
+                                <button class="btn btn-sm btn-primary">Pagar</button>
+                                @*<button class="btn btn-sm btn-secondary">Cancel</button>*@
                             </div>
                         </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                               
-                            </li>
-                            <li class="list-group-item">
-                                <i class="icon-Clock"></i> Tempo de uso da mesa:
-                                @mesa.Tempo
-                            </li>
-                            <li class="list-group-item">Total: R$ 34.543,45</li>
-                        </ul>
                     </div>
-                  
-                    <div class="box-footer flexbox">
-                        <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido">
-                        <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceito</label>
-                        <div class="text-end flex-grow">
-                            <button class="btn btn-sm btn-primary">Pagar</button>
-                            @*<button class="btn btn-sm btn-secondary">Cancel</button>*@
-                        </div>
-                    </div>
-                </div>
                     //</a>
                 }
                 else
@@ -97,40 +98,40 @@
 
 <script>
     function setPedidoPago(idpedido) {
-            $.confirm({
-                title: 'Atenção!',
-                icon: 'fa fa-dollar',
-                animation: 'scale',
-                closeAnimation: 'scale',
-                content: 'Pedido foi recebido pelo caixa?',
-                buttons: {
-                    Sim: {
-                        btnClass: 'btn-danger',
-                        keys: ['enter', 'shift'],
-                        action: function () {
-                            $.ajax({
-                                type: "post",
-                                dataType: 'json',
-                                data: {
-                                    'idpedido': idpedido, 'status': 6
-                                },
-                                url: hostSite() + "Sales/ChangeStatus",
-                                success: function (data) {
-                                    if (data.success) {
-                                        toastr.success("Pedido recebido com sucesso!", "Sucesso");
-                                        window.location.reload();
-                                    }
-                                    else {
-                                        toastr.error(data.message, "Erro");
-                                    }
+        $.confirm({
+            title: 'Atenção!',
+            icon: 'fa fa-dollar',
+            animation: 'scale',
+            closeAnimation: 'scale',
+            content: 'Pedido foi recebido pelo caixa?',
+            buttons: {
+                Sim: {
+                    btnClass: 'btn-danger',
+                    keys: ['enter', 'shift'],
+                    action: function () {
+                        $.ajax({
+                            type: "post",
+                            dataType: 'json',
+                            data: {
+                                'idpedido': idpedido, 'status': 6
+                            },
+                            url: hostSite() + "Sales/ChangeStatus",
+                            success: function (data) {
+                                if (data.success) {
+                                    toastr.success("Pedido recebido com sucesso!", "Sucesso");
+                                    window.location.reload();
                                 }
-                            });
-                        }
-                    },
-                    Não: function () {
-
+                                else {
+                                    toastr.error(data.message, "Erro");
+                                }
+                            }
+                        });
                     }
+                },
+                Não: function () {
+
                 }
-            });
-        }
+            }
+        });
+    }
 </script>
