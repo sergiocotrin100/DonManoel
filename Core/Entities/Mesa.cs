@@ -28,6 +28,19 @@ namespace Core.Entities
         public long? IdPedido { get; set; }
         public DateTime? DataAberturaPedido { get; set; }
         public double? ValorPedido { get; set; }
+        public int TaxaServico { get; set; }
+        public double ValorTotalPedido
+        {
+            get
+            {
+                if(this.Id>0 && this.ValorPedido.HasValue && this.ValorPedido>0 && this.TaxaServico>0)
+                {
+                    var valortaxa = (this.TaxaServico * this.ValorPedido.Value) / 100;
+                    return this.ValorPedido.Value + valortaxa;
+                }
+                return 0;
+            }
+        }
         public string Tempo
         {
             get

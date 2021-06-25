@@ -55,15 +55,15 @@
                                         <i class="icon-Clock"></i> Tempo de uso da mesa:
                                         @mesa.Tempo
                                     </li>
-                                    <li class="list-group-item">Total: R$ 34.543,45</li>
+                                    <li class="list-group-item">Total: <span id="totalpedido_@mesa.IdPedido">@mesa.ValorTotalPedido.FormatMoney() </span></li>
                                 </ul>
                             </a>
                         </div>
                         <div class="box-footer flexbox">
-                            <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido">
-                            <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceito</label>
+                            <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido" checked onclick="recalcularValorPedido(this.checked,@mesa.IdPedido,@mesa.ValorPedido.Value,@mesa.TaxaServico);">
+                            <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceita?</label>
                             <div class="text-end flex-grow">
-                                <button class="btn btn-sm btn-success" onclick="setPedidoPago(@mesa.IdPedido)"><i class="fa fa-dollar"></i> Pagar</button>
+                                <button class="btn btn-sm btn-danger" onclick="setPedidoPago(@mesa.IdPedido)"><i class="fa fa-dollar"></i> Pagar</button>
                             </div>
                         </div>
                     </div>
@@ -96,6 +96,15 @@
 
 
 <script>
+    function recalcularValorPedido(checked, idpedido, totalitens, taxaservico) {
+        var totalpedido = totalitens;
+        if (checked) {
+            totalpedido = calcularTotalPedidoComTaxaServico(totalitens, taxaservico);
+        } 
+
+        $("#totalpedido_" + idpedido).html(formatMoney(totalpedido,false));
+    }
+
     function setPedidoPago(idpedido) {
         $.confirm({
             title: 'Atenção!',
