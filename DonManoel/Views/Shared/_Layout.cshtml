@@ -487,6 +487,18 @@
            newWin.print();
            newWin.close();
         }
+
+        function calcularTaxaServico(totalitens, taxaServico) {
+            var valortaxa = (taxaServico * totalitens) / 100;
+            return valortaxa;
+        }
+
+        function calcularTotalPedidoComTaxaServico(totalitens, taxaServico) {
+            return totalitens + calcularTaxaServico(totalitens, taxaServico);
+        }
+
+        
+
     </script>
     <script>'serviceWorker' in navigator && navigator.serviceWorker.register('../serviceworker')</script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -51,11 +51,10 @@
                             </div>
                         </div>
                         <div class="box-footer flexbox">
-                            <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido">
-                            <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceito</label>
+                            <input type="checkbox" id="chkSetValorTotal_@mesa.IdPedido" checked>
+                            <label for="chkSetValorTotal_@mesa.IdPedido">Taxa de serviço aceita?</label>
                             <div class="text-end flex-grow">
-                                <button class="btn btn-sm btn-primary">Pagar</button>
-                                @*<button class="btn btn-sm btn-secondary">Cancel</button>*@
+                                <button class="btn btn-sm btn-success" onclick="setPedidoPago(@mesa.IdPedido)"><i class="fa fa-dollar"></i> Pagar</button>
                             </div>
                         </div>
                     </div>
@@ -85,3 +84,44 @@
         }
     </div>
 </div>
+
+
+<script>
+    function setPedidoPago(idpedido) {
+            $.confirm({
+                title: 'Atenção!',
+                icon: 'fa fa-dollar',
+                animation: 'scale',
+                closeAnimation: 'scale',
+                content: 'Pedido foi recebido pelo caixa?',
+                buttons: {
+                    Sim: {
+                        btnClass: 'btn-danger',
+                        keys: ['enter', 'shift'],
+                        action: function () {
+                            $.ajax({
+                                type: "post",
+                                dataType: 'json',
+                                data: {
+                                    'idpedido': idpedido, 'status': 6
+                                },
+                                url: hostSite() + "Sales/ChangeStatus",
+                                success: function (data) {
+                                    if (data.success) {
+                                        toastr.success("Pedido recebido com sucesso!", "Sucesso");
+                                        window.location.reload();
+                                    }
+                                    else {
+                                        toastr.error(data.message, "Erro");
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    Não: function () {
+
+                    }
+                }
+            });
+        }
+</script>
