@@ -39,7 +39,7 @@
                                         </div>
                                         <div class=" col-sm-4" style="padding: 0px 15px 0px 0px;">
                                             <i class="icon-Calculator"></i> Total <br />
-                                            <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                                            <b><span id="totalpedido_@mesa.IdPedido">@mesa.ValorTotalPedido.FormatMoney(false) </span></b>
                                         </div>
                                         <div class=" col-sm-4">
                                             <i class="icon-User"></i> Atendente <br />
@@ -55,7 +55,6 @@
                                         <i class="icon-Clock"></i> Tempo de uso da mesa:
                                         @mesa.Tempo
                                     </li>
-                                    <li class="list-group-item">Total: <span id="totalpedido_@mesa.IdPedido">@mesa.ValorTotalPedido.FormatMoney() </span></li>
                                 </ul>
                             </a>
                         </div>

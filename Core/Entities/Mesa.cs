@@ -33,7 +33,7 @@ namespace Core.Entities
         {
             get
             {
-                if(this.Id>0 && this.ValorPedido.HasValue && this.ValorPedido>0 && this.TaxaServico>0)
+                if(this.Id>0 && this.ValorPedido.HasValue && this.TaxaServico>0)
                 {
                     var valortaxa = (this.TaxaServico * this.ValorPedido.Value) / 100;
                     return this.ValorPedido.Value + valortaxa;

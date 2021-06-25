@@ -66,6 +66,14 @@ namespace Infrastructure.Repository
                 parameters.Add("STATUS", (int)Settings.Status.PedidoItem.Enviado, OracleDbType.Int32, ParameterDirection.Input);
                 await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
             }
+
+            if (status == (int)Settings.Status.Pedido.Pronto)
+            {
+                sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET VALOR_TAXA_SERVICO = (VALOR_ITENS * TAXA_SERVICO) /100 WHERE ID_PEDIDO=:ID");
+                parameters = new OracleDynamicParameters();
+                parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
+                await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+            }
         }
 
         public async Task ChangeStateItem(long idpedidoitem, int status)
