@@ -33,6 +33,7 @@ namespace Infrastructure.Repository
                         P.VALOR_ITENS VALORPEDIDO,
                         U.NOME ATENDENTE,
                         P.ID IDPEDIDO,
+                        P.TAXA_SERVICO TAXASERVICO,
                         NVL(P.VALOR_ITENS,0) ValorPedido
                     FROM MESAS M
                     LEFT JOIN DOTNET_PEDIDO P ON P.ID_MESA = M.ID AND P.ID_STATUS_PEDIDO NOT IN(6,7)
