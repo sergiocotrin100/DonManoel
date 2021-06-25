@@ -344,10 +344,24 @@ function fecharConta() {
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
-                                // window.location.reload();
-                                debugger;
-                                $("#modalImpressao #numeropedido").html(data.result.id.toString().padStart('00000'));
-                                $("#modalImpressao #numeromesa").html(data.result.idMesa.toString().padStart('00'));
+                                 $("#modalImpressao #numeropedidoimpressao").html(("00000" + data.result.id).slice(-5));
+                                $("#modalImpressao #numeromesaimpressao").html(("00" + data.result.idMesa).slice(-2));
+                                $("#modalImpressao #datapedidoimpressao").html(data.result.dataPedidoImpressao);
+                                $("#modalImpressao #horapedidoimpressao").html(data.result.horaPedidoImpressao);
+
+                                $("#tableItensImpressao tbody").remove();
+                                var tbody = $('#tableItensImpressao').children('tbody');
+
+                                var table = tbody.length ? tbody : $('#tableItensImpressao');
+                                $.each(data.result.itensImpressao, function (idx, item) {
+                                    table.append('<tr>' +
+                                        '<td>' + item.quantidade + '</td> ' +
+                                        '<td style="max-width: 17ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + item.descricao + '</td> ' +
+                                        '<td>' + item.valorFormatado + '</td> ' +
+                                        '<td>' + item.valorTotalFormatado + '</td> ' +
+                                        '</tr>');
+                                });
+
                                 jQuery('#modalImpressao').modal('show')
                             }
                             else {

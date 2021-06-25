@@ -379,17 +379,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <br />
                     <div id="divImpressao" style="background-color: #FFFF66;width:260px;">
+
                         <p>
                             <br />
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dom Manoel Restaurante Ltda.<br />
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Telefone: (19) 3254-6790<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; SEM VALOR FISCAL<br>
                             ----------------------------------------------<br>
-                            &nbsp;&nbsp;&nbsp; Data: 03/03/2011&nbsp; Hora: 11:46:21<br />
-                            &nbsp; Nº VENDA <span id="numeropedido"></span> MESA: <span id="numeromesa"></span><br />
+                            &nbsp;&nbsp;&nbsp; Data: <span id="datapedidoimpressao"></span>&nbsp; Hora: <span id="horapedidoimpressao"></span> <br />
+                            &nbsp;&nbsp;&nbsp; Nº VENDA <span id="numeropedidoimpressao"></span> MESA: <span id="numeromesaimpressao"></span><br />
                             ----------------------------------------------<br />
-                            <table>
+                            <table id="tableItensImpressao">
                                 <thead>
                                     <tr>
                                         <th>Qtde</th>
@@ -399,7 +401,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    @*<tr>
                                         <td>2</td>
                                         <td style="max-width: 17ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">xyahfasdfhj fasdfahdsj hfsjad</td>
                                         <td>10,90</td>
@@ -410,7 +412,7 @@
                                         <td style="max-width: 17ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">xyahfasdfhj fasdfahdsj hfsjad</td>
                                         <td>10,90</td>
                                         <td>21,18</td>
-                                    </tr>
+                                    </tr>*@
                                 </tbody>
                                 <tfoot>
                                     <tr>
