@@ -57,7 +57,6 @@ namespace Core.Entities
                 return false;
             }
         }
-
         public bool CanFecharPedido
         {
             get
@@ -67,13 +66,14 @@ namespace Core.Entities
                     if (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago && this.IdStatusPedido != (int)Settings.Status.Pedido.Pendente)
                     {
                         if (this.Itens == null || this.Itens.Count == 0) return false;
-                        return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado || x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado || x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto);
+                        if (this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)) return false;
+                        if (this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)) return false;
+                        return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto);
                     }
                 }
                 return false;
             }
         }
-
         public bool IsAtrasado
         {
             get
@@ -134,6 +134,49 @@ namespace Core.Entities
                     }
                 }
                 return 0;
+            }
+        }
+        public string DataPedidoImpressao
+        {
+            get
+            {
+                if(this.Id >0)
+                {
+                    return this.Data.FormatDate();
+                }
+                return string.Empty;    
+            }
+        }
+        public string HoraPedidoImpressao
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    return this.Data.ToString("hh:mm:ss");
+                }
+                return string.Empty;
+            }
+        }
+        public dynamic itensImpressao
+        {
+            get
+            {
+                if(this.Id>0 && this.Itens != null && this.Itens.Count>0)
+                {
+                    var Query = from p in this.Itens.GroupBy(p => p.IdMenu)
+                                select new
+                                {
+                                    Quantidade = p.Count(),
+                                    p.First().IdMenu,
+                                    p.First().Valor,
+                                    p.First().Menu.Descricao,
+                                    p.First().ValorFormatado,
+                                };
+                    return Query;
+                }
+
+                return new List<PedidoItem>();
             }
         }
     }

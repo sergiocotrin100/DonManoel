@@ -344,10 +344,39 @@ function fecharConta() {
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
-                                // window.location.reload();
-                                debugger;
-                                $("#modalImpressao #numeropedido").html(data.result.id.toString().padStart('00000'));
-                                $("#modalImpressao #numeromesa").html(data.result.idMesa.toString().padStart('00'));
+                                 $("#modalImpressao #numeropedidoimpressao").html(("00000" + data.result.id).slice(-5));
+                                $("#modalImpressao #numeromesaimpressao").html(("00" + data.result.idMesa).slice(-2));
+                                $("#modalImpressao #datapedidoimpressao").html(data.result.dataPedidoImpressao);
+                                $("#modalImpressao #horapedidoimpressao").html(data.result.horaPedidoImpressao);
+
+                                $("#tableItensImpressao tbody").remove();
+                                var tbody = $('#tableItensImpressao').children('tbody');
+
+                                var table = tbody.length ? tbody : $('#tableItensImpressao');
+                                var totalitens = parseFloat(0);
+                                $.each(data.result.itensImpressao, function (idx, item) {
+                                    table.append('<tr style="font-size: 11px;">' +
+                                        '<td style="text-align: center;">' + item.quantidade + '</td> ' +
+                                        '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + item.descricao + '</td> ' +
+                                        '<td style="text-align: right;">' + item.valorFormatado + '</td> ' +
+                                        '<td style="text-align: right;">' + formatMoney((item.quantidade * item.valor), false) + '</td> ' +
+                                        '</tr>');
+                                    totalitens += item.valor;
+                                });
+                              
+                                var valortaxa = 0;
+                                $("#modalImpressao #subtotalimpressao").html(formatMoney(totalitens));
+                                if (isNullOrEmpty(PEDIDO.TaxaServico) || PEDIDO.TaxaServico == 0)
+                                    $("#modalImpressao #taxaservicoimpressao").html("-");
+                                else {
+                                    var valortaxa = (PEDIDO.TaxaServico * totalitens) / 100;
+                                    $("#modalImpressao #taxaservicoimpressao").html(formatMoney(valortaxa));
+                                }
+
+                                var total = valortaxa + totalitens;
+                                $("#modalImpressao #totalimpressao").html(formatMoney(total));                                
+
+
                                 jQuery('#modalImpressao').modal('show')
                             }
                             else {
