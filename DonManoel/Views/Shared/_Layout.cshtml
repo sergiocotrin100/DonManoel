@@ -499,34 +499,57 @@
             return totalitens + calcularTaxaServico(totalitens, taxaServico);
         }
 
+        function getPedidoImpressaoById(idpedido) {
+            let pedido = [];
+            $.each(LISTAMESAS, function (idx, mesa) {
+                if (!isNullOrEmpty(mesa.IdPedido) && mesa.IdPedido == idpedido) {
+                    pedido = mesa.Pedido;
+                    return;
+                }
+            });
+
+            return pedido;
+        }
+
+        function printOrderById(idpedido) {
+            let model = getPedidoImpressaoById(idpedido);
+
+            printOrder(model);
+        } 
+
         function printOrder(model) {
-            debugger;
-            $("#modalImpressao #numeropedidoimpressao").html(("00000" + model.id).slice(-5));
-            $("#modalImpressao #numeromesaimpressao").html(("00" + model.idMesa).slice(-2));
-            $("#modalImpressao #datapedidoimpressao").html(model.dataPedidoImpressao);
-            $("#modalImpressao #horapedidoimpressao").html(model.horaPedidoImpressao);
+
+            $("#modalImpressao #numeropedidoimpressao").html(("00000" + (isNullOrEmpty(model.id) ? model.Id : model.id)).slice(-5));
+            $("#modalImpressao #numeromesaimpressao").html(("00" + (isNullOrEmpty(model.idMesa) ? model.IdMesa : model.idMesa)).slice(-3));
+            $("#modalImpressao #datapedidoimpressao").html((isNullOrEmpty(model.dataPedidoImpressao) ? model.DataPedidoImpressao : model.dataPedidoImpressao));
+            $("#modalImpressao #horapedidoimpressao").html((isNullOrEmpty(model.horaPedidoImpressao) ? model.HoraPedidoImpressao : model.horaPedidoImpressao));
 
             $("#tableItensImpressao tbody").remove();
             var tbody = $('#tableItensImpressao').children('tbody');
 
             var table = tbody.length ? tbody : $('#tableItensImpressao');
             var totalitens = parseFloat(0);
-            $.each(model.itensImpressao, function (idx, item) {
+            debugger;
+            $.each((isNullOrEmpty(model.itensImpressao) ? model.ItensImpressao : model.itensImpressao), function (idx, item) {
+                debugger;
+                let qtde = (isNullOrEmpty(item.quantidade) ? item.Quantidade : item.quantidade);
+                let valor = (isNullOrEmpty(item.valor) ? item.Valor : item.valor);
                 table.append('<tr style="font-size: 11px;">' +
-                    '<td style="text-align: center;">' + item.quantidade + '</td> ' +
-                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + item.descricao + '</td> ' +
-                    '<td style="text-align: right;">' + item.valorFormatado + '</td> ' +
-                    '<td style="text-align: right;">' + formatMoney((item.quantidade * item.valor), false) + '</td> ' +
+                    '<td style="text-align: center;">' + qtde + '</td> ' +
+                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (isNullOrEmpty(item.id) ? item.Descricao : item.descricao) + '</td> ' +
+                    '<td style="text-align: right;">' + (isNullOrEmpty(item.valorFormatado) ? item.ValorFormatado : item.valorFormatado) + '</td> ' +
+                    '<td style="text-align: right;">' + formatMoney((qtde * valor), false) + '</td> ' +
                     '</tr>');
-                totalitens += item.valor;
+                totalitens += valor;
             });
 
             var valortaxa = 0;
+            let taxa = (isNullOrEmpty(model.taxaServico) ? model.TaxaServico : model.taxaServico);
             $("#modalImpressao #subtotalimpressao").html(formatMoney(totalitens));
-            if (isNullOrEmpty(model.TaxaServico) || model.TaxaServico == 0)
+            if (isNullOrEmpty(taxa) || taxa == 0)
                 $("#modalImpressao #taxaservicoimpressao").html("R$ 0,00");
             else {
-                $("#modalImpressao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, model.TaxaServico)));
+                $("#modalImpressao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, taxa)));
             }
 
             var total = valortaxa + totalitens;
