@@ -108,11 +108,25 @@ namespace DonManoel.Controllers
             return View(pedidos);
         }
 
+        [HttpGet("GetPedidosCozinha")]
+        public PartialViewResult GetPedidosCozinha()
+        {
+            var pedidos = service.GetPedidosCozinha().Result;
+            return PartialView("_kitchenPartial", pedidos);
+        }
+
         [HttpGet("Bar")]
         public IActionResult Bar()
         {
             var pedidos = service.GetPedidosBar().Result;
             return View(pedidos);
+        }
+
+        [HttpGet("GetPedidosBar")]
+        public PartialViewResult GetPedidosBar()
+        {
+            var pedidos = service.GetPedidosBar().Result;
+            return PartialView("_barPartial", pedidos);
         }
 
         [HttpGet("Tracking")]

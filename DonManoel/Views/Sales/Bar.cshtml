@@ -1,61 +1,13 @@
 ﻿@model List<Core.Entities.Pedido>
-@using CrossCutting
 
 
-@{
-    var model = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
-}
+<div id="divPedidosBar">
+    @await Html.PartialAsync("_barPartial", Model)
 
-<script type="text/javascript">
-    var pedidos = JSON.parse('@Html.Raw(model)');
-</script>
-
-
-<div class="table-responsive">
-    <table class="table b-1 border-secondary">
-        <thead class="bg-secondary">
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th class="text-center" colspan="2">Prato Adulto</th>
-                <th class="text-center" colspan="2">Prato Kids</th>
-            </tr>
-            <tr>
-                <th>Pedido</th>
-                <th>Atendente</th>
-                <th class="text-center">Prazo</th>
-                <th class="text-center">Tempo</th>
-                <th class="text-center">Prazo</th>
-                <th class="text-center">Tempo</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Core.Entities.Pedido pedido in Model)
-            {
-                if (pedido.IsAtrasado)
-                {
-                    <tr class="bg-danger">
-                        <td>Mesa @pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                    </tr>
-                }
-                else
-                {
-                    <tr>
-                        <td>@pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                        <td class="text-center">@pedido.Tempo</td>
-                    </tr>
-                }
-
-            }
-        </tbody>
-    </table>
 </div>
+
+
+@section Scripts
+{
+    <script src="~/js/viewsScript/sales/bar.js?cache=@ViewData["version"].ToString()"></script>
+}

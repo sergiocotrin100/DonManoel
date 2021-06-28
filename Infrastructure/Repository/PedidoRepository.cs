@@ -535,6 +535,8 @@ namespace Infrastructure.Repository
 
                         foreach (var pedido in listaPedidos.ToList())
                         {
+                            pedido.LogStatus = await GetLogPedidoStatus(pedido.Id, conn, transaction);
+
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
                         }

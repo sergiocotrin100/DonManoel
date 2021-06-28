@@ -1,0 +1,45 @@
+﻿@model List<Core.Entities.Pedido>
+@using CrossCutting
+
+
+<p>
+    Última atualização:
+    @DateTime.Now.ToString("HH:mm:ss")
+</p>
+
+<div class="table-responsive">
+    <table class="table b-1 border-secondary">
+        <thead class="bg-secondary">
+            <tr>
+                <th>Mesa</th>
+                <th>Atendente</th>
+                <th class="text-center">Prazo</th>
+                <th class="text-center">Tempo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Core.Entities.Pedido pedido in Model.OrderBy(x=> x.DataEnvioCozinha))
+            {
+                if (pedido.IsAtrasado)
+                {
+                    <tr class="bg-danger">
+                        <td>@pedido.IdMesa.ToString("000")</td>
+                        <td>@pedido.Atendente.FirstName()</td>
+                        <td class="text-center">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
+                        <td class="text-center">@pedido.TempoPratoAdulto</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@pedido.IdMesa.ToString("000")</td>
+                        <td>@pedido.Atendente.FirstName()</td>
+                        <td class="text-center">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
+                        <td class="text-center">@pedido.TempoPratoAdulto</td>
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </table>
+</div>
