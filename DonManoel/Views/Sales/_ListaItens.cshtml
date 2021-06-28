@@ -1,5 +1,6 @@
 ﻿@model Core.Entities.Pedido
 @using CrossCutting
+@inject Core.Interfaces.IUserSession usuario;
 
 <div class="row" id="itens">
     <div class="col-xxxl-8 col-12">
@@ -140,26 +141,29 @@
                                 }
                             }
 
-
                         </tbody>
                     </table>
 
-                    @if (Model.CanCancel)
-                    {
-                        <button id="btnCancelarPedido" class="btn btn-danger pull-right"><i class="fa fa fa-trash"></i> Cacelar</button>
-                    }
+                    <div class="d-none d-md-block">
+                        @if (Model.CanCancel)
+                        {
+                            <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                        }
 
-                    @if (Model.CanSend)
-                    {
-                        <button id="btnEnviarPedido" class="btn btn-success pull-right"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
-                    }
+                        @if (Model.CanSend)
+                        {
+                            <button class="btn btn-success pull-right enviar-pedido"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
+                        }
 
-                    @if (Model.CanFecharPedido)
-                    {
-                        <button id="btnFecharPedido" class="btn btn-primary pull-right"><i class="fa fa fa-dollar"></i> Pagar</button>
-                    }
+                        @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                        {
+                            <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                        }
 
-                    <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                        <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                    </div>
+
+
                 </div>
 
             </div>

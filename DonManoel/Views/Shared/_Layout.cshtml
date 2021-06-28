@@ -214,16 +214,17 @@
                         <a href="#"><i class="icon-Clipboard-check"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>Pedidos</a>
                         <ul>
                             <li><a asp-controller="Sales" asp-action="kitchen"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Cozinha</a></li>
+                            <li><a asp-controller="Sales" asp-action="Bar"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Bar</a></li>
                             <li><a asp-controller="Sales" asp-action="Tracking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Pedidos</a></li>
                         </ul>
                     </li>
-                    <li>
+                    @*<li>
                         <a href="#"><i class="icon-Dinner"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>Menus</a>
                         <ul>
                             <li><a href="add_new_menu.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Pratos</a></li>
                             <li><a href="menu_categories.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Bebidas</a></li>
                         </ul>
-                    </li>
+                    </li>*@
                 </ul>
             </nav>
 
@@ -383,7 +384,7 @@
                         <p>
                             <br />
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dom Manoel Restaurante Ltda.<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Telefone: (19) 3254-6790<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Telefone: 19 98374-6228<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; SEM VALOR FISCAL<br>
                             ----------------------------------------------<br>
                             &nbsp;&nbsp;&nbsp; Data: <span id="datapedidoimpressao"></span>&nbsp; Hora: <span id="horapedidoimpressao"></span> <br />
@@ -392,7 +393,7 @@
                             <table id="tableItensImpressao">
                                 <thead>
                                     <tr>
-                                        <th >Qtde</th>
+                                        <th>Qtde</th>
                                         <th>Descrição</th>
                                         <th style="text-align: right;">Unit.</th>
                                         <th style="text-align: right;">Total</th>
@@ -423,7 +424,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                           
+
                         </p>
                         <p>
                             ----------------------------------------------<br />
@@ -435,8 +436,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-danger btn-block float-end" onclick="imprimirContaMesa();">
+                    <div class="d-grid gap-2 d-flex">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal" style="float:left;">Fechar</button>
+                        <button type="button" class="btn btn-danger float-end" onclick="imprimirContaMesa();" style="float:right;">
                             <i class="fa fa-print"></i> Imprimir
                         </button>
                     </div>
@@ -497,6 +499,42 @@
             return totalitens + calcularTaxaServico(totalitens, taxaServico);
         }
 
+        function printOrder(model) {
+            debugger;
+            $("#modalImpressao #numeropedidoimpressao").html(("00000" + model.id).slice(-5));
+            $("#modalImpressao #numeromesaimpressao").html(("00" + model.idMesa).slice(-2));
+            $("#modalImpressao #datapedidoimpressao").html(model.dataPedidoImpressao);
+            $("#modalImpressao #horapedidoimpressao").html(model.horaPedidoImpressao);
+
+            $("#tableItensImpressao tbody").remove();
+            var tbody = $('#tableItensImpressao').children('tbody');
+
+            var table = tbody.length ? tbody : $('#tableItensImpressao');
+            var totalitens = parseFloat(0);
+            $.each(model.itensImpressao, function (idx, item) {
+                table.append('<tr style="font-size: 11px;">' +
+                    '<td style="text-align: center;">' + item.quantidade + '</td> ' +
+                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + item.descricao + '</td> ' +
+                    '<td style="text-align: right;">' + item.valorFormatado + '</td> ' +
+                    '<td style="text-align: right;">' + formatMoney((item.quantidade * item.valor), false) + '</td> ' +
+                    '</tr>');
+                totalitens += item.valor;
+            });
+
+            var valortaxa = 0;
+            $("#modalImpressao #subtotalimpressao").html(formatMoney(totalitens));
+            if (isNullOrEmpty(model.TaxaServico) || model.TaxaServico == 0)
+                $("#modalImpressao #taxaservicoimpressao").html("R$ 0,00");
+            else {
+                $("#modalImpressao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, model.TaxaServico)));
+            }
+
+            var total = valortaxa + totalitens;
+            $("#modalImpressao #totalimpressao").html(formatMoney(total));
+
+
+            jQuery('#modalImpressao').modal('show');
+        }
         
 
     </script>

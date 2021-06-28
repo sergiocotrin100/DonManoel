@@ -5,6 +5,10 @@ namespace Core.Entities
 {
     public class Mesa
     {
+        public Mesa()
+        {
+            this.Pedido = new Pedido();
+        }
         public long Id { get; set; }
         public string Nome { get; set; }
         public int Numero { get; set; }
@@ -27,20 +31,7 @@ namespace Core.Entities
         public string Atendente { get; set; }
         public long? IdPedido { get; set; }
         public DateTime? DataAberturaPedido { get; set; }
-        public double? ValorPedido { get; set; }
-        public int TaxaServico { get; set; }
-        public double ValorTotalPedido
-        {
-            get
-            {
-                if(this.Id>0 && this.ValorPedido.HasValue && this.TaxaServico>0)
-                {
-                    var valortaxa = (this.TaxaServico * this.ValorPedido.Value) / 100;
-                    return this.ValorPedido.Value + valortaxa;
-                }
-                return 0;
-            }
-        }
+        public Pedido Pedido { get; set; }
         public string Tempo
         {
             get

@@ -63,7 +63,24 @@ namespace Core.Entities
             {
                 if (this.Id > 0)
                 {
-                    if (this.IdStatusPedido != (int)Settings.Status.Pedido.Cancelado && this.IdStatusPedido != (int)Settings.Status.Pedido.Pago && this.IdStatusPedido != (int)Settings.Status.Pedido.Pendente)
+                    if (this.IdStatusPedido == (int)Settings.Status.Pedido.Pronto)
+                    {
+                        if (this.Itens == null || this.Itens.Count == 0) return false;
+                        if (this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)) return false;
+                        if (this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)) return false;
+                        return this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto);
+                    }
+                }
+                return false;
+            }
+        }
+        public bool CanPrint
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    if (this.IdStatusPedido == (int)Settings.Status.Pedido.ContaFechada)
                     {
                         if (this.Itens == null || this.Itens.Count == 0) return false;
                         if (this.Itens.Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)) return false;
@@ -177,6 +194,26 @@ namespace Core.Entities
                 }
 
                 return new List<PedidoItem>();
+            }
+        }
+        public decimal ValorTotalPedido
+        {
+            get
+            {
+                if(this.Id > 0)
+                {
+                    if(this.TaxaServico>0)
+                    {
+                        var valortaxa = (this.TaxaServico * this.ValorItens) / 100;
+                        return this.ValorItens + valortaxa;
+
+                    } 
+                    else
+                    {
+                        return this.ValorItens;
+                    }                   
+                }
+                return 0;
             }
         }
     }
