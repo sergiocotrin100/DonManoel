@@ -97,25 +97,67 @@ namespace Core.Entities
             {
                 if (this.Id > 0)
                 {
-                    TimeSpan time = DateTime.Now - this.Data;
-                    //precisa terminar de implementar
+                    if (this.TempoEspera.HasValue)
+                    {
+                        if(this.TempoPreparoAdultoCozinha>0)
+                        return this.TempoEspera.Value.TotalMinutes>this.TempoPreparoAdultoCozinha;
+                    }
                 }
                 return false;
             }
         }
+        public DateTime? DataEnvioCozinha
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    var status = this.LogStatus.Where(ped => ped.IdStatusPedido == (int)Settings.Status.Pedido.EmPreparacao).ToList();
+                    if (status.Count > 0)
+                    {
+                        var enviado = status.OrderByDescending(x => x.Data).First();
+                        return enviado.Data;
+                     }
+                }
+                return null;
+            }
+        }
+
+        private TimeSpan? TempoEspera
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    if (this.TempoPreparoAdultoCozinha > 0)
+                    {
+                        if (this.DataEnvioCozinha.HasValue)
+                        {
+                            TimeSpan time = DateTime.Now - this.DataEnvioCozinha.Value;
+                            return time;
+                        }
+                    }
+
+                }
+                return null;
+            }
+        }
+
         public string Tempo
         {
             get
             {
                 if (this.Id > 0)
                 {
-                    TimeSpan time = DateTime.Now - this.Data;
-                    return $"{time.Hours.ToString("00")}:{time.Minutes.ToString("00")}";
+                    if(this.TempoEspera.HasValue)
+                    {
+                        return $"{this.TempoEspera.Value.Hours.ToString("00")}:{this.TempoEspera.Value.Minutes.ToString("00")}";
+                    }
                 }
                 return string.Empty;
             }
         }
-        public int TempoPreparoCozinha
+        private int TempoPreparoAdultoCozinha
         {
             get
             {
@@ -123,8 +165,8 @@ namespace Core.Entities
                 {
                     if(this.Itens != null && this.Itens.Count>0)
                     {
-                        int _tempoPreparo = this.Itens.Where(item => item.Menu.TipoCategoria==Settings.TipoCategoria.Cozinha).Sum(item => item.TempoPreparo);
-                        int _quantidade = this.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Cozinha).ToList().Count();
+                        int _tempoPreparo = this.Itens.Where(item => item.Menu.TipoCategoria==Settings.TipoCategoria.Cozinha && item.Menu.IsPratoKids==false).Sum(item => item.TempoPreparo);
+                        int _quantidade = this.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Cozinha && item.Menu.IsPratoKids == false).ToList().Count();
                         if (_quantidade > 0)
                             return _tempoPreparo / _quantidade;
                         else
@@ -132,6 +174,18 @@ namespace Core.Entities
                     }
                 }
                 return 0;
+            }
+        }
+        public string TempoPreparoAdultoCozinhaFormatado
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    if (this.TempoPreparoAdultoCozinha > 0)
+                        return $"{this.TempoPreparoAdultoCozinha.ToString()} Minutos";
+                }
+                return "";
             }
         }
         public int TempoPreparBar

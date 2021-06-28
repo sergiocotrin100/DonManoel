@@ -158,10 +158,31 @@ namespace Infrastructure.Repository
 
         public async Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido)
         {
+            List<LogPedidoStatus> lstLog = new List<LogPedidoStatus>();
             using (IDbConnection conn = _connection.GetConnection())
             {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        lstLog = await GetLogPedidoStatus(idpedido, conn, transaction);
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+            return lstLog;
+        }
+
+        internal async Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
                     SELECT 
                         L.ID,
                         L.ID_USUARIO IDUSUARIO,
@@ -174,11 +195,10 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = L.ID_STATUS_PEDIDO
                     WHERE L.ID_PEDIDO=:ID_PEDIDO
                  ");
-                var parametros = new DynamicParameters();
-                parametros.Add("ID_PEDIDO", idpedido, DbType.String);
-                var model = await conn.QueryAsync<LogPedidoStatus>(cmd.ToString(), parametros);
-                return model.ToList();
-            }
+            var parametros = new DynamicParameters();
+            parametros.Add("ID_PEDIDO", idpedido, DbType.String);
+            var model = await conn.QueryAsync<LogPedidoStatus>(cmd.ToString(), parametros);
+            return model.ToList();
         }
 
         public async Task<Pedido> GetPedidoById(long idpedido)
@@ -191,7 +211,7 @@ namespace Infrastructure.Repository
                     Pedido model = new Pedido();
                     try
                     {
-                        model = await GetPedidoById(idpedido, conn,transaction);
+                        model = await GetPedidoById(idpedido, conn, transaction);
                         transaction.Commit();
                     }
                     catch
@@ -227,6 +247,8 @@ namespace Infrastructure.Repository
             var parametros = new DynamicParameters();
             parametros.Add("ID", idpedido, DbType.Int64);
             var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
+
+            model.LogStatus = await GetLogPedidoStatus(idpedido, conn, transaction);
 
             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
             model.Itens = await repository.GetItens(model.Id, conn, transaction);
@@ -450,6 +472,8 @@ namespace Infrastructure.Repository
 
                         foreach (var pedido in listPedidos.ToList())
                         {
+                            pedido.LogStatus = await GetLogPedidoStatus(pedido.Id, conn, transaction);
+
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
                         }
@@ -561,6 +585,8 @@ namespace Infrastructure.Repository
 
                         foreach (var pedido in listaPedidos.ToList())
                         {
+                            pedido.LogStatus = await GetLogPedidoStatus(pedido.Id, conn, transaction);
+
                             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
                             pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
 

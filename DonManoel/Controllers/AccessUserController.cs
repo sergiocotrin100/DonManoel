@@ -181,7 +181,10 @@ namespace DonManoel.Controllers
                     return View("LoginAsync", form);
                 }
 
-                return LocalRedirect("/Home");
+                if(usuario.Role == CrossCutting.Settings.Role.Cozinha)
+                    return LocalRedirect("/Sales/kitchen");
+                else
+                    return LocalRedirect("/Home");
             }
 
             return View("LoginAsync",form);

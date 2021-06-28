@@ -13,6 +13,19 @@ namespace Core.Entities
         public string Ativo { get; set; }
         public int TempoPreparo { get; set; }
         public string TipoCategoria { get; set; }
+        public string PratoKids { get; set; }
+        public bool IsPratoKids
+        {
+            get
+            {
+                if(this.Id>0)
+                {
+                    if (!string.IsNullOrWhiteSpace(this.PratoKids))
+                        return this.PratoKids.Equals("S", System.StringComparison.OrdinalIgnoreCase);
+                }
+                return false;
+            }
+        }
         public decimal Valor { get; set; }
         public string ValorFormatado
         {
