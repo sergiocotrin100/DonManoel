@@ -108,6 +108,13 @@ namespace DonManoel.Controllers
             return View(pedidos);
         }
 
+        [HttpGet("Bar")]
+        public IActionResult Bar()
+        {
+            var pedidos = service.GetPedidosBar().Result;
+            return View(pedidos);
+        }
+
         [HttpGet("Tracking")]
         public IActionResult Tracking()
         {
@@ -144,11 +151,11 @@ namespace DonManoel.Controllers
         }
 
         [HttpPost("ChangeStatus")]
-        public async Task<JsonResult> ChangeStatus(long idpedido, int status)
+        public async Task<JsonResult> ChangeStatus(long idpedido, int status, string taxaservico = null)
         {
             try
             {
-                await service.ChangeState(idpedido, status);
+                await service.ChangeState(idpedido, status, taxaservico);
                 var result = await service.GetPedidoById(idpedido);
                 return Json(new { success = true, message = "", result = result });
             }

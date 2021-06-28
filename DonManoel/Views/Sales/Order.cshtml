@@ -1,5 +1,6 @@
 ﻿@model Core.Entities.Pedido
 @using CrossCutting
+@inject Core.Interfaces.IUserSession usuario;
 
 
 @{
@@ -55,7 +56,7 @@
 
 </div>
 <style>
-    #footButtons {
+    .footButtons {
         background-color: #f3f2f7;
         position: fixed;
         bottom: 0px;
@@ -63,16 +64,30 @@
         right: 0px;
         height: 50px;
         margin-bottom: 0px;
-        z-index:999;
-        opacity:0.7;
+        z-index: 999;
+        opacity: 0.7;
     }
 </style>
-<div id="footButtons" class="d-sm-none ">
-    <div class="row" >
+<div class="d-sm-none footButtons">
+    <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="box-footer" style=" padding: 5px;">
-                <button type="button"  onclick="javascript: alert('teste');" class="btn btn-danger">Cancel</button>
-                <button type="button" onclick="javascript: alert('teste');" class="btn btn-success pull-right">Submit</button>
+                @if (Model.CanCancel)
+                {
+                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                }
+
+                @if (Model.CanSend)
+                {
+                    <button class="btn btn-success pull-right enviar-pedido"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
+                }
+
+                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                {
+                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                }
+
+                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
             </div>
         </div>
     </div>

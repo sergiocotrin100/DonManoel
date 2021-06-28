@@ -23,7 +23,12 @@ namespace Infrastructure.Repository
             _userSession = userSession;
         }
 
-        public async Task ChangeState(long idpedido, int status)
+        public PedidoRepository()
+        {
+
+        }
+
+        public async Task ChangeState(long idpedido, int status, string taxaservico = null)
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
@@ -32,19 +37,20 @@ namespace Infrastructure.Repository
                 {
                     try
                     {
-                        await ChangeState(idpedido, status, conn, transaction);
+                        await ChangeState(idpedido, status, !string.IsNullOrWhiteSpace(taxaservico) && taxaservico.Equals("S", StringComparison.OrdinalIgnoreCase), conn, transaction);
 
                         transaction.Commit();
                     }
-                    catch 
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        throw ex;
                     }
                 }
             }
         }
 
-        internal async Task ChangeState(long idpedido, int status, IDbConnection conn, IDbTransaction transaction)
+        internal async Task ChangeState(long idpedido, int status, bool taxaservico, IDbConnection conn, IDbTransaction transaction)
         {
             StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
             var parameters = new OracleDynamicParameters();
@@ -67,9 +73,14 @@ namespace Infrastructure.Repository
                 await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
             }
 
-            if (status == (int)Settings.Status.Pedido.Pronto)
+            if (status == (int)Settings.Status.Pedido.Pago)
             {
-                sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET VALOR_TAXA_SERVICO = (VALOR_ITENS * TAXA_SERVICO) /100 WHERE ID_PEDIDO=:ID");
+                sql = new StringBuilder();
+                if (taxaservico)
+                    sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET VALOR_TAXA_SERVICO = (VALOR_ITENS * TAXA_SERVICO) /100, VALOR_TOTAL = ((VALOR_ITENS * TAXA_SERVICO) /100) + VALOR_ITENS WHERE ID=:ID");
+                else
+                    sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET VALOR_TAXA_SERVICO = NULL, VALOR_TOTAL = VALOR_ITENS WHERE ID=:ID");
+
                 parameters = new OracleDynamicParameters();
                 parameters.Add("ID", idpedido, OracleDbType.Long, ParameterDirection.Input);
                 await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
@@ -180,8 +191,22 @@ namespace Infrastructure.Repository
                     Pedido model = new Pedido();
                     try
                     {
-                        var cmd = new StringBuilder();
-                        cmd.AppendFormat(@"                           
+                        model = await GetPedidoById(idpedido, conn,transaction);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                    }
+                    return model;
+                }
+            }
+        }
+
+        internal async Task<Pedido> GetPedidoById(long idpedido, IDbConnection conn, IDbTransaction transaction)
+        {
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"                           
                             SELECT 
                                 P.ID,
                                 P.ID_USUARIO IDUSUARIO,
@@ -189,7 +214,7 @@ namespace Infrastructure.Repository
                                 P.CLIENTE,
                                 P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
                                 P.TAXA_SERVICO TAXASERVICO,
-                                P.VALOR_ITENS,
+                                P.VALOR_ITENS VALORITENS,
                                 P.VALOR_TOTAL VALORTOTAL,
                                 P.DATA,
                                 S.NOME AS STATUS,
@@ -199,22 +224,13 @@ namespace Infrastructure.Repository
                             LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                             WHERE P.ID=:ID
                          ");
-                        var parametros = new DynamicParameters();
-                        parametros.Add("ID", idpedido, DbType.Int64);
-                         model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
+            var parametros = new DynamicParameters();
+            parametros.Add("ID", idpedido, DbType.Int64);
+            var model = await conn.QueryFirstAsync<Pedido>(cmd.ToString(), parametros);
 
-                        PedidoItemRepository repository = new PedidoItemRepository(_userSession);
-                        model.Itens = await repository.GetItens(model.Id, conn, transaction);
-                        transaction.Commit();
-                    }
-                    catch 
-                    {
-                        transaction.Rollback();
-                    }
-                    return model;
-                }
-            }
-
+            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+            model.Itens = await repository.GetItens(model.Id, conn, transaction);
+            return model;
         }
 
         public async Task<List<Pedido>> GetPedidos(Pedido item)
@@ -301,7 +317,7 @@ namespace Infrastructure.Repository
 
                         transaction.Commit();
                     }
-                    catch 
+                    catch
                     {
                         transaction.Rollback();
                     }
@@ -423,14 +439,14 @@ namespace Infrastructure.Repository
                             FROM DOTNET_PEDIDO P
                             INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                             LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
-                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5,6)
+                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5)
                             AND P.ID IN
                             (
                                 SELECT ID_PEDIDO FROM ITENS
                             )
                          ");
                         var parametros = new DynamicParameters();
-                       listPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+                        listPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
                         foreach (var pedido in listPedidos.ToList())
                         {
@@ -484,7 +500,7 @@ namespace Infrastructure.Repository
                             FROM DOTNET_PEDIDO P
                             INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                             LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
-                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5,6)
+                            WHERE P.ID_STATUS_PEDIDO IN(2,3,4,5)
                             AND P.ID IN
                             (
                                 SELECT ID_PEDIDO FROM ITENS
@@ -500,7 +516,7 @@ namespace Infrastructure.Repository
                         }
                         transaction.Commit();
                     }
-                    catch 
+                    catch
                     {
                         transaction.Rollback();
                     }
@@ -551,7 +567,7 @@ namespace Infrastructure.Repository
                         }
                         transaction.Commit();
                     }
-                    catch 
+                    catch
                     {
                         transaction.Rollback();
                     }
@@ -582,7 +598,8 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                     LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                     WHERE P.ID_MESA=:IDMESA
-                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5,6)
+                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4)
+                    ORDER BY P.ID DESC
                  ");
                 var parametros = new DynamicParameters();
                 parametros.Add("IDMESA", idMesa, DbType.Int32);

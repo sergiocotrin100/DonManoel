@@ -18,15 +18,15 @@ $(document).ready(function () {
         addItem();
     });
 
-    $("#btnEnviarPedido").click(function () {
+    $(".enviar-pedido").click(function () {
         enviarPedido();
     });
 
-    $("#btnCancelarPedido").click(function () {
+    $(".cancelar-pedido").click(function () {
         cancelarPedido();
     });
 
-    $("#btnFecharPedido").click(function () {
+    $(".fechar-pedido").click(function () {
         fecharConta();
     });
 
@@ -344,7 +344,9 @@ function fecharConta() {
                         url: hostSite() + "Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
-                                 $("#modalImpressao #numeropedidoimpressao").html(("00000" + data.result.id).slice(-5));
+                                printOrder(data.result);
+                                /*
+                                $("#modalImpressao #numeropedidoimpressao").html(("00000" + data.result.id).slice(-5));
                                 $("#modalImpressao #numeromesaimpressao").html(("00" + data.result.idMesa).slice(-2));
                                 $("#modalImpressao #datapedidoimpressao").html(data.result.dataPedidoImpressao);
                                 $("#modalImpressao #horapedidoimpressao").html(data.result.horaPedidoImpressao);
@@ -367,7 +369,7 @@ function fecharConta() {
                                 var valortaxa = 0;
                                 $("#modalImpressao #subtotalimpressao").html(formatMoney(totalitens));
                                 if (isNullOrEmpty(PEDIDO.TaxaServico) || PEDIDO.TaxaServico == 0)
-                                    $("#modalImpressao #taxaservicoimpressao").html("-");
+                                    $("#modalImpressao #taxaservicoimpressao").html("R$ 0,00");
                                 else {
                                     $("#modalImpressao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, PEDIDO.TaxaServico)));
                                 }
@@ -376,7 +378,8 @@ function fecharConta() {
                                 $("#modalImpressao #totalimpressao").html(formatMoney(total));                                
 
 
-                                jQuery('#modalImpressao').modal('show')
+                                jQuery('#modalImpressao').modal('show');
+                                */
                             }
                             else {
                                 toastr.error(data.message, "Erro");
