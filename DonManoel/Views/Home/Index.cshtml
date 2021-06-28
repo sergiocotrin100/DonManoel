@@ -24,28 +24,28 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="box-body">
-                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-12 col-lg-12" style="display: inline-flex;">
+                            </div>
+                            <div class="box-body">
+                                <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12" style="display: inline-flex;">
 
-                                        <div class="col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
-                                            <i class="icon-Calculator"></i> Sub-Total <br />
-                                            <b>@mesa.Pedido.ValorItens.FormatMoney(false)</b>
-                                        </div>
-                                        <div class="col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
-                                            <i class="icon-Calculator"></i> Total <br />
-                                            <b>@mesa.Pedido.ValorTotalPedido.FormatMoney(false)</b>
-                                        </div>
-                                        <div class="col-sm-4 col-md-4 col-lg-4">
-                                            <i class="icon-User"></i> Atendente <br />
-                                            @mesa.Atendente.FirstName()
+                                            <div class="col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
+                                                <i class="icon-Calculator"></i> Sub-Total <br />
+                                                <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                                            </div>
+                                            <div class="col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
+                                                <i class="icon-Calculator"></i> Total <br />
+                                                <b>@mesa.ValorPedido.Value.FormatMoney(false)</b>
+                                            </div>
+                                            <div class="col-sm-4 col-md-4 col-lg-4">
+                                                <i class="icon-User"></i> Atendente <br />
+                                                @mesa.Atendente.FirstName()
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
 
                                     </li>
                                     <li class="list-group-item">
