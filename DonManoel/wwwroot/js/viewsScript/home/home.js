@@ -5,8 +5,9 @@ function recalcularValorPedido(checked, idpedido, totalitens, taxaservico) {
         totalpedido = calcularTotalPedidoComTaxaServico(totalitens, taxaservico);
     }
 
-    $("#totalpedido_" + idpedido).html(formatMoney(totalpedido, false));
+    $("#totalpedido_" + idpedido).html(formatMoney(totalpedido, false)); 
 }
+
 
 function setPedidoPago(idpedido) {
     var checked = $("#chkTaxaServico_" + idpedido).is(':checked');
