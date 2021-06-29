@@ -80,7 +80,7 @@ namespace DonManoel
                 options.Cookie.HttpOnly = true;
             });
 
-              services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             //services.AddControllersWithViews();
 
 
@@ -126,10 +126,19 @@ namespace DonManoel
             app.UseAuthorization();
 
             app.UseMvc();
+          
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllerRoute(
+            //      name: "areas",
+            //      pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+            //    );
+            //});
+
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapControllerRoute(name: "pedido",pattern: "{controller=Sales}/{action=Order}/{idmesa}/{idorder?}");
+                endpoints.MapControllerRoute(name: "areas", pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
