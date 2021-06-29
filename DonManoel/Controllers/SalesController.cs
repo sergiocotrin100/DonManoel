@@ -22,7 +22,7 @@ namespace DonManoel.Controllers
         private readonly IMesaRepository serviceMesa;
         private readonly IUsuarioRepository serviceUsuario;
 
-        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario) : base(userSession, service)
+        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario) : base(userSession, service, serviceMesa)
         {
             _userSession = userSession;
             this.service = service;

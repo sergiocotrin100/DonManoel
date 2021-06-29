@@ -58,7 +58,6 @@ function showDetails(idpedido) {
     var table = tbody.length ? tbody : $('#tableDetails');
 
     $.each(model.Itens, function (idx, item) {
-        debugger;
         table.append('<tr>' +
             '<td>' + item.DataAtualizacaoFormatada + '</td> ' +
             '<td>' + item.Menu.Nome + '</td> ' +

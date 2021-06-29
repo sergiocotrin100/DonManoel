@@ -15,10 +15,12 @@ namespace DonManoel.Controllers
     {
         private readonly IUserSession userSession;
         private readonly IPedidoRepository serviceOrder;
-        public MainController(IUserSession userSession, IPedidoRepository serviceOrder)
+        private readonly IMesaRepository serviceMesa;
+        public MainController(IUserSession userSession, IPedidoRepository serviceOrder, IMesaRepository serviceMesa)
         {
             this.userSession = userSession;
             this.serviceOrder = serviceOrder;
+            this.serviceMesa = serviceMesa;
         }
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -29,6 +31,12 @@ namespace DonManoel.Controllers
                     ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(userSession.Id).Result;
                 else
                     ViewBag.MeusPedidos = serviceOrder.GetMeusPedidos(null).Result;
+
+                var result = serviceMesa.GetAll().Result;
+                result = result.Where(item => item.EmUso).ToList();
+
+                ViewBag.PedidosImpressao = result;
+
             }
             catch
             {
