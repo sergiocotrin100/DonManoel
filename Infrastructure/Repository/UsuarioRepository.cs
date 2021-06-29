@@ -22,6 +22,46 @@ namespace Infrastructure.Repository
             _userSession = userSession;
         }
 
+        public async Task<List<Usuario>> GetUsuarios(bool? ativo)
+        {
+            var lstUsuarios = new List<Usuario>();
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    IEnumerable<Pedido> listPedidos = new List<Pedido>();
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            SELECT 
+                                ID,
+                                LOGIN, 
+                                NOME,
+                                EMAIL,
+                                SENHA,
+                                DEPARTAMENTO 
+                            FROM PCO_USR
+                            WHERE FILIAL = 'D1' 
+                            AND ATIVO = NVL(:ATIVO,ATIVO)
+                         ");
+                        var parametros = new DynamicParameters();
+                        parametros.Add("ATIVO", ativo.HasValue ? ativo.Value : (object)null, DbType.Int32);
+                        var result = await conn.QueryAsync<Usuario>(cmd.ToString(), parametros);
+                        lstUsuarios = result.ToList();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                    }
+                    return lstUsuarios;
+                }
+            }
+        }
+
         public async Task<Usuario> Login(string username, string password)
         {
             using (IDbConnection conn = _connection.GetConnection())
@@ -44,6 +84,7 @@ namespace Infrastructure.Repository
                             DEPARTAMENTO 
                         FROM PCO_USR
                         WHERE FILIAL = 'D1' 
+                        AND ATIVO=1
                         AND LOGIN = :USERNAME
                     )
 select x.* from (
@@ -280,6 +321,6 @@ select x.* from (SELECT * FROM VW_USUARIOS WHERE EMAIL=:EMAIL) x WHERE  rownum =
                 }
             }
             return Task.FromResult(lineEncoded);
-        }
+        }        
     }
 }

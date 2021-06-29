@@ -14,64 +14,95 @@
         <div class="box-header with-border">
             <h3 class="box-title"><i class="fa fa-list"></i> Pedidos</h3>
         </div>
-
         <div class="box-body">
-            <div class="table-responsive">
-                <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Nº Pedido</th>
-                            <th class="text-center">Nº Mesa</th>
-                            <th class="text-center">Atendente</th>
-                            <th class="text-center">Data</th>
-                            <th class="text-center">Tempo</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Valor Pedido</th>
-                            <th class="text-center">Taxa Serviço</th>
-                            <th class="text-center">Valor Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var pedido in Model)
-                        {
-                            <tr>
-                                <td class="text-center">@pedido.Id.ToString("00000")</td>
-                                <td class="text-center">@pedido.IdMesa.ToString("00")</td>
-                                <td>@pedido.Atendente.FirstName()</td>
-                                <td class="text-center">@pedido.Data.FormatDateHour()</td>
-                                <td class="text-center">Tempo</td>
-                                <td>@pedido.Status</td>
-                                <td style="text-align:right">@pedido.ValorItens.FormatMoney(false)</td>
-                                <td style="text-align:right">@pedido.ValorTaxaServico.FormatMoney(false)</td>
-                                <td style="text-align:right">@pedido.ValorTotalPedido.FormatMoney(false)</td>
-                            </tr>
-                        }
+            <fieldset>
+                <legend>Filtros</legend>
 
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th class="text-center">Nº Pedido</th>
-                            <th class="text-center">Nº Mesa</th>
-                            <th class="text-center">Atendente</th>
-                            <th class="text-center">Data</th>
-                            <th class="text-center">Tempo</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Valor Pedido</th>
-                            <th class="text-center">Taxa Serviço</th>
-                            <th class="text-center">Valor Total</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <form id="formSearch" name="formSearch">
+                    <div class="row">
+                        <div class="col-1 col-sm-1 col-md-1 col-lg-1">
+                            <div class="form-group">
+                                <label for="Id" class="control-label">Nº Pedido</label>
+                                <input type="text" id="Id" name="Id" class="form-control numeric" />
+                            </div>
+                        </div>
+                        <div class="col-2 col-sm-2 col-md-2 col-lg-2">
+                            <div class="form-group">
+                                <label for="IdStatusPedido" class="control-label">Status</label>
+                                <select name="IdStatusPedido" id="IdStatusPedido" class="form-control">
+                                    <option value=""></option>
+                                    <option value="1">Pendente</option>
+                                    <option value="2">Aguardando Preparação</option>
+                                    <option value="3">Em Preparação</option>
+                                    <option value="4">Pronto</option>
+                                    <option value="5">Conta Fechada</option>
+                                    <option value="6">Pago</option>
+                                    <option value="7">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-1 col-sm-1 col-md-1 col-lg-1">
+                            <div class="form-group">
+                                <label for="IdMesa" class="control-label">Mesa</label>
+                                <select name="IdMesa" id="IdMesa" class="form-control">
+                                    <option value=""></option>
+                                    @foreach (var mesa in (List<Core.Entities.Mesa>)ViewBag.Mesas)
+                                    {
+                                        <option value="@mesa.Id">Mesa @mesa.Id.ToString("00")</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-3 col-sm-3 col-md-3 col-lg-3">
+                            <div class="form-group">
+                                <label for="IdUsuario" class="control-label">Atendente</label>
+                                <select name="IdUsuario" id="IdUsuario" class="form-control">
+                                    <option value=""></option>
+                                    @foreach (var usuario in (List<Core.Entities.Usuario>)ViewBag.Usuarios)
+                                    {
+                                        <option value="@usuario.Id">@usuario.Nome.FormatName()</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-2 col-sm-2 col-md-2 col-lg-2">
+                            <div class="form-group">
+                                <label for="DataInicio" class="control-label">Data Inicio</label>
+                                <input type="date" id="DataInicio" name="DataInicio" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-2 col-sm-2 col-md-2 col-lg-2">
+                            <div class="form-group">
+                                <label for="DataFim" class="control-label">Data Fim</label>
+                                <input type="date" id="DataFim" name="DataFim" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-1 col-sm-1 col-md-1 col-lg-1">
+                            <div class="form-group">
+                                <br />
+                                <button type="button" class="btn btn-danger" id="btnSearch">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
+           
+        </div>
+        <div class="box-body">
+            <div id="divPedidos">
+                @await Html.PartialAsync("_pedidos", Model)
+
             </div>
         </div>
-
+        </div>
     </div>
-</div>
 
 @section Scripts
 {
     <script src="~/assets/vendor_components/datatable/datatables.min.js"></script>
-    <script src="~/js/pages/data-table.js"></script>
-    <script src="~/js/viewsScript/sales/kitchen.js?cache=@ViewData["version"].ToString()"></script>
+    @*<script src="~/js/pages/data-table.js"></script>*@
+    <script src="~/js/viewsScript/sales/index.js?cache=@ViewData["version"].ToString()"></script>
 
 }

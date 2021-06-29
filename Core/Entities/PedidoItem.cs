@@ -16,6 +16,7 @@ namespace Core.Entities
         public long IdPedido { get; set; }
         public long IdMenu { get; set; }
         public long IdStatusPedidoItem { get; set; }
+        public string Status { get; set; }
         public int TempoPreparo { get; set; }
         public decimal Valor { get; set; }
         public string Observacao { get; set; }
@@ -43,6 +44,17 @@ namespace Core.Entities
                 if (this.Id > 0 && this.Quantidade>0)
                 {
                     return (this.Quantidade * this.Valor).FormatMoney(false);
+                }
+                return "";
+            }
+        }
+        public string DataAtualizacaoFormatada
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    return this.DataAtualizacao.HasValue? this.DataAtualizacao.Value.FormatDateHour(): this.Data.FormatDateHour();
                 }
                 return "";
             }

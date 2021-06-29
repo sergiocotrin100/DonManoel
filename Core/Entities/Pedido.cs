@@ -136,6 +136,22 @@ namespace Core.Entities
                 return null;
             }
         }
+        public DateTime? DataFechamentoMesa
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    var status = this.LogStatus.Where(ped => ped.IdStatusPedido == (int)Settings.Status.Pedido.ContaFechada).ToList();
+                    if (status.Count > 0)
+                    {
+                        var enviado = status.OrderByDescending(x => x.Data).First();
+                        return enviado.Data;
+                    }
+                }
+                return null;
+            }
+        }
         private TimeSpan? TempoEsperaAdulto
         {
             get
@@ -344,6 +360,21 @@ namespace Core.Entities
                     }
                 }
                 return 0;
+            }
+        }
+        public string TempoMesa
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    if(this.DataFechamentoMesa.HasValue)
+                    {
+                        TimeSpan time = DateTime.Now - this.DataFechamentoMesa.Value;
+                        return $"{time.Hours.ToString("00")}:{time.Minutes.ToString("00")}";
+                    }                   
+                }
+                return string.Empty;
             }
         }
     }

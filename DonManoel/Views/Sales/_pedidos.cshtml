@@ -1,0 +1,103 @@
+﻿@model List<Core.Entities.Pedido>
+@using CrossCutting
+
+
+<div class="table-responsive">
+    <table id="example1" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">Nº Pedido</th>
+                <th class="text-center">Nº Mesa</th>
+                <th class="text-center">Atendente</th>
+                <th class="text-center">Data</th>
+                <th class="text-center">Tempo</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Valor Pedido</th>
+                <th class="text-center">Taxa Serviço</th>
+                <th class="text-center">Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pedido in Model)
+            {
+                <tr>
+                    <td class="text-center"><a href="javascript:showDetails(@pedido.Id)">@pedido.Id.ToString("00000")</a> </td>
+                    <td class="text-center">@pedido.IdMesa.ToString("00")</td>
+                    <td>@pedido.Atendente.FirstName()</td>
+                    <td class="text-center">@pedido.Data.FormatDateHour()</td>
+                    <td class="text-center">@pedido.TempoMesa</td>
+                    <td>@pedido.Status</td>
+                    <td style="text-align:right">@pedido.ValorItens.FormatMoney(false)</td>
+                    <td style="text-align:right">@pedido.ValorTaxaServico.FormatMoney(false)</td>
+                    <td style="text-align:right">@pedido.ValorTotalPedido.FormatMoney(false)</td>
+                </tr>
+            }
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-center">Nº Pedido</th>
+                <th class="text-center">Nº Mesa</th>
+                <th class="text-center">Atendente</th>
+                <th class="text-center">Data</th>
+                <th class="text-center">Tempo</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Valor Pedido</th>
+                <th class="text-center">Taxa Serviço</th>
+                <th class="text-center">Valor Total</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<div class="modal fade" data-backdrop="false" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="tableDetails" class="table product-overview">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Item</th>
+                                <th>Status</th>
+                                <th>Valor</th>
+                                <th>Ponto Carne</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td>
+                                   
+
+
+                                    @*@foreach (var excecao in item.Excecao)
+                                    {
+                                        <div style="display: inline-flex; margin-left: 20px;">
+                                            <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
+                                        </div><br />
+                                    }*@
+
+                                  
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-flex">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -545,9 +545,7 @@
 
             var table = tbody.length ? tbody : $('#tableItensImpressao');
             var totalitens = parseFloat(0);
-            debugger;
             $.each((isNullOrEmpty(model.itensImpressao) ? model.ItensImpressao : model.itensImpressao), function (idx, item) {
-                debugger;
                 let qtde = (isNullOrEmpty(item.quantidade) ? item.Quantidade : item.quantidade);
                 let valor = (isNullOrEmpty(item.valor) ? item.Valor : item.valor);
                 table.append('<tr style="font-size: 11px;">' +

@@ -19,22 +19,47 @@ namespace DonManoel.Controllers
         private readonly IUserSession _userSession;
         private readonly IPedidoRepository service;
         private readonly IPedidoItemRepository serviceItem;
+        private readonly IMesaRepository serviceMesa;
+        private readonly IUsuarioRepository serviceUsuario;
 
-        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem) : base(userSession, service)
+        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario) : base(userSession, service)
         {
             _userSession = userSession;
             this.service = service;
             this.serviceItem = serviceItem;
+            this.serviceMesa = serviceMesa;
+            this.serviceUsuario = serviceUsuario;
         }
         public IActionResult Index()
         {
             var model = new Pedido();
-            model.DataInicio = DateTime.Now.Date;
+            model.DataInicio = DateTime.Now.AddDays(-10);
             model.DataFim = DateTime.Now.Date;
             if (_userSession.Role == Settings.Role.Garcon)
                 model.IdUsuario = _userSession.Id;
             var result = service.GetPedidos(model).Result;
+            ViewBag.Mesas = GetMesas().OrderBy(x=> x.Id).ToList();
+            ViewBag.Usuarios = GeUsuarios().OrderBy(x => x.Nome).ToList();
             return View(result);
+        }
+
+        private List<Mesa> GetMesas()
+        {
+            return serviceMesa.GetAll().Result;
+        }
+
+        private List<Usuario> GeUsuarios()
+        {
+            return serviceUsuario.GetUsuarios(true).Result;
+        }
+
+        [HttpPost("GetPedidos")]
+        public PartialViewResult GetPedidos(Pedido model)
+        {
+            if (_userSession.Role == Settings.Role.Garcon)
+                model.IdUsuario = _userSession.Id;
+            var result = service.GetPedidos(model).Result;
+            return PartialView("_pedidos", result);
         }
 
         [HttpGet("Order")]

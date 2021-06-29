@@ -282,10 +282,20 @@ namespace Infrastructure.Repository
                             FROM DOTNET_PEDIDO P
                             INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                             LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
-                            WHERE P.ID_USUARIO = NVL(:ID_USUARIO, P.ID_USUARIO)
+                            WHERE P.ID = NVL(:ID, P.ID)
+                            AND P.ID_USUARIO = NVL(:ID_USUARIO, P.ID_USUARIO)
+                            AND P.ID_MESA = NVL(:ID_MESA, P.ID_MESA)
+                            AND P.ID_STATUS_PEDIDO = NVL(:ID_STATUS_PEDIDO, P.ID_STATUS_PEDIDO)
+                            AND ((:DTINI IS NULL AND :DTFIM IS NULL) OR
+                             (TRUNC(P.DATA) BETWEEN trunc(:DTINI) AND TRUNC(:DTFIM)))
                          ");
                         var parametros = new DynamicParameters();
-                        parametros.Add("ID_USUARIO", item.IdUsuario>0? item.IdUsuario : (object)null, DbType.Int64);
+                        parametros.Add("ID", item.Id > 0 ? item.Id : (object)null, DbType.Int64);
+                        parametros.Add("ID_USUARIO", item.IdUsuario > 0 ? item.IdUsuario : (object)null, DbType.Int64);
+                        parametros.Add("ID_MESA", item.IdMesa > 0 ? item.IdMesa : (object)null, DbType.Int64);
+                        parametros.Add("ID_STATUS_PEDIDO", item.IdStatusPedido > 0 ? item.IdStatusPedido : (object)null, DbType.Int64);
+                        parametros.Add("DTINI", item.DataInicio.HasValue ? item.DataInicio.Value : (object)null, DbType.Date);
+                        parametros.Add("DTFIM", item.DataFim.HasValue ? item.DataFim.Value : (object)null, DbType.Date);
                         listPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
 
                         foreach (var pedido in listPedidos.ToList())
@@ -304,8 +314,7 @@ namespace Infrastructure.Repository
                     return listPedidos.ToList();
                 }
             }
-
-       }
+        }
 
         public async Task<long> Save(Pedido model)
         {
