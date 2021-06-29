@@ -19,8 +19,8 @@ namespace DonManoel.Controllers
         private readonly IUserSession _userSession;
         private readonly IPedidoRepository service;
         private readonly IPedidoItemRepository serviceItem;
-        
-        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem) :base(userSession,service)
+
+        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem) : base(userSession, service)
         {
             _userSession = userSession;
             this.service = service;
@@ -28,11 +28,17 @@ namespace DonManoel.Controllers
         }
         public IActionResult Index()
         {
-            return View();
+            var model = new Pedido();
+            model.DataInicio = DateTime.Now.Date;
+            model.DataFim = DateTime.Now.Date;
+            if (_userSession.Role == Settings.Role.Garcon)
+                model.IdUsuario = _userSession.Id;
+            var result = service.GetPedidos(model).Result;
+            return View(result);
         }
 
         [HttpGet("Order")]
-        public IActionResult Order([FromQuery]long idmesa, [FromQuery] long? idorder)
+        public IActionResult Order([FromQuery] long idmesa, [FromQuery] long? idorder)
         {
             Pedido model = new Pedido();
             model.IdMesa = idmesa;
@@ -173,7 +179,7 @@ namespace DonManoel.Controllers
                 var result = await service.GetPedidoById(idpedido);
                 return Json(new { success = true, message = "", result = result });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
             }
@@ -181,11 +187,11 @@ namespace DonManoel.Controllers
 
         [HttpPost("ChangeStatusItem")]
         public async Task<JsonResult> ChangeStatusItem(long idpedidoitem, int status)
-        {           
+        {
             try
             {
                 await service.ChangeStateItem(idpedidoitem, status);
-                return Json(new { success = true, message = ""});
+                return Json(new { success = true, message = "" });
             }
             catch (Exception ex)
             {
@@ -208,9 +214,9 @@ namespace DonManoel.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
-        }        
+        }
 
     }
 
-    
+
 }

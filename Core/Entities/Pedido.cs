@@ -19,6 +19,8 @@ namespace Core.Entities
         public string Observacao { get; set; }
         public string Status { get; set; }
         public DateTime Data { get; set; }
+        public DateTime? DataInicio { get; set; }
+        public DateTime? DataFim { get; set; }
         public string Atendente { get; set; }
         public List<PedidoItem> Itens { get; set; }
         public List<LogPedidoStatus> LogStatus { get; set; }
@@ -134,7 +136,6 @@ namespace Core.Entities
                 return null;
             }
         }
-
         private TimeSpan? TempoEsperaAdulto
         {
             get
@@ -173,7 +174,6 @@ namespace Core.Entities
                 return null;
             }
         }
-
         public string TempoPratoAdulto
         {
             get
@@ -264,7 +264,6 @@ namespace Core.Entities
                 return "";
             }
         }
-
         public int TempoPreparBar
         {
             get

@@ -6,7 +6,52 @@
 $(function () {
     "use strict";
 
-    $('#example1').DataTable();
+	$('#example1').DataTable({
+        language: {
+            decimal: ",",
+            thousands: ".",
+            loadingRecords: "Carregando...",
+            processing: "Processando...",
+            lengthMenu: "Mostrar _MENU_",
+            zeroRecords: "Nenhum registro encontrado",
+            emptyTable: "Nenhum registro encontrado",
+            info: "Registros _START_ a _END_ de _TOTAL_",
+            infoEmpty: "",//"Nada para mostrar",
+            infoFiltered: "(filtrados de _MAX_)",
+            infoPostFix: "",
+            url: "",
+            paginate: {
+                First: "Primeiro",
+                Previous: "Anterior",
+                Next: "Seguinte",
+                Last: "Último"
+            },
+            buttons: {
+                pageLength: {
+                    _: '<i class="fal fa-align-justify" data-toggle="tooltip" data-placement="top" title="%d Linhas"></i>',
+                    '-1': "Mostrar Tudo"
+                }
+            },
+            search: "",
+            searchPlaceholder: "Pesquisar...",
+            select: true,
+            deferRender: true,
+            fixedHeader: {
+                header: true,
+                footer: false
+            }
+            , bAutoWidth: true
+
+        },
+        drawCallback: function (settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+            var info = $(this).closest('.dataTables_wrapper').find('.dataTables_info');
+            info.toggle(this.api().page.info().pages > 1);
+            $(".dataTables_paginate a").addClass("paginate_button");
+        }
+	});
+	//$('#example1').FWDataTableDefault();
     $('#example2').DataTable({
       'paging'      : true,
       'lengthChange': false,

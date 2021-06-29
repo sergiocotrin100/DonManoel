@@ -1,7 +1,77 @@
-﻿
-@{
-    ViewData["Title"] = "Index";
+﻿@model List<Core.Entities.Pedido>
+@using CrossCutting
+@inject Core.Interfaces.IUserSession usuario;
+
+@{ var pedidos = Newtonsoft.Json.JsonConvert.SerializeObject(Model); }
+
+<script type="text/javascript">
+    var LISTAPEDIDOS = JSON.parse('@Html.Raw(pedidos)');
+</script>
+
+
+<div class="col-12">
+    <div class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-list"></i> Pedidos</h3>
+        </div>
+
+        <div class="box-body">
+            <div class="table-responsive">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Nº Pedido</th>
+                            <th class="text-center">Nº Mesa</th>
+                            <th class="text-center">Atendente</th>
+                            <th class="text-center">Data</th>
+                            <th class="text-center">Tempo</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Valor Pedido</th>
+                            <th class="text-center">Taxa Serviço</th>
+                            <th class="text-center">Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pedido in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@pedido.Id.ToString("00000")</td>
+                                <td class="text-center">@pedido.IdMesa.ToString("00")</td>
+                                <td>@pedido.Atendente.FirstName()</td>
+                                <td class="text-center">@pedido.Data.FormatDateHour()</td>
+                                <td class="text-center">Tempo</td>
+                                <td>@pedido.Status</td>
+                                <td style="text-align:right">@pedido.ValorItens.FormatMoney(false)</td>
+                                <td style="text-align:right">@pedido.ValorTaxaServico.FormatMoney(false)</td>
+                                <td style="text-align:right">@pedido.ValorTotalPedido.FormatMoney(false)</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-center">Nº Pedido</th>
+                            <th class="text-center">Nº Mesa</th>
+                            <th class="text-center">Atendente</th>
+                            <th class="text-center">Data</th>
+                            <th class="text-center">Tempo</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Valor Pedido</th>
+                            <th class="text-center">Taxa Serviço</th>
+                            <th class="text-center">Valor Total</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/vendor_components/datatable/datatables.min.js"></script>
+    <script src="~/js/pages/data-table.js"></script>
+    <script src="~/js/viewsScript/sales/kitchen.js?cache=@ViewData["version"].ToString()"></script>
+
 }
-
-<h1>Index</h1>
-

@@ -259,29 +259,53 @@ namespace Infrastructure.Repository
         {
             using (IDbConnection conn = _connection.GetConnection())
             {
-                var cmd = new StringBuilder();
-                cmd.AppendFormat(@"
-                    SELECT 
-                        P.ID,
-                        P.ID_USUARIO IDUSUARIO,
-                        P.ID_MESA IDMESA,
-                        P.CLIENTE,
-                        P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
-                        P.TAXA_SERVICO TAXASERVICO,
-                        P.VALOR_ITENS,
-                        P.VALOR_TOTAL VALORTOTAL,
-                        P.DATA,
-                        S.NOME AS STATUS
-                    FROM DOTNET_PEDIDO P
-                    INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
-                    WHERE P.ID_USUARIO=:ID_USUARIO
-                 ");
-                var parametros = new DynamicParameters();
-                parametros.Add("ID_USUARIO", item.IdUsuario, DbType.Int64);
-                var model = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
-                return model.ToList();
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    IEnumerable<Pedido> listPedidos = new List<Pedido>();
+                    try
+                    {
+                        var cmd = new StringBuilder();
+                        cmd.AppendFormat(@"
+                            SELECT 
+                                P.ID,
+                                P.ID_USUARIO IDUSUARIO,
+                                P.ID_MESA IDMESA,
+                                P.CLIENTE,
+                                P.ID_STATUS_PEDIDO IDSTATUSPEDIDO,
+                                P.TAXA_SERVICO TAXASERVICO,
+                                P.VALOR_ITENS VALORITENS,
+                                P.VALOR_TOTAL VALORTOTAL,
+                                P.DATA,
+                                S.NOME AS STATUS,
+                                U.NOME ATENDENTE    
+                            FROM DOTNET_PEDIDO P
+                            INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
+                            LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
+                            WHERE P.ID_USUARIO = NVL(:ID_USUARIO, P.ID_USUARIO)
+                         ");
+                        var parametros = new DynamicParameters();
+                        parametros.Add("ID_USUARIO", item.IdUsuario>0? item.IdUsuario : (object)null, DbType.Int64);
+                        listPedidos = await conn.QueryAsync<Pedido>(cmd.ToString(), parametros);
+
+                        foreach (var pedido in listPedidos.ToList())
+                        {
+                            pedido.LogStatus = await GetLogPedidoStatus(pedido.Id, conn, transaction);
+
+                            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+                            pedido.Itens = await repository.GetItens(pedido.Id, conn, transaction);
+                        }
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                    }
+                    return listPedidos.ToList();
+                }
             }
-        }
+
+       }
 
         public async Task<long> Save(Pedido model)
         {
