@@ -130,7 +130,7 @@ namespace DonManoel.Areas.Admin.Controllers
         public async Task<IActionResult> ResetPassAsync(bool deslogou = false)
         {
             ViewBag.deslogou = deslogou;
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
 
             return View("ResetPassAsync", new LoginModel());
         }

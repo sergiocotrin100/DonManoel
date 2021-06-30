@@ -76,6 +76,7 @@ namespace DonManoel
                 o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 o.LoginPath = new PathString("/Admin/AccessUser/LoginAsync");
                 o.LogoutPath = new PathString("/Admin/AccessUser/LogoutAsync");
+                
                 o.AccessDeniedPath = new PathString("/Admin/Erro/AcessoNegado");
             });
 

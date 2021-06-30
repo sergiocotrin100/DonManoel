@@ -3,7 +3,7 @@
 @inject Core.Interfaces.IUserSession usuario;
 
 @{
-   //    Layout = "Admin/Views/Shared/_Layout.cshtm";
+    //    Layout = "Admin/Views/Shared/_Layout.cshtm";
     //<a href="C:\Projetos\SAV\Restaurante_GIT_Sergio\DonManoel\Areas\Admin\Views\Shared\_Layout.cshtml">C:\Projetos\SAV\Restaurante_GIT_Sergio\DonManoel\Areas\Admin\Views\Shared\_Layout.cshtml</a>
     var lstMesas = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
 }
@@ -26,7 +26,7 @@
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                     <div class="col-sm-6 col-md-6 col-lg-12">
                                         <h4 class="box-title" style="float:left">
-                                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido"> <strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></a>
+                                            <a href="/Admin/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido"> <strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></a>
                                         </h4>
                                     </div>
                                     <div class="col-sm-6 col-md-6 col-lg-12">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
+                            <a href="/Admin/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
                                 <div class="row">
                                     <div class="col-12 col-sm-12 col-md-12 col-lg-12" style="display: inline-flex;">
 
@@ -83,7 +83,7 @@
                     </div> }
                 else
                 {
-                    <a href="/Sales/Order?idmesa=@mesa.Id">
+                    <a href="/Admin/Sales/Order?idmesa=@mesa.Id">
                         <div class="box box-solid bg-danger">
                             <div class="box-header">
                                 <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
@@ -91,14 +91,14 @@
                             <div class="box-body" style="font-size:30px;">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <img src="~/images/mesa.png" />
+                                        <img src="~/Admin/images/mesa.png" />
                                         <span>Livre</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </a>            }
-
+                    </a>
+                    }
             </div>}
     </div>
 </div>
