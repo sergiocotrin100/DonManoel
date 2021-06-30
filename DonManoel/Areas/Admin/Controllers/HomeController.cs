@@ -15,11 +15,13 @@ namespace DonManoel.Areas.Admin.Controllers
         private readonly IUserSession _userSession;
         private readonly IMesaRepository _mesa;
         private readonly IPedidoRepository service;
-        public HomeController(IUserSession userSession,IMesaRepository mesa, IPedidoRepository service) : base(userSession, service, mesa)
+        private readonly IDashBoardRepository serviceDashBoard;
+        public HomeController(IUserSession userSession,IMesaRepository mesa, IPedidoRepository service, IDashBoardRepository serviceDashBoard) : base(userSession, service, mesa, serviceDashBoard)
         {
             _userSession = userSession;
             _mesa = mesa;
             this.service = service;
+            this.serviceDashBoard = serviceDashBoard;
         }
 
         [HttpGet]
