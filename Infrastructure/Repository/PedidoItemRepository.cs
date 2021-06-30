@@ -153,6 +153,7 @@ namespace Infrastructure.Repository
                                 M.VALOR,
                                 M.ID_CATEGORIA IDCATEGORIA,
                                 C.TIPO AS TIPOCATEGORIA,
+                                M.IMAGEM,
                                 NVL(M.PRATO_KIDS,'N') PRATOKIDS
                             FROM MENU M
                             INNER JOIN CATEGORIA C ON C.ID = M.ID_CATEGORIA
