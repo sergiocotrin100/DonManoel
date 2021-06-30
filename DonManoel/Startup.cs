@@ -36,6 +36,7 @@ namespace DonManoel
             services.AddTransient<IMesaRepository, MesaRepository>();
             services.AddTransient<IPedidoItemRepository, PedidoItemRepository>();
             services.AddTransient<IPedidoRepository, PedidoRepository>();
+            services.AddTransient<IDashBoardRepository, DashBoardRepository>();
             services.AddTransient<IDonConnection, DonConnection>();
             services.Configure<EmailConfiguracao>(Configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmail, Email>();

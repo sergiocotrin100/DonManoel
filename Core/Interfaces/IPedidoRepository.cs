@@ -20,5 +20,6 @@ namespace Core.Interfaces
         Task ChangeStateItem(long idpedidoitem, int status);
         Task<List<Categoria>> GetCategorias();
         Task<List<Pedido>> GetMeusPedidos(long? idusuario);
+
     }
 }

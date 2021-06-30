@@ -31,6 +31,22 @@
 </head>
 
 <body class="layout-top-nav light-skin theme-primary fixed">
+    
+    @{ 
+        var GraficoPedidosSemanal = (List<Core.Entities.GraphOrders>)ViewBag.GraficoPedidosSemanal;
+        var lstGraficoPedidosSemanal = Newtonsoft.Json.JsonConvert.SerializeObject(GraficoPedidosSemanal);
+
+        var GraficoPedidosSemanalGarcom = (List<Core.Entities.GraphOrders>)ViewBag.GraficoPedidosSemanalGarcom;
+        var lstGraficoPedidosSemanalGarcom = Newtonsoft.Json.JsonConvert.SerializeObject(GraficoPedidosSemanalGarcom);
+     }
+
+
+    <script type="text/javascript">
+        var GRAFICOPEDIDOSSEMANAL = JSON.parse('@Html.Raw(lstGraficoPedidosSemanal)');
+        var GRAFICOPEDIDOSSEMANALGARCOM  = JSON.parse('@Html.Raw(lstGraficoPedidosSemanalGarcom)');
+    </script>
+
+
     @if (usuario.IsAuthenticated())
     {
         <div class="wrapper">
@@ -265,6 +281,55 @@
                             </a>
                         </div>
                         <div class="right-bar-content">
+                            <div class="box no-shadow box-bordered border-light">
+                                <div class="box-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5>Meus Pedidos</h5>
+                                            <h2 class="mb-0 text-center">@ViewBag.GraficoQuantidadePedidos</h2>
+                                        </div>
+                                        <div class="p-10">
+                                            <div id="chart-pedidos"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (usuario.Role == CrossCutting.Settings.Role.Caixa || usuario.Role == CrossCutting.Settings.Role.Gerente)
+                            {
+                                <div class="box no-shadow box-bordered border-light">
+                                    <div class="box-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5>Pedidos/Garçom</h5>
+                                                <h2 class="mb-0 text-center">@ViewBag.GraficoQuantidadePedidosGarcom</h2>
+                                            </div>
+                                            <div class="p-10">
+                                                <div id="chart-pedidos-garcon"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @*<div class="box no-shadow box-bordered border-light">
+            <div class="box-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Item/Dia</h5>
+                        <h2 class="mb-0">5.12%</h2>
+                    </div>
+                    <div class="p-10">
+                        <div id="chartItemSemanal"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="my-0"><span class="badge badge-xl badge-dot badge-primary me-10"></span>Reclamação</h5>
+                    <h5 class="my-0"><span class="badge badge-xl badge-dot badge-danger me-10"></span>Elogio</h5>
+                </div>
+            </div>
+        </div>*@
                             <div class="box no-shadow box-bordered border-light">
                                 <div class="box-body">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -599,6 +664,7 @@
     <script src="/js/jquery.smartmenus.js"></script>
     <script src="/js/menus.js"></script>
     <script src="/js/template.js"></script>
+    <script src="/js/graph.js"></script>
     <link rel="stylesheet" href="/plugins/JqueryConfirm/jquery-confirm.css">
     <script src="/plugins/JqueryConfirm/jquery-confirm.js" type="text/javascript"></script>
     <script src="/js/script.js"></script>
@@ -750,7 +816,7 @@
 
                 let quebralinha = '';
                 //if (isNullOrEmpty(excecoes) && isNullOrEmpty(observacao))
-                    quebralinha = '<br/>';
+                quebralinha = '<br/>';
 
                 table.append('<tr style="font-size: 10px;">' +
                     '<td> ' +

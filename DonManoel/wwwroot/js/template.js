@@ -1693,4 +1693,4 @@ $(".right-bar-btn").click(function(){
         var chart = new ApexCharts(document.querySelector("#chart3"), options);
         chart.render();
 
-}); // End of use strict
+  }); // End of use strict

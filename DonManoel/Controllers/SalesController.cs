@@ -21,14 +21,15 @@ namespace DonManoel.Controllers
         private readonly IPedidoItemRepository serviceItem;
         private readonly IMesaRepository serviceMesa;
         private readonly IUsuarioRepository serviceUsuario;
-
-        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario) : base(userSession, service, serviceMesa)
+        private readonly IDashBoardRepository serviceDashBoard;
+        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario, IDashBoardRepository serviceDashBoard) : base(userSession, service, serviceMesa, serviceDashBoard)
         {
             _userSession = userSession;
             this.service = service;
             this.serviceItem = serviceItem;
             this.serviceMesa = serviceMesa;
             this.serviceUsuario = serviceUsuario;
+            this.serviceDashBoard = serviceDashBoard;
         }
         public IActionResult Index()
         {

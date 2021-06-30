@@ -668,5 +668,6 @@ namespace Infrastructure.Repository
                 return model.FirstOrDefault();
             }
         }
+
     }
 }
