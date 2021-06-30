@@ -557,10 +557,7 @@
                             <table id="tableItensImpressaoPreparacao">
                                 <thead>
                                     <tr>
-                                        <th>Qtde</th>
-                                        <th>Descrição</th>
-                                        <th style="text-align: right;">Unit.</th>
-                                        <th style="text-align: right;">Total</th>
+                                        <th>Item</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -684,7 +681,7 @@
                 let valor = (isNullOrEmpty(item.valor) ? item.Valor : item.valor);
                 table.append('<tr style="font-size: 11px;">' +
                     '<td style="text-align: center;">' + qtde + '</td> ' +
-                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (isNullOrEmpty(item.id) ? item.Descricao : item.descricao) + '</td> ' +
+                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (isNullOrEmpty(item.descricao) ? item.Descricao : item.descricao) + '</td> ' +
                     '<td style="text-align: right;">' + (isNullOrEmpty(item.valorFormatado) ? item.ValorFormatado : item.valorFormatado) + '</td> ' +
                     '<td style="text-align: right;">' + formatMoney((qtde * valor), false) + '</td> ' +
                     '</tr>');
@@ -725,36 +722,48 @@
             $("#modalImpressaoPreparacao #datapedidoimpressao").html((isNullOrEmpty(model.dataPedidoImpressao) ? model.DataPedidoImpressao : model.dataPedidoImpressao));
             $("#modalImpressaoPreparacao #horapedidoimpressao").html((isNullOrEmpty(model.horaPedidoImpressao) ? model.HoraPedidoImpressao : model.horaPedidoImpressao));
 
-            $("#tableItensImpressaoPreparacao tbody").remove();
+            $("#tableItensImpressaoPreparacao tbody tr").remove();
             var tbody = $('#tableItensImpressaoPreparacao').children('tbody');
-
             var table = tbody.length ? tbody : $('#tableItensImpressaoPreparacao');
-            var totalitens = parseFloat(0);
-            debugger;
-            $.each((isNullOrEmpty(model.itensImpressao) ? model.ItensImpressao : model.itensImpressao), function (idx, item) {
-                let qtde = (isNullOrEmpty(item.quantidade) ? item.Quantidade : item.quantidade);
-                let valor = (isNullOrEmpty(item.valor) ? item.Valor : item.valor);
-                table.append('<tr style="font-size: 11px;">' +
-                    '<td style="text-align: center;">' + qtde + '</td> ' +
-                    '<td style="max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (isNullOrEmpty(item.id) ? item.Descricao : item.descricao) + '</td> ' +
-                    '<td style="text-align: right;">' + (isNullOrEmpty(item.valorFormatado) ? item.ValorFormatado : item.valorFormatado) + '</td> ' +
-                    '<td style="text-align: right;">' + formatMoney((qtde * valor), false) + '</td> ' +
+
+            $.each(model.Itens, function (idx, item) {
+                let status = (isNullOrEmpty(item.idStatusPedidoItem) ? item.IdStatusPedidoItem : item.idStatusPedidoItem);
+                if (status != 2) return;
+
+                let observacao = item.Observacao;
+                if (!isNullOrEmpty(observacao)) {
+                    observacao = ' <div style="display: inline-flex; margin-left: 2px;"> ' +
+                        '    <span class="mdi mdi-subdirectory-arrow-right"></span> <p> ' + observacao + '</p> ' +
+                        ' </div>';
+                }
+
+                observacao = isNullOrEmpty(observacao) ? '' : observacao;
+
+                let excecoes = '';
+                $.each(item.Excecao, function (idx, excecao) {
+                    excecoes += ' <div style="display: inline-flex; margin-left: 2px;"> ' +
+                        '    <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> ' + excecao.Observacao + '</p> ' +
+                        ' </div>';
+                });
+
+                excecoes = isNullOrEmpty(excecoes) ? '' : excecoes;
+
+                let quebralinha = '';
+                //if (isNullOrEmpty(excecoes) && isNullOrEmpty(observacao))
+                    quebralinha = '<br/>';
+
+                table.append('<tr style="font-size: 10px;">' +
+                    '<td> ' +
+                    '<div style="max-width: 43ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' +
+                    item.Menu.Nome +
+                    '</div>' +
+                    observacao +
+                    excecoes +
+                    quebralinha +
+                    '</td> ' +
                     '</tr>');
-                totalitens += valor;
+
             });
-
-            var valortaxa = 0;
-            let taxa = (isNullOrEmpty(model.taxaServico) ? model.TaxaServico : model.taxaServico);
-            $("#modalImpressaoPreparacao #subtotalimpressao").html(formatMoney(totalitens));
-            if (isNullOrEmpty(taxa) || taxa == 0)
-                $("#modalImpressaoPreparacao #taxaservicoimpressao").html("R$ 0,00");
-            else {
-                $("#modalImpressaoPreparacao #taxaservicoimpressao").html(formatMoney(calcularTaxaServico(totalitens, taxa)));
-            }
-
-            var total = valortaxa + totalitens;
-            $("#modalImpressaoPreparacao #totalimpressao").html(formatMoney(total));
-
 
             jQuery('#modalImpressaoPreparacao').modal('show');
         }
