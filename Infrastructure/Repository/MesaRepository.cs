@@ -60,10 +60,9 @@ namespace Infrastructure.Repository
 
                         transaction.Commit();
                     }
-                    catch(Exception ex)
+                    catch
                     {
                         transaction.Rollback();
-                        throw ex;
                     }                    
                 }                
             }

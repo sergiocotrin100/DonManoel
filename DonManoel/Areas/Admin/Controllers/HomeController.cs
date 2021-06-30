@@ -15,7 +15,7 @@ namespace DonManoel.Areas.Admin.Controllers
         private readonly IUserSession _userSession;
         private readonly IMesaRepository _mesa;
         private readonly IPedidoRepository service;
-        public HomeController(IUserSession userSession,IMesaRepository mesa, IPedidoRepository service) : base(userSession, service)
+        public HomeController(IUserSession userSession,IMesaRepository mesa, IPedidoRepository service) : base(userSession, service, mesa)
         {
             _userSession = userSession;
             _mesa = mesa;
