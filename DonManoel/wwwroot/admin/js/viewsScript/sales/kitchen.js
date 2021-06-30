@@ -1,7 +1,7 @@
 ﻿
 
 $(document).ready(function () {
-    setInterval(atualizarPedidosCozinha, 60000);
+    setInterval(atualizarPedidosCozinha, 10000);
 });
 
 
@@ -9,7 +9,7 @@ function atualizarPedidosCozinha() {
     $.ajax(
         {
             type: 'GET',
-            url: hostSite() + "Sales/GetPedidosCozinha",
+            url: hostSite() + "Admin/Sales/GetPedidosCozinha",
             dataType: 'html',
             cache: false,
             async: true,

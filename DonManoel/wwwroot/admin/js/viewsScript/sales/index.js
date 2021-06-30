@@ -22,7 +22,7 @@ function search() {
     $.ajax(
         {
             type: 'POST',
-            url: hostSite() + "Sales/GetPedidos",
+            url: hostSite() + "Admin/Sales/GetPedidos",
             data: {
                 'model':model
             },

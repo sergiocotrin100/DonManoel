@@ -9,7 +9,7 @@ function atualizarPedidosBar() {
     $.ajax(
         {
             type: 'GET',
-            url: hostSite() + "Sales/GetPedidosBar",
+            url: hostSite() + "Admin/Sales/GetPedidosBar",
             dataType: 'html',
             cache: false,
             async: true,

@@ -29,7 +29,7 @@ function setPedidoPago(idpedido) {
                         data: {
                             'idpedido': idpedido, 'status': 6, taxaservico: taxaservico
                         },
-                        url: hostSite() + "Sales/ChangeStatus",
+                        url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Pedido recebido com sucesso!", "Sucesso");

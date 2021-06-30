@@ -120,10 +120,10 @@ function addItem() {
         data: {
             'idmesa': idmesa, 'pontoCarne': $("input[name='pontocarne']:checked").val(), 'observacao': observacao, 'menu': MENUSELECIONADO
         },
-        url: hostSite() + "Sales/AddItem",
+        url: hostSite() + "Admin/Sales/AddItem",
         success: function (data) {
             if (data.success) {
-                var url = hostSite() + "Sales/Order?idmesa=" + idmesa + "&idorder=" + data.result + "&viewitens=1";
+                var url = hostSite() + "Admin/Sales/Order?idmesa=" + idmesa + "&idorder=" + data.result + "&viewitens=1";
                 window.location.href = url;
             } else {
                 toastr.error(data.message, "Erro");
@@ -151,7 +151,7 @@ function enviarPedido() {
                         data: {
                             'idpedido': $("#hdIdPedido").val(), 'status': 3
                         },
-                        url: hostSite() + "Sales/ChangeStatus",
+                        url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
@@ -189,7 +189,7 @@ function cancelarPedido() {
                         data: {
                             'idpedido': $("#hdIdPedido").val(), 'status': 7
                         },
-                        url: hostSite() + "Sales/ChangeStatus",
+                        url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Pedido cancelado com sucesso!", "Sucesso");
@@ -227,7 +227,7 @@ function cancelarItem(id) {
                         data: {
                             'idpedidoitem': id, 'status': 4
                         },
-                        url: hostSite() + "Sales/ChangeStatusItem",
+                        url: hostSite() + "Admin/Sales/ChangeStatusItem",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Item cancelado com sucesso!", "Sucesso");
@@ -265,7 +265,7 @@ function setItemEntregue(id) {
                         data: {
                             'idpedidoitem': id, 'status': 5
                         },
-                        url: hostSite() + "Sales/ChangeStatusItem",
+                        url: hostSite() + "Admin/Sales/ChangeStatusItem",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Item entregue com sucesso!", "Sucesso");
@@ -303,7 +303,7 @@ function duplicarItem(id) {
                         data: {
                             'idpedidoitem': id
                         },
-                        url: hostSite() + "Sales/DuplicateItem",
+                        url: hostSite() + "Admin/Sales/DuplicateItem",
                         success: function (data) {
                             if (data.success) {
                                 toastr.success("Item duplicado com sucesso!", "Sucesso");
@@ -341,7 +341,7 @@ function fecharConta() {
                         data: {
                             'idpedido': $("#hdIdPedido").val(), 'status': 5
                         },
-                        url: hostSite() + "Sales/ChangeStatus",
+                        url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
                                 printOrder(data.result);                               

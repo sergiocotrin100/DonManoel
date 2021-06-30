@@ -113,7 +113,7 @@
                                             var lstPedidos = (List<Core.Entities.Pedido>)ViewBag.MeusPedidos;
                                         }
                                         <span class="label label-primary">@lstPedidos.Count</span>
-                                        <a href="#" class="waves-effect waves-light dropdown-toggle btn-danger-light" data-bs-toggle="dropdown" title="Pedidos Pendentes">
+                                        <a href="#" class="waves-effect waves-light dropdown-toggle btn-danger-light" data-bs-toggle="dropdown" title="Meus Pedidos">
                                             <i class="icon-Dinner"><span class="path1"></span><span class="path2"></span></i>
                                         </a>
                                         <ul class="dropdown-menu animated bounceIn">
@@ -132,7 +132,7 @@
                                                     @foreach (var pedido in lstPedidos)
                                                     {
                                                         <li>
-                                                            <a href="Admin/Sales/Order?idmesa=@pedido.IdMesa&idorder=@pedido.Id&viewitens=1">
+                                                            <a href="/Admin/Sales/Order?idmesa=@pedido.IdMesa&idorder=@pedido.Id&viewitens=1">
                                                                 <i class="fa fa-users text-info"></i> Mesa: @pedido.IdMesa.ToString("000") - Pedido: @pedido.Id.ToString("0000") <br />
                                                                 <span style="font-size:12px; float:right;" class="text-danger">@pedido.Status</span>
                                                             </a>
