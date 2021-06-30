@@ -17,10 +17,21 @@ namespace DonManoel
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                 Host.CreateDefaultBuilder(args)
+                     .ConfigureWebHostDefaults(webBuilder =>
+                     {
+                         webBuilder.UseUrls("http://0.0.0.0:5002");
+                         webBuilder.UseIISIntegration();
+                         webBuilder.UseStartup<Startup>();
+
+                     });
     }
+
+    //public static IHostBuilder CreateHostBuilder(string[] args) =>
+    //        Host.CreateDefaultBuilder(args)
+    //            .ConfigureWebHostDefaults(webBuilder =>
+    //            {
+    //                webBuilder.UseStartup<Startup>();
+    //            });
+    //}
 }
