@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using CrossCutting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -9,8 +10,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace DonManoel.Controllers
+namespace DonManoel.Areas.Admin.Controllers
 {
+ 
     public class MainController : Controller
     {
         private readonly IUserSession userSession;

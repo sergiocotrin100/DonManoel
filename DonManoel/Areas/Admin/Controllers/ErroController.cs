@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DonManoel.Controllers
+namespace DonManoel.Areas.Admin.Controllers
 {
-    [Route("[controller]")]
+    [Area("Admin")]
+    [Route("Admin/[controller]")]
+    [AllowAnonymous]
     public class ErroController : Controller
     {
         [AllowAnonymous]

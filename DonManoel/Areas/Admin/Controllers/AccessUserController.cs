@@ -14,9 +14,12 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace DonManoel.Controllers
+namespace DonManoel.Areas.Admin.Controllers
 {
-    [Route("[controller]")]
+    [Area("Admin")]
+    [Route("Admin/[controller]")]
+    [AllowAnonymous]
+
     public class AccessUserController : Controller
     {
         private readonly IUsuarioRepository _usuario;
@@ -159,7 +162,8 @@ namespace DonManoel.Controllers
         public async Task<IActionResult> LoginAsync(bool deslogou = false)
         {
             ViewBag.deslogou = deslogou;
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
 
             return View("LoginAsync", new LoginModel());
         }
@@ -184,7 +188,7 @@ namespace DonManoel.Controllers
                 if(usuario.Role == CrossCutting.Settings.Role.Cozinha)
                     return LocalRedirect("/Sales/kitchen");
                 else
-                    return LocalRedirect("/Home");
+                    return LocalRedirect("/Admin/Home");
             }
 
             return View("LoginAsync",form);
@@ -205,7 +209,8 @@ namespace DonManoel.Controllers
 
             //claims.Add(new Claim(ClaimTypes.Role, usuario.Role));
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsIdentity = new ClaimsIdentity(claims, "backend");
+            //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = false,
@@ -213,9 +218,13 @@ namespace DonManoel.Controllers
                 AllowRefresh = true,
             };
             await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
+                "backend",
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
+            //await HttpContext.SignInAsync(
+            //    CookieAuthenticationDefaults.AuthenticationScheme,
+            //    new ClaimsPrincipal(claimsIdentity),
+            //    authProperties);
 
         }
 
