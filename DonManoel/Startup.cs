@@ -52,29 +52,58 @@ namespace DonManoel
                 options.EnableEndpointRouting = false;
             }).AddRazorPagesOptions(options => { }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
+
+
             //services.AddSignalR();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-           .AddCookie(opt =>
-           {
-               opt.LoginPath = new PathString("/AccessUser/LoginAsync");
-               opt.LogoutPath = new PathString("/AccessUser/LogoutAsync");
-               opt.AccessDeniedPath = new PathString("/Erro/AcessoNegado");
-               opt.ExpireTimeSpan = TimeSpan.FromMinutes(600);
-               opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-               //opt.Cookie = new CookieBuilder()
-               //{
-               //    Name = ".DonManuelCookie",
-               //    //Expiration = new System.TimeSpan(0, 120, 0),
+            //services.AddAuthentication(o =>
+            //{
+            //    o.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //})
+            //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
+            //{
+            //    o.LoginPath = new PathString("");
+            //})
+            services.AddAuthentication(options =>
+            {
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+           .AddCookie("backend", o =>
+            {
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(600);
+                o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                o.LoginPath = new PathString("/Admin/AccessUser/LoginAsync");
+                o.LogoutPath = new PathString("/Admin/AccessUser/LogoutAsync");
+                
+                o.AccessDeniedPath = new PathString("/Admin/Erro/AcessoNegado");
+            });
 
-               //    //Se tiver um domínio...
-               //    //Domain = ".site.com.br",
-               //};
-           });
+           // services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+           //.AddCookie(opt =>
+           //{
+           //    opt.LoginPath = new PathString("/Admin/AccessUser/LoginAsync");
+           //    opt.LogoutPath = new PathString("/Admin/AccessUser/LogoutAsync");
+           //    opt.AccessDeniedPath = new PathString("/Admin/Erro/AcessoNegado");
+
+           //    opt.ExpireTimeSpan = TimeSpan.FromMinutes(600);
+           //    opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+           //    //opt.Cookie = new CookieBuilder()
+           //    //{
+           //    //    Name = ".DonManuelCookie",
+           //    //    //Expiration = new System.TimeSpan(0, 120, 0),
+
+           //    //    //Se tiver um domínio...
+           //    //    //Domain = ".site.com.br",
+           //    //};
+           //});
+
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //services.AddDistributedMemoryCache();
+            services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(3);
@@ -82,8 +111,6 @@ namespace DonManoel
             });
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
-            //services.AddControllersWithViews();
-
 
             services.AddProgressiveWebApp();
             //services.AddProgressiveWebApp(new PwaOptions
@@ -127,7 +154,7 @@ namespace DonManoel
             app.UseAuthorization();
 
             app.UseMvc();
-          
+
             //app.UseEndpoints(endpoints =>
             //{
             //    endpoints.MapControllerRoute(
@@ -139,7 +166,9 @@ namespace DonManoel
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(name: "areas", pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapAreaControllerRoute(name: "mvcAreaRoute", "Admin", pattern: "{area:exists}/{controller=Home}/{action=Index}");
+                // endpoints.MapAreaControllerRoute(name: "areas", "areas", pattern: "{area:exists}/{controller=Default}/{action=Index}/{id?}");
+                //endpoints.MapControllerRoute(name: "areas", pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
