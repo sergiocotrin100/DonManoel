@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DonManoel.Controllers
+namespace DonManoel.Areas.Admin.Controllers
 {
-    [AllowAnonymous]
-    public class HomeController : Controller
+    public class HomeController1 : Controller
     {
         public IActionResult Index()
         {

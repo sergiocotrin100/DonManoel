@@ -1,0 +1,109 @@
+﻿@model List<Core.Entities.Mesa>
+@using CrossCutting
+@inject Core.Interfaces.IUserSession usuario;
+
+@{
+   //    Layout = "Admin/Views/Shared/_Layout.cshtm";
+    //<a href="C:\Projetos\SAV\Restaurante_GIT_Sergio\DonManoel\Areas\Admin\Views\Shared\_Layout.cshtml">C:\Projetos\SAV\Restaurante_GIT_Sergio\DonManoel\Areas\Admin\Views\Shared\_Layout.cshtml</a>
+    var lstMesas = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
+}
+
+<script type="text/javascript">
+    var LISTAMESAS = JSON.parse('@Html.Raw(lstMesas)');
+</script>
+
+<div class="text-center">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
+        @foreach (var mesa in Model)
+        {
+            <div class="col">
+                @if (mesa.EmUso)
+                {
+                    <div class="box box-solid bg-secondary">
+                        <div class="box-header">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                    <div class="col-sm-6 col-md-6 col-lg-12">
+                                        <h4 class="box-title" style="float:left">
+                                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido"> <strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></a>
+                                        </h4>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-12">
+                                        <span class="badge bg-danger badge-pill " style="float:right">Mesa Ocupada</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <a href="/Sales/Order?idmesa=@mesa.Id&idorder=@mesa.IdPedido">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12" style="display: inline-flex;">
+
+                                        <div class="col-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
+                                            <i class="icon-Calculator"></i> Sub-total <br />
+                                            <b>@mesa.Pedido.ValorItens.FormatMoney(false)</b>
+                                        </div>
+                                        <div class="col-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0px 15px 0px 0px;">
+                                            <i class="icon-Calculator"></i> Total <br />
+                                            <b>@mesa.Pedido.ValorTotalPedido.FormatMoney(false)</b>
+                                        </div>
+                                        <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+                                            <i class="icon-User"></i> Atendente <br />
+                                            @mesa.Atendente.FirstName()
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="icon-Clock"></i> Tempo de uso da mesa:
+                                        @mesa.Tempo
+                                    </li>
+                                </ul>
+                            </a>
+                        </div>
+                        <div class="box-footer flexbox">
+                            <input type="checkbox" id="chkTaxaServico_@mesa.IdPedido" checked onclick="recalcularValorPedido(this.checked,@mesa.IdPedido,@mesa.Pedido.ValorItens,@mesa.Pedido.TaxaServico);">
+                            <label for="chkTaxaServico_@mesa.IdPedido">Taxa de serviço aceita?</label>
+                            @if (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente)
+                            {
+                                <div class="text-end flex-grow">
+                                    @if (mesa.Pedido.IdStatusPedido == (int)Settings.Status.Pedido.ContaFechada)
+                                    {
+
+                                        <button class="btn btn-sm btn-danger" onclick="printOrderById(@mesa.IdPedido)"><i class="fa fa-print"></i> Imprimir</button>
+                                        <button class="btn btn-sm btn-danger" onclick="setPedidoPago(@mesa.IdPedido)"><i class="fa fa-dollar"></i> Pagar</button>}
+
+                                </div>}
+
+                        </div>
+                    </div> }
+                else
+                {
+                    <a href="/Sales/Order?idmesa=@mesa.Id">
+                        <div class="box box-solid bg-danger">
+                            <div class="box-header">
+                                <h4 class="box-title"><strong>Mesa <b>@mesa.Numero.ToString("000")</b></strong></h4>
+                            </div>
+                            <div class="box-body" style="font-size:30px;">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <img src="~/images/mesa.png" />
+                                        <span>Livre</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>            }
+
+            </div>}
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/viewsScript/home/home.js?cache=@ViewData["version"].ToString()"></script>
+}

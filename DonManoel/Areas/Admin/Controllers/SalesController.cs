@@ -10,10 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace DonManoel.Controllers
+namespace DonManoel.Areas.Admin.Controllers
 {
-    [Route("[controller]")]
-    [Authorize]
+  
+    [Authorize(AuthenticationSchemes = "backend")]
+    [Area("Admin")]
+    [Route("Admin/[controller]")]
     public class SalesController : MainController
     {
         private readonly IUserSession _userSession;
