@@ -563,23 +563,33 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" style="text-align:right;">
-                                            Sub-Total: <span id="subtotalimpressao"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4" style="text-align:right;">
-                                            Taxa de Serviço: <span id="taxaservicoimpressao"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td colspan="4">
                                             <hr />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="4" style="text-align: right;font-weight: bold;">
-                                            Valor Total: <span id="totalimpressao"></span>
+                                        <td colspan="2" style="text-align:left;">
+                                            Sub-Total
+                                        </td>
+                                        <td colspan="2" style="text-align: right;font-weight: bold;">
+                                            <span id="subtotalimpressao"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align:left;">
+                                            Taxa de Serviço
+                                        </td>
+                                        <td colspan="2" style="text-align: right;font-weight: bold;">
+                                            <span id="taxaservicoimpressao"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2" style="text-align: left;font-size:18px;">
+                                            Valor Total
+                                        </td>
+                                        <td colspan="2" style="text-align: right;font-weight: bold;font-size: 18px;">
+                                            <span id="subtotalimpressao"></span>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -749,9 +759,7 @@
 
             var table = tbody.length ? tbody : $('#tableItensImpressao');
             var totalitens = parseFloat(0);
-            debugger;
             $.each((isNullOrEmpty(model.itensImpressao) ? model.ItensImpressao : model.itensImpressao), function (idx, item) {
-                debugger;
                 let qtde = (isNullOrEmpty(item.quantidade) ? item.Quantidade : item.quantidade);
                 let valor = (isNullOrEmpty(item.valor) ? item.Valor : item.valor);
                 table.append('<tr style="font-size: 11px;">' +

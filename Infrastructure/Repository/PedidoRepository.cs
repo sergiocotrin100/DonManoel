@@ -663,7 +663,7 @@ namespace Infrastructure.Repository
                     INNER JOIN DOTNET_STATUS_PEDIDO S ON S.ID = P.ID_STATUS_PEDIDO
                     LEFT JOIN PCO_USR U ON U.ID = P.ID_USUARIO
                     WHERE P.ID_MESA=:IDMESA
-                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4)
+                    AND P.ID_STATUS_PEDIDO IN(1,2,3,4,5)
                     ORDER BY P.ID DESC
                  ");
                 var parametros = new DynamicParameters();
