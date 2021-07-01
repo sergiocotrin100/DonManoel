@@ -232,7 +232,7 @@ namespace DonManoel.Areas.Admin.Controllers
         [HttpGet("LogoutAsync")]
         public async Task<IActionResult> LogoutAsync()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
             ViewData["Deslogou"] = 1;
 
             RedirectToActionResult redirectResult = new RedirectToActionResult("LoginAsync", "AccessUser", new { deslogou = true });
