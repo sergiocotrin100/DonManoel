@@ -13,6 +13,10 @@
 <script type="text/javascript">
     var objPedido = JSON.parse('@Html.Raw(model)');
     var lstCategorias = JSON.parse('@Html.Raw(categorias)');
+
+    function manageImageError(obj) {
+        $(obj).attr('src', hostSite() + 'admin/images/produto-sem-imagem-18.jpg')
+    }
 </script>
 
 
@@ -31,7 +35,7 @@
                             <div class="box food-box">
                                 <div class="box-body text-center">
                                     @*<div class="menu-item"><img src="~/admin/images/food/dish-1.png" class="img-fluid w-p75" alt=""></div>*@
-                                    <div class="menu-item"><img src="@menu.ImageUrl" class="img-fluid w-p75" alt=""></div>
+                                    <div class="menu-item"><img onerror="javascript:manageImageError(this)" src="@menu.ImageUrl" class="img-fluid w-p75" alt=""></div>
                                     <div class="menu-details text-center">
                                         <h5 class="mt-20 mb-10">@menu.Nome</h5>
                                     </div>
@@ -97,5 +101,5 @@
 
 @section Scripts
 {
-    <script src="/admin/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
+    <script src="~/admin/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
 }
