@@ -11,6 +11,7 @@ namespace Core.Entities
         public  int? IdCategoria { get; set; }
         public long IdUsuario { get; set; }
         public string Ativo { get; set; }
+        public string Imagem { get; set; }
         public int TempoPreparo { get; set; }
         public string TipoCategoria { get; set; }
         public string PratoKids { get; set; }
@@ -35,5 +36,18 @@ namespace Core.Entities
             }
         }
         public List<MenuComposicao> Composicao { get; set; }
+        public string ImageUrl
+        {
+            get
+            {
+                if (this.Id > 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(this.Imagem))
+                        return $"/admin/images/food/{this.Imagem}";
+                   
+                }
+                return string.Empty;
+            }
+        }
     }
 }

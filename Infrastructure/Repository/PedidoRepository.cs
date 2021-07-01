@@ -418,15 +418,19 @@ namespace Infrastructure.Repository
                 cmd.AppendFormat(@"
                     SELECT 
                         ID,
-                        NOME,
-                        DESCRICAO,
-                        ID_USUARIO IDUSUARIO,
-                        ATIVO,
-                        TEMPO_PREPARO TEMPOPREPARO,
-                        VALOR,
-                        ID_CATEGORIA IDCATEGORIA    
-                    FROM MENU
-                    WHERE ATIVO='S'                   
+                        M.ID,
+                        M.NOME,
+                        M.DESCRICAO,
+                        M.ID_USUARIO IDUSUARIO,
+                        M.ATIVO,
+                        M.TEMPO_PREPARO TEMPOPREPARO,
+                        M.VALOR,
+                        M.ID_CATEGORIA IDCATEGORIA,
+                        M.IMAGEM,
+                        NVL(M.PRATO_KIDS,'N') PRATOKIDS  
+                    FROM MENU M
+                    WHERE M.ATIVO='S'    
+                               
                  ");
                 var menus = await conn.QueryAsync<Menu>(cmd.ToString(), parametros);
                 menus = menus.ToList();
