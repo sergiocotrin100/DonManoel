@@ -1,53 +1,76 @@
 ﻿@model List<Core.Entities.Pedido>
 @using CrossCutting
 
+<style>
+    .table > thead > tr > td, .table > thead > tr > th {
+        padding: 0;
+    }
 
-<p>
+    @@-webkit-keyframes blinker {
+        from {
+            opacity: 1.0;
+        }
+
+        to {
+            opacity: 0.0;
+        }
+    }
+
+    .blink {
+        text-decoration: blink;
+        -webkit-animation-name: blinker;
+        -webkit-animation-duration: 0.6s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: ease-in-out;
+        -webkit-animation-direction: alternate;
+    }
+</style>
+<label style="font-size:large">
     Última atualização:
     @DateTime.Now.ToString("HH:mm:ss")
-</p>
+</label>
 
 <div class="table-responsive">
     <table class="table b-1 border-secondary">
         <thead class="bg-secondary">
             <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th class="text-center" colspan="2">Prato Adulto</th>
-                <th class="text-center" colspan="2">Prato Kids</th>
+                <th class="text-center">&nbsp;</th>
+                <th class="text-center">&nbsp;</th>
+                <th class="text-center" colspan="2" style="border: 1px solid #0d6efd">Prato Adulto</th>
+                <th class="text-center" colspan="2" style="border: 1px solid #0d6efd">Prato Kids</th>
             </tr>
             <tr>
-                <th>Mesa</th>
-                <th>Atendente</th>
-                <th class="text-center">Prazo</th>
-                <th class="text-center">Tempo</th>
-                <th class="text-center">Prazo</th>
+                <th class="text-center" style="border-right: 1px solid #0d6efd ">Mesa</th>
+                <th class="text-center" style="border-right: 1px solid #0d6efd ">Atendente</th>
+                <th class="text-center" style="border-right: 1px solid #0d6efd ">Prazo</th>
+                <th class="text-center" style="border-right: 1px solid #0d6efd ">Tempo</th>
+                <th class="text-center" style="border-right: 1px solid #0d6efd ">Prazo</th>
                 <th class="text-center">Tempo</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (Core.Entities.Pedido pedido in Model.OrderBy(x=> x.DataEnvioCozinha))
+            @foreach (Core.Entities.Pedido pedido in Model.OrderBy(x => x.DataEnvioCozinha))
             {
                 if (pedido.IsAtrasado)
                 {
-                    <tr class="bg-danger">
-                        <td>@pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td class="text-center">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
-                        <td class="text-center">@pedido.TempoPratoAdulto</td>
-                        <td class="text-center">@pedido.TempoPreparoKidsCozinhaFormatado</td>
-                        <td class="text-center">@pedido.TempoPratoKids</td>
+                    <tr class="bg-danger blink">
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold; ">@pedido.IdMesa.ToString("000")</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.Atendente.FirstName()</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPratoAdulto</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPreparoKidsCozinhaFormatado</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPratoKids</td>
                     </tr>
                 }
                 else
                 {
-                    <tr>
-                        <td>@pedido.IdMesa.ToString("000")</td>
-                        <td>@pedido.Atendente.FirstName()</td>
-                        <td class="text-center">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
-                        <td class="text-center">@pedido.TempoPratoAdulto</td>
-                        <td class="text-center">@pedido.TempoPreparoKidsCozinhaFormatado</td>
-                        <td class="text-center">@pedido.TempoPratoKids</td>
+                    <tr class="">
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold; ">@pedido.IdMesa.ToString("000")</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold; ">@pedido.Atendente.FirstName()</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold; ">@pedido.TempoPreparoAdultoCozinhaFormatado</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPratoAdulto</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPreparoKidsCozinhaFormatado</td>
+                        <td class="text-center" style="border-right: 1px solid #0d6efd; font-size: 18px; font-weight: bold;">@pedido.TempoPratoKids</td>
                     </tr>
                 }
 
