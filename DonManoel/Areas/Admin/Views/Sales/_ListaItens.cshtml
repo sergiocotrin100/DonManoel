@@ -2,18 +2,27 @@
 @using CrossCutting
 @inject Core.Interfaces.IUserSession usuario;
 
+
+
 <div class="row" id="itens">
+
+
+
+
     <div class="col-xxxl-8 col-12">
         <div class="box">
-            <div class="box-header bg-danger">
+            <div class="box-header bg-danger" style="display:inline-flex">
+                <h4 style="margin-right:5px">Mesa @Model.IdMesa </h4>
                 @{
                     var lstItens = Model.Itens;
                     if (lstItens == null)
+                    {
                         lstItens = new List<Core.Entities.PedidoItem>();
-                    else
-                        lstItens = Model.Itens.Where(item => item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto
-                        || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado
-                        || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado).ToList();
+                    }
+                    //else
+                    //    lstItens = Model.Itens.Where(item => item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto
+                    //    || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado
+                    //    || item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado).ToList();
                 }
                 @if (lstItens.Count > 1)
                 {
@@ -26,151 +35,451 @@
 
             </div>
 
+            @{
+                int qtdSolicitado = 0;
+                int qtdCozinha = 0;
+                int qtdPronto = 0;
+                int qtdCancelado = 0;
+                foreach (var item in lstItens)
+                {
+
+                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                    {
+                        qtdSolicitado += 1;
+                    }
+                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                    {
+                        qtdCozinha += 1;
+                    }
+                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                    {
+                        qtdPronto += 1;
+                    }
+                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado)
+                    {
+                        qtdCancelado += 1;
+                    }
+                }
+            }
+
             <div class="box-body">
-                <div class="table-responsive">
-                    <table class="table product-overview">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                            </tr>
-                        </thead>
-                        <tbody>
 
-                            @foreach (var item in lstItens)
-                            {
-                                if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
-                                {
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link active" id="nav-solicitado-tab" data-bs-toggle="tab" data-bs-target="#nav-solicitado" type="button" role="tab" aria-controls="nav-solicitado" aria-selected="true">
+                            Solicitado
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @qtdSolicitado
+                                <span class="visually-hidden">Qtd Solicitado</span>
+                            </span>
+                        </button>
+                        <button class="nav-link" id="nav-cozinha-tab" data-bs-toggle="tab" data-bs-target="#nav-cozinha" type="button" role="tab" aria-controls="nav-cozinha" aria-selected="false">
+                            Cozinha
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @qtdCozinha
+                                <span class="visually-hidden">Qtd Preparando</span>
+                            </span>
+                        </button>
+                        <button class="nav-link" id="nav-entregue-tab" data-bs-toggle="tab" data-bs-target="#nav-entregue" type="button" role="tab" aria-controls="nav-entregue" aria-selected="false">
+                            Entregue
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @qtdPronto
+                                <span class="visually-hidden">Qtd Pronto</span>
+                            </span>
+                        </button>
+                        <button class="nav-link" id="nav-cancelado-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelado" type="button" role="tab" aria-controls="nav-cancelado" aria-selected="false">
+                            Cancelado
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @qtdCancelado
+                                <span class="visually-hidden">Qtd Cancelado</span>
+                            </span>
+                        </button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-solicitado" role="tabpanel" aria-labelledby="nav-solicitado-tab">
+                        @*solicitado inicio*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: green;"></i>
-                                                &nbsp;
-                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
-                                            </div>
-
-                                            @foreach (var excecao in item.Excecao)
-                                            {
-                                                <div style="display: inline-flex; margin-left: 20px;">
-                                                    <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
-                                                </div><br />
-                                            }
-
-                                            <div class="act-btn d-flex justify-content-between">
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                    <small class="d-block">Cancelar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                    <small class="d-block">Duplicar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                    <small class="d-block">Entregue</small>
-                                                </div>
-                                            </div>
-                                        </td>
-
+                                        <th>Item</th>
                                     </tr>
-                                }
-                                else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                                </thead>
+                                <tbody>
+                                    @if (lstItens.Where(x=>x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado).Count() == 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nada para mostrar</h6>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in lstItens)
+                                        {
+
+                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                            &nbsp;
+                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                                        </div>
+
+                                                        @foreach (var excecao in item.Excecao)
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Sem</b> @excecao.Observacao</p>
+                                                            </div><br />
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.PontoCarne))
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Preparo da carne:</b> @item.PontoCarne</p>
+                                                            </div><br />
+                                                        }
+
+                                                        <div class="act-btn d-flex justify-content-between">
+
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                <small class="d-block">Cancelar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                <small class="d-block">Duplicar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                <small class="d-block">Solicitado</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                            <div class="d-none d-md-block">
+                                @if (Model.CanCancel)
                                 {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: orange;"></i>
-                                                &nbsp;
-                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
-                                            </div>
-
-
-                                            @foreach (var excecao in item.Excecao)
-                                            {
-                                                <div style="display: inline-flex; margin-left: 20px;">
-                                                    <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
-                                                </div><br />
-                                            }
-
-                                            <div class="act-btn d-flex justify-content-between">
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                    <small class="d-block">Cancelar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                    <small class="d-block">Duplicar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="setItemEntregue(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                    <small class="d-block">Entregue</small>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                    </tr>
+                                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
                                 }
-                                else if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+
+                                @if (Model.CanSend)
                                 {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
-                                                &nbsp;
-                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
-                                            </div>
-
-                                            @foreach (var excecao in item.Excecao)
-                                            {
-                                                <div style="display: inline-flex; margin-left: 20px;">
-                                                    <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Sem</b> @excecao.Observacao</p>
-                                                </div><br />
-                                            }
-
-                                            <div class="act-btn d-flex justify-content-between">
-
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                    <small class="d-block">Cancelar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                    <small class="d-block">Duplicar</small>
-                                                </div>
-                                                <div class="text-center mx-5">
-                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
-                                                    <small class="d-block">Entregue</small>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                    </tr>
+                                    <button class="btn btn-success pull-right " onclick="enviarPedido()"><i class="fa fa fa-cutlery"></i> Preparar</button>
                                 }
-                            }
 
-                        </tbody>
-                    </table>
+                                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                                {
+                                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                                }
 
-                    <div class="d-none d-md-block">
-                        @if (Model.CanCancel)
-                        {
-                            <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
-                        }
+                                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                            </div>
 
-                        @if (Model.CanSend)
-                        {
-                            <button class="btn btn-success pull-right enviar-pedido"><i class="fa fa fa-shopping-cart"></i> Enviar</button>
-                        }
 
-                        @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
-                        {
-                            <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
-                        }
+                        </div>
 
-                        <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                        @*solicitado fim*@
+                    </div>
+                    <div class="tab-pane fade" id="nav-cozinha" role="tabpanel" aria-labelledby="nav-cozinha-tab">
+                        @*cozinha inicio*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (lstItens.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado).Count() == 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nada para mostrar</h6>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in lstItens)
+                                        {
+                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: orange;"></i>
+                                                            &nbsp;
+                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                                        </div>
+
+
+                                                        @foreach (var excecao in item.Excecao)
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
+                                                            </div><br />
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.PontoCarne))
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Preparo da carne:</b> @item.PontoCarne</p>
+                                                            </div><br />
+                                                        }
+
+                                                        <div class="act-btn d-flex justify-content-between">
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="cancelarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                <small class="d-block">Cancelar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                <small class="d-block">Duplicar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="setItemEntregue(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-cutlery"></i></a>
+                                                                <small class="d-block">Clique quando Entregue</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                    </tbody>
+                            </table>
+
+                            <div class="d-none d-md-block">
+                                @if (Model.CanCancel)
+                                {
+                                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                                }
+
+                                @if (Model.CanSend)
+                                {
+                                    <button class="btn btn-success pull-right "><i class="fa fa fa-shopping-cart"></i> Preparar</button>
+                                }
+
+                                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                                {
+                                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                                }
+
+                                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                            </div>
+
+
+                        </div>
+
+                        @*cozinha fim*@
+                    </div>
+                    <div class="tab-pane fade" id="nav-entregue" role="tabpanel" aria-labelledby="nav-entregue-tab">
+                        @*entregue inicio*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (lstItens.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto).Count() == 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nada para mostrar</h6>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in lstItens)
+                                        {
+                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: green;"></i>
+                                                            &nbsp;
+                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                                        </div>
+
+                                                        @foreach (var excecao in item.Excecao)
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
+                                                            </div><br />
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.PontoCarne))
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Preparo da carne:</b> @item.PontoCarne</p>
+                                                            </div><br />
+                                                        }
+
+                                                        <div class="act-btn d-flex justify-content-between">
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                <small class="d-block">Cancelar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                <small class="d-block">Duplicar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-check"></i></a>
+                                                                <small class="d-block">Entregue</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                    </tbody>
+                            </table>
+
+                            <div class="d-none d-md-block">
+                                @if (Model.CanCancel)
+                                {
+                                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                                }
+
+                                @if (Model.CanSend)
+                                {
+                                    <button class="btn btn-success pull-right "  onclick="enviarPedido()"><i class="fa fa fa-shopping-cart"></i> Preparar</button>
+                                }
+
+                                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                                {
+                                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                                }
+
+                                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                            </div>
+
+
+                        </div>
+
+                        @*entregue fim*@
                     </div>
 
+                    <div class="tab-pane fade" id="nav-cancelado" role="tabpanel" aria-labelledby="nav-cancelado-tab">
+                        @*cancelado inicio*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (lstItens.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado).Count() == 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nada para mostrar</h6>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in lstItens)
+                                        {
+                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: green;"></i>
+                                                            &nbsp;
+                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Menu.Nome</h6>
+                                                        </div>
 
+                                                        @foreach (var excecao in item.Excecao)
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span> <p><b>Sem</b> @excecao.Observacao</p>
+                                                            </div><br />
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.PontoCarne))
+                                                        {
+                                                            <div style="display: inline-flex; margin-left: 20px;">
+                                                                <span class="mdi mdi-subdirectory-arrow-right"></span>  <p><b>Preparo da carne:</b> @item.PontoCarne</p>
+                                                            </div><br />
+                                                        }
+
+                                                        <div class="act-btn d-flex justify-content-between">
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-primary-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                <small class="d-block">Cancelar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" onclick="duplicarItem(@item.Id)" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                <small class="d-block">Duplicar</small>
+                                                            </div>
+                                                            <div class="text-center mx-5">
+                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-ban"></i></a>
+                                                                <small class="d-block">Cancelado</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                    </tbody>
+                            </table>
+
+                            <div class="d-none d-md-block">
+                                @if (Model.CanCancel)
+                                {
+                                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                                }
+
+                                @if (Model.CanSend)
+                                {
+                                    <button class="btn btn-success pull-right " onclick="enviarPedido()"><i class="fa fa fa-shopping-cart"></i> Preparar</button>
+                                }
+
+                                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                                {
+                                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                                }
+
+                                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                            </div>
+
+
+                        </div>
+
+                        @*cancelado fim*@
+                    </div>
                 </div>
+
+             
 
             </div>
         </div>

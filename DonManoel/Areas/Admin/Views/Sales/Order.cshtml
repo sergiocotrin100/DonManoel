@@ -55,9 +55,9 @@
     </div>
 
     @Html.Partial("_MenuDetalhes")
-    @Html.Partial("_ListaItens", Model)
-
-
+    <div id="resultadoItens">
+        @Html.Partial("_ListaItens", Model)
+    </div>
 
 </div>
 <style>
@@ -73,6 +73,7 @@
         opacity: 0.7;
     }
 </style>
+@*area de botoes que aparecem em celular*@
 <div class="d-sm-none footButtons">
     <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12">
@@ -97,9 +98,9 @@
         </div>
     </div>
 </div>
-
+@*area de botoes que aparecem em celular*@
 
 @section Scripts
-{
+{<script src="~/admin/assets/vendor_components/jquery-toast-plugin-master/src/jquery.toast.js"></script>
     <script src="~/admin/js/viewsScript/sales/order.js?cache=@ViewData["version"].ToString()"></script>
 }

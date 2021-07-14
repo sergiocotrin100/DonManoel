@@ -12,7 +12,7 @@ using System;
 
 namespace DonManoel.Areas.Admin.Controllers
 {
-  
+
     [Authorize(AuthenticationSchemes = "backend")]
     [Area("Admin")]
     [Route("Admin/[controller]")]
@@ -41,7 +41,7 @@ namespace DonManoel.Areas.Admin.Controllers
             if (_userSession.Role == Settings.Role.Garcon)
                 model.IdUsuario = _userSession.Id;
             var result = service.GetPedidos(model).Result;
-            ViewBag.Mesas = GetMesas().OrderBy(x=> x.Id).ToList();
+            ViewBag.Mesas = GetMesas().OrderBy(x => x.Id).ToList();
             ViewBag.Usuarios = GeUsuarios().OrderBy(x => x.Nome).ToList();
             return View(result);
         }
@@ -199,36 +199,52 @@ namespace DonManoel.Areas.Admin.Controllers
         }
 
         [HttpPost("ChangeStatus")]
-        public async Task<JsonResult> ChangeStatus(long idpedido, int status, string taxaservico = null)
+        public async Task<PartialViewResult> ChangeStatus(long idpedido, int status, long idorder, string taxaservico = null)
         {
             try
             {
                 await service.ChangeState(idpedido, status, taxaservico);
                 var result = await service.GetPedidoById(idpedido);
-                return Json(new { success = true, message = "", result = result });
+                //return Json(new { success = true, message = "", result = result });
+                Pedido model = new Pedido();
+
+                if (idorder > 0)
+                {
+                    model = service.GetPedidoById(idorder).Result;
+                }
+                return PartialView("_ListaItens", model);
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                // return Json(new { success = false, message = ex.Message });
+                return PartialView("_ListaItens", new Pedido());
             }
         }
 
         [HttpPost("ChangeStatusItem")]
-        public async Task<JsonResult> ChangeStatusItem(long idpedidoitem, int status)
+        public async Task<PartialViewResult> ChangeStatusItem(long idpedidoitem, int status, long idorder)
         {
             try
             {
                 await service.ChangeStateItem(idpedidoitem, status);
-                return Json(new { success = true, message = "" });
+                Pedido model = new Pedido();
+
+                if (idorder > 0)
+                {
+                    model = service.GetPedidoById(idorder).Result;
+                }
+                //return Json(new { success = true, message = "" });
+                return PartialView("_ListaItens", model);
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                // return Json(new { success = false, message = ex.Message });
+                return PartialView("_ListaItens", new Pedido());
             }
         }
 
         [HttpPost("DuplicateItem")]
-        public async Task<JsonResult> DuplicateItem(long idpedidoitem)
+        public async Task<PartialViewResult> DuplicateItem(long idpedidoitem, long idorder)
         {
             try
             {
@@ -236,11 +252,21 @@ namespace DonManoel.Areas.Admin.Controllers
                 model.Id = 0;
                 model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
                 await serviceItem.Save(model);
-                return Json(new { success = true, message = "" });
+
+                Pedido modelPedido = new Pedido();
+
+                if (idorder > 0)
+                {
+                    modelPedido = service.GetPedidoById(idorder).Result;
+                }
+
+                return PartialView("_ListaItens", modelPedido);
+                //return Json(new { success = true, message = "" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                // return Json(new { success = false, message = ex.Message });
+                return PartialView("_ListaItens", new Pedido());
             }
         }
 

@@ -18,9 +18,9 @@ $(document).ready(function () {
         addItem();
     });
 
-    $(".enviar-pedido").click(function () {
-        enviarPedido();
-    });
+    //$(".enviar-pedido").click(function () {
+    //    enviarPedido();
+    //});
 
     $(".cancelar-pedido").click(function () {
         cancelarPedido();
@@ -126,7 +126,7 @@ function addItem() {
                 var url = hostSite() + "Admin/Sales/Order?idmesa=" + idmesa + "&idorder=" + data.result + "&viewitens=1";
                 window.location.href = url;
             } else {
-                toastr.error(data.message, "Erro");
+                erro(data.message);
             }
         }
     });
@@ -134,6 +134,10 @@ function addItem() {
 }
 
 function enviarPedido() {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -147,31 +151,35 @@ function enviarPedido() {
                 action: function () {
                     $.ajax({
                         type: "post",
-                        dataType: 'json',
+                        dataType: 'html',
                         data: {
-                            'idpedido': $("#hdIdPedido").val(), 'status': 3
+                            'idpedido': $("#hdIdPedido").val(), 'status': 3, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
-                            if (data.success) {
-                                toastr.success("Solicitação efetuada com sucesso!", "Sucesso");
-                                window.location.reload();
-                            }
-                            else {
-                                toastr.error(data.message, "Erro");
-                            }
+                            sucesso("Pedido enviado para cozinha!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
                         }
+                        , error: function (request, status, error) {
+                            erro(request.responseText);
+                        }
+
                     });
                 }
             },
             Não: function () {
-
+                aviso("Pedido nao enviado para cozinha.");
             }
         }
     });
 }
 
 function cancelarPedido() {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -185,31 +193,34 @@ function cancelarPedido() {
                 action: function () {
                     $.ajax({
                         type: "post",
-                        dataType: 'json',
+                        dataType: 'html',
                         data: {
-                            'idpedido': $("#hdIdPedido").val(), 'status': 7
+                            'idpedido': $("#hdIdPedido").val(), 'status': 7, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
-                            if (data.success) {
-                                toastr.success("Pedido cancelado com sucesso!", "Sucesso");
-                                window.location.reload();
-                            }
-                            else {
-                                toastr.error(data.message, "Erro");
-                            }
+                            sucesso("Pedido cancelado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
                         }
                     });
                 }
             },
             Não: function () {
-
+                aviso("Pedido não cancelado.");
             }
         }
     });
 }
 
 function cancelarItem(id) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -223,31 +234,35 @@ function cancelarItem(id) {
                 action: function () {
                     $.ajax({
                         type: "post",
-                        dataType: 'json',
+                        dataType: 'html',
                         data: {
-                            'idpedidoitem': id, 'status': 4
+                            'idpedidoitem': id, 'status': 4, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatusItem",
                         success: function (data) {
-                            if (data.success) {
-                                toastr.success("Item cancelado com sucesso!", "Sucesso");
-                                window.location.reload();
-                            }
-                            else {
-                                toastr.error(data.message, "Erro");
-                            }
+                            sucesso("Item cancelado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
                         }
                     });
                 }
             },
             Não: function () {
-
+                aviso("Item não cancelado.");
             }
         }
     });
 }
 
 function setItemEntregue(id) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -261,31 +276,34 @@ function setItemEntregue(id) {
                 action: function () {
                     $.ajax({
                         type: "post",
-                        dataType: 'json',
+                        dataType: 'html',
                         data: {
-                            'idpedidoitem': id, 'status': 5
+                            'idpedidoitem': id, 'status': 5, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatusItem",
                         success: function (data) {
-                            if (data.success) {
-                                toastr.success("Item entregue com sucesso!", "Sucesso");
-                                window.location.reload();
-                            }
-                            else {
-                                toastr.error(data.message, "Erro");
-                            }
+                            sucesso("Item entregue com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
                         }
                     });
                 }
             },
             Não: function () {
-
+                aviso("Pedido não enviado para cozinha");
             }
         }
     });
 }
 
 function duplicarItem(id) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -299,25 +317,24 @@ function duplicarItem(id) {
                 action: function () {
                     $.ajax({
                         type: "post",
-                        dataType: 'json',
+                        dataType: 'html',
                         data: {
-                            'idpedidoitem': id
+                            'idpedidoitem': id, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/DuplicateItem",
                         success: function (data) {
-                            if (data.success) {
-                                toastr.success("Item duplicado com sucesso!", "Sucesso");
-                                window.location.reload();
-                            }
-                            else {
-                                toastr.error(data.message, "Erro");
-                            }
+                            sucesso("Item duplicado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
                         }
                     });
                 }
             },
             Não: function () {
-
+                aviso("Item não foi duplicado.");
             }
         }
     });
@@ -344,19 +361,65 @@ function fecharConta() {
                         url: hostSite() + "Admin/Sales/ChangeStatus",
                         success: function (data) {
                             if (data.success) {
-                                printOrder(data.result);                               
+                                printOrder(data.result);
                             }
                             else {
-                                toastr.error(data.message, "Erro");
+                                erro(data.message);
                             }
                         }
                     });
                 }
             },
             Não: function () {
-
+                aviso("Conta não foi fechada.");
             }
         }
+    });
+}
+
+function erro(msg) {
+    $.toast({
+        heading: 'Erro',
+        text: "Ocorreu um erro fatal, informe o administrador" + msg,
+        position: 'top-right',
+        loaderBg: '#ff6849',
+        icon: 'error',
+        hideAfter: 4000
+
+    });
+}
+function info(msg) {
+    $.toast({
+        heading: 'informação',
+        text: msg,
+        position: 'top-right',
+        loaderBg: '#ff6849',
+        icon: 'info',
+        hideAfter: 4000,
+        stack: 6
+    });
+}
+
+function aviso(msg) {
+    $.toast({
+        heading: 'Aviso',
+        text: msg,
+        position: 'top-right',
+        loaderBg: '#ff6849',
+        icon: 'warning',
+        hideAfter: 3500,
+        stack: 6
+    });
+}
+function sucesso(msg) {
+    $.toast({
+        heading: 'Sucesso',
+        text: msg,
+        position: 'top-right',
+        loaderBg: '#ff6849',
+        icon: 'success',
+        hideAfter: 3500,
+        stack: 6
     });
 }
 

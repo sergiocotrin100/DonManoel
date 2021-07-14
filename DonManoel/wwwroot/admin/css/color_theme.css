@@ -1220,8 +1220,10 @@ Theme Primary Color
   background-color: #e9f5ea !important;
   color: #01b075; }
 .theme-primary .bg-danger {
-  background-color: #e66430 !important;
-  color: #ffffff; }
+    background-color: #e66430 !important;
+    color: #ffffff;
+    z-index: 1;
+}
 .theme-primary .bg-danger-light {
   background-color: #ffe1d5 !important;
   color: #e66430; }
