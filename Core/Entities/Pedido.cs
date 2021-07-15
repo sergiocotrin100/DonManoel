@@ -226,6 +226,7 @@ namespace Core.Entities
                 {
                     if (this.Itens != null && this.Itens.Count > 0)
                     {
+                        //TipoCategoria significa cozinha ou bar
                         int _tempoPreparo = this.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Cozinha && item.Menu.IsPratoKids == false).Sum(item => item.TempoPreparo);
                         int _quantidade = this.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Cozinha && item.Menu.IsPratoKids == false).ToList().Count();
                         if (_quantidade > 0)

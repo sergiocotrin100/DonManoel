@@ -18,6 +18,7 @@ namespace Core.Interfaces
         Task<Pedido> GetPedidoAbertoByMesa(int idMesa);
         Task ChangeState(long idpedido, int status, string taxaservico = null);
         Task ChangeStateItem(long idpedidoitem, int status);
+        Task ChangeStateItemBar(string nomePedidoitem, long idPedido, int status,string statusFase);
         Task<List<Categoria>> GetCategorias();
         Task<List<Pedido>> GetMeusPedidos(long? idusuario);
 

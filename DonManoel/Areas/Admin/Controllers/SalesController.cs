@@ -243,12 +243,61 @@ namespace DonManoel.Areas.Admin.Controllers
             }
         }
 
+        [HttpPost("ChangeStatusItemBar")]
+        public async Task<PartialViewResult> ChangeStatusItemBar(string nomePedidoitem,long idPedido, int status, long idorder,string statusFase)
+        {
+            try
+            {
+                await service.ChangeStateItemBar(nomePedidoitem, idPedido, status, statusFase);
+                Pedido model = new Pedido();
+
+                if (idorder > 0)
+                {
+                    model = service.GetPedidoById(idorder).Result;
+                }
+                //return Json(new { success = true, message = "" });
+                return PartialView("_ListaItens", model);
+            }
+            catch (Exception ex)
+            {
+                // return Json(new { success = false, message = ex.Message });
+                return PartialView("_ListaItens", new Pedido());
+            }
+        }
+
         [HttpPost("DuplicateItem")]
         public async Task<PartialViewResult> DuplicateItem(long idpedidoitem, long idorder)
         {
             try
             {
                 var model = await serviceItem.GetItemById(idpedidoitem);
+                model.Id = 0;
+                model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
+                await serviceItem.Save(model);
+
+                Pedido modelPedido = new Pedido();
+
+                if (idorder > 0)
+                {
+                    modelPedido = service.GetPedidoById(idorder).Result;
+                }
+
+                return PartialView("_ListaItens", modelPedido);
+                //return Json(new { success = true, message = "" });
+            }
+            catch (Exception ex)
+            {
+                // return Json(new { success = false, message = ex.Message });
+                return PartialView("_ListaItens", new Pedido());
+            }
+        }
+
+        [HttpPost("DuplicateItemBar")]
+        public async Task<PartialViewResult> DuplicateItemBar(string nomePedidoitem, long idorder)
+        {
+            try
+            {
+                var model = await serviceItem.GetItemByNameOrder(nomePedidoitem, idorder);
                 model.Id = 0;
                 model.IdStatusPedidoItem = (int)Settings.Status.PedidoItem.Solicitado;
                 await serviceItem.Save(model);

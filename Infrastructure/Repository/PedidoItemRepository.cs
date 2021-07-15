@@ -51,6 +51,28 @@ namespace Infrastructure.Repository
             return model;
         }
 
+        public async Task<PedidoItem> GetItemByNameOrder(string nomePedidoItem, long idPedido)
+        {
+            PedidoItem model = new PedidoItem();
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        model = await GetItemByNameOrder(nomePedidoItem, idPedido, conn, transaction);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+            return model;
+        }
+
         internal async Task<PedidoItem> GetItemById(long idpedidoitem, IDbConnection conn, IDbTransaction transaction)
         {
             PedidoItem model = new PedidoItem();
@@ -78,6 +100,49 @@ namespace Infrastructure.Repository
 
             model.Menu = await GetMenu(model.IdMenu, conn, transaction);
             model.Excecao = await GetExcecao(model.Id, conn, transaction);
+            return model;
+        }
+
+        internal async Task<PedidoItem> GetItemByNameOrder(string nomePedidoitem,long idPedido, IDbConnection conn, IDbTransaction transaction)
+        {
+            IEnumerable<PedidoItem> listaItens = new List<PedidoItem>();
+            var cmd = new StringBuilder();
+            cmd.AppendFormat(@"
+                            SELECT 
+                                I.ID,
+                                I.ID_PEDIDO IDPEDIDO,
+                                I.ID_USUARIO IDUSUARIO,
+                                I.ID_MENU IDMENU,
+                                I.ID_STATUS_PEDIDO_ITEM IDSTATUSPEDIDOITEM,
+                                I.VALOR,
+                                I.TEMPO_PREPARO TEMPOPREPARO,
+                                I.DATA,
+                                I.PONTO_CARNE AS PONTOCARNE,
+                                I.DATA_ATUALIZACAO AS DATAATUALIZACAO,
+                                S.NOME AS STATUS                                
+                            FROM DOTNET_PEDIDO_ITENS I
+                            INNER JOIN DOTNET_STATUS_PEDIDO_ITENS S ON S.ID = I.ID_STATUS_PEDIDO_ITEM
+                            WHERE I.ID_PEDIDO=:ID 
+                 ");
+            var parametros = new DynamicParameters();
+            parametros.Add("ID", idPedido, DbType.Int64);
+            listaItens = await conn.QueryAsync<PedidoItem>(cmd.ToString(), parametros);
+
+            foreach (var item in listaItens)
+            {
+                item.Menu = await GetMenu(item.IdMenu, conn, transaction);
+                item.Excecao = await GetExcecao(item.Id, conn, transaction);
+            }
+
+            PedidoItem model = new PedidoItem();
+            foreach (var item in listaItens)
+            {
+                if(item.Menu.Nome == nomePedidoitem)
+                {
+                    model = item;
+                }
+            }
+
             return model;
         }
 

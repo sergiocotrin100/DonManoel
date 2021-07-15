@@ -1,4 +1,5 @@
-﻿
+﻿//const { stat } = require("fs");
+
 var MENUSELECIONADO = [];
 var PEDIDO = null;
 var CATEGORIAS = [];
@@ -258,6 +259,91 @@ function cancelarItem(id) {
     });
 }
 
+function cancelarItemBar(nome, status) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente cancelar esse item?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'html',
+                        data: {
+                            'nomepedidoitem': nome, 'idPedido': idOrder, 'status': 4, 'idorder': idOrder, 'statusFase': status
+                        },
+                        url: hostSite() + "Admin/Sales/ChangeStatusItemBar",
+                        success: function (data) {
+                            sucesso("Item cancelado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
+                        }
+                    });
+                }
+            },
+            Não: function () {
+                aviso("Item não cancelado.");
+            }
+        }
+    });
+}
+
+
+function cancelarItemQuantoEmPreparo(id) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'O item já foi enviado para a cozinha, antes de confirmar o cancelamento, verifique se o prato esta pronto, caso não esteja pronto, clique em "sim" para cancelar.',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'html',
+                        data: {
+                            'idpedidoitem': id, 'status': 4, 'idorder': idOrder
+                        },
+                        url: hostSite() + "Admin/Sales/ChangeStatusItem",
+                        success: function (data) {
+                            sucesso("Item cancelado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
+                        }
+                    });
+                }
+            },
+            Não: function () {
+                aviso("Item não cancelado.");
+            }
+        }
+    });
+}
+
 function setItemEntregue(id) {
     var idOrder = 0;
     var url_string = window.location.href
@@ -279,6 +365,48 @@ function setItemEntregue(id) {
                         dataType: 'html',
                         data: {
                             'idpedidoitem': id, 'status': 5, 'idorder': idOrder
+                        },
+                        url: hostSite() + "Admin/Sales/ChangeStatusItem",
+                        success: function (data) {
+                            sucesso("Item entregue com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
+                        }
+                    });
+                }
+            },
+            Não: function () {
+                aviso("Pedido não enviado para cozinha");
+            }
+        }
+    });
+}
+
+
+function setItemBarEntregue(nome) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Esse item foi entregue?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'html',
+                        data: {
+                            'nomePedidoitem': id, 'status': 5, 'idorder': idOrder
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatusItem",
                         success: function (data) {
@@ -339,6 +467,49 @@ function duplicarItem(id) {
         }
     });
 }
+
+
+function duplicarItemBar(nome) {
+    var idOrder = 0;
+    var url_string = window.location.href
+    var url = new URL(url_string);
+    idOrder = url.searchParams.get("idorder");
+    $.confirm({
+        title: 'Atenção!',
+        icon: 'fa fa-user',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        content: 'Deseja realmente duplicar esse item?',
+        buttons: {
+            Sim: {
+                btnClass: 'btn-danger',
+                keys: ['enter', 'shift'],
+                action: function () {
+                    $.ajax({
+                        type: "post",
+                        dataType: 'html',
+                        data: {
+                            'nomePedidoitem': nome, 'idorder': idOrder
+                        },
+                        url: hostSite() + "Admin/Sales/DuplicateItemBar",
+                        success: function (data) {
+                            sucesso("Item duplicado com sucesso!");
+                            $("#resultadoItens").html('');
+                            $("#resultadoItens").html(data);
+                        },
+                        error: function (request, status, error) {
+                            erro(request.responseText);
+                        }
+                    });
+                }
+            },
+            Não: function () {
+                aviso("Item não foi duplicado.");
+            }
+        }
+    });
+}
+
 
 function fecharConta() {
     $.confirm({

@@ -109,6 +109,28 @@ namespace Infrastructure.Repository
             }
         }
 
+        public async Task ChangeStateItemBar(string nomePedidoitem,long idPedido, int status, string statusFase)
+        {
+            using (IDbConnection conn = _connection.GetConnection())
+            {
+                conn.Open();
+                using (IDbTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        await ChangeStateItemBar(nomePedidoitem, idPedido,status, statusFase, conn, transaction);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
         internal async Task ChangeStateItem(long idpedidoitem, int status, IDbConnection conn, IDbTransaction transaction)
         {
             StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS, DATA_ATUALIZACAO = SYSDATE WHERE ID=:ID");
@@ -155,6 +177,84 @@ namespace Infrastructure.Repository
                 }
             }
         }
+
+        //cancela item do bar 1 por 1
+        internal async Task ChangeStateItemBar(string nomePedidoitem, long idPedido, int status, string statusFase, IDbConnection conn, IDbTransaction transaction)
+        {
+            PedidoItemRepository repository = new PedidoItemRepository(_userSession);
+            var todosItens = await repository.GetItens(idPedido, conn, transaction);
+
+            //quando bebidas, logica para mudar status da bebida que esta agrupada na tela
+            var listPedidoBar = new List<PedidoItem>();
+            foreach (var item in todosItens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Bar).ToList())
+            {
+                if (item.Menu.Nome == nomePedidoitem && item.IdStatusPedidoItem == statusFase.ToLong())
+                {
+                    listPedidoBar.Add(item);
+                }
+            }
+
+            long idPedidoItem = 0;
+            if (listPedidoBar.Count > 1)
+            {
+                foreach (var item in listPedidoBar)
+                {
+                    // se o valor atual da lista for maior que o valor que já tenho
+                    if (item.Id > idPedidoItem)
+                        // atualiza o valor que ja tenho
+                        idPedidoItem = item.Id;
+                }
+            }
+            else
+            {
+                idPedidoItem = listPedidoBar.FirstOrDefault().Id;
+            }
+
+            StringBuilder sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO_ITENS SET ID_STATUS_PEDIDO_ITEM = :STATUS, DATA_ATUALIZACAO = SYSDATE WHERE ID=:ID");
+            var parameters = new OracleDynamicParameters();
+            parameters.Add("ID", idPedidoItem, OracleDbType.Long, ParameterDirection.Input);
+            parameters.Add("STATUS", status, OracleDbType.Int32, ParameterDirection.Input);
+            await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+            if (status == (int)Settings.Status.PedidoItem.Pronto)
+            {
+                PedidoItemRepository pedidoitem = new PedidoItemRepository(_userSession);
+                PedidoItem model = await pedidoitem.GetItemById(idPedidoItem, conn, transaction);
+
+                sql = new StringBuilder();
+                sql.AppendFormat(@"
+                    SELECT 
+                        I.ID_STATUS_PEDIDO_ITEM IDSTATUSPEDIDOITEM
+                    FROM DOTNET_PEDIDO_ITENS I
+                    WHERE I.ID_PEDIDO=:IDPEDIDO
+                 ");
+                var parametros = new DynamicParameters();
+                parametros.Add("IDPEDIDO", model.IdPedido, DbType.Int64);
+                var itens = await conn.QueryAsync<PedidoItem>(sql.ToString(), parametros, transaction);
+
+                int statusPedidoVenda = 0;
+                if (itens.ToList().Exists(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado))
+                    statusPedidoVenda = (int)Settings.Status.Pedido.EmPreparacao;
+                else
+                    statusPedidoVenda = (int)Settings.Status.Pedido.Pronto;
+
+                if (statusPedidoVenda > 0)
+                {
+                    sql = new StringBuilder(@"UPDATE DOTNET_PEDIDO SET ID_STATUS_PEDIDO = :STATUS WHERE ID=:ID");
+                    parameters = new OracleDynamicParameters();
+                    parameters.Add("ID", model.IdPedido, OracleDbType.Long, ParameterDirection.Input);
+                    parameters.Add("STATUS", statusPedidoVenda, OracleDbType.Int32, ParameterDirection.Input);
+                    await conn.ExecuteAsync(sql.ToString(), parameters, transaction: transaction);
+
+                    await SaveLogStatus(new LogPedidoStatus()
+                    {
+                        IdPedido = model.IdPedido,
+                        IdStatusPedido = status
+                    }, conn, transaction);
+                }
+            }
+        }
+
 
         public async Task<List<LogPedidoStatus>> GetLogPedidoStatus(long idpedido)
         {
