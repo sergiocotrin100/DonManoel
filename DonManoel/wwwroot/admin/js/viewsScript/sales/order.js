@@ -406,9 +406,9 @@ function setItemBarEntregue(nome) {
                         type: "post",
                         dataType: 'html',
                         data: {
-                            'nomePedidoitem': id, 'status': 5, 'idorder': idOrder
+                            'nomePedidoitem': nome, 'status': 5, 'idorder': idOrder
                         },
-                        url: hostSite() + "Admin/Sales/ChangeStatusItem",
+                        url: hostSite() + "Admin/Sales/ChangeStatusItemBar",
                         success: function (data) {
                             sucesso("Item entregue com sucesso!");
                             $("#resultadoItens").html('');
