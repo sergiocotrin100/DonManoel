@@ -2,10 +2,13 @@
 @using CrossCutting
 @inject Core.Interfaces.IUserSession usuario;
 
-
+<style>
+    .classRowDisplay {
+        display: table-row !important;
+    }
+</style>
 
 <div class="row" id="itens">
-
 
 
 
@@ -16,8 +19,9 @@
                 @{
                     var lstItens = Model.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Cozinha).ToList();
 
-                    var lstItensBar = Model.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Bar).GroupBy(x => (x.IdStatusPedidoItem, x.Menu.Nome))
-                    .Select(g => new { Id = g.Key, IdStatusPedidoItem = g.Key.IdStatusPedidoItem, Nome = g.Key.Nome, Total = g.ToList() });
+                    var lstItensBar = Model.Itens.Where(item => item.Menu.TipoCategoria == Settings.TipoCategoria.Bar).GroupBy(u => u.IdMenu)
+                    .Select(grp => grp.ToList())
+                    .ToList();
 
                     if (lstItens == null)
                     {
@@ -38,9 +42,13 @@
 
             @{
                 int qtdSolicitado = 0;
+                List<Core.Entities.PedidoItem> lstBarSolic = new List<Core.Entities.PedidoItem>();
                 int qtdCozinha = 0;
+                List<Core.Entities.PedidoItem> lstBarCozi = new List<Core.Entities.PedidoItem>();
                 int qtdPronto = 0;
+                List<Core.Entities.PedidoItem> lstBarPronto = new List<Core.Entities.PedidoItem>();
                 int qtdCancelado = 0;
+                List<Core.Entities.PedidoItem> lstBarCancelado = new List<Core.Entities.PedidoItem>();
                 foreach (var item in lstItens)
                 {
 
@@ -63,22 +71,28 @@
                 }
                 foreach (var item in lstItensBar)
                 {
-
-                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                    foreach (var itemGroup in item)
                     {
-                        qtdSolicitado += item.Total.Count();
-                    }
-                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
-                    {
-                        qtdCozinha += item.Total.Count();
-                    }
-                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
-                    {
-                        qtdPronto += item.Total.Count();
-                    }
-                    if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado)
-                    {
-                        qtdCancelado += item.Total.Count();
+                        if (itemGroup.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                        {
+                            qtdSolicitado += 1;
+                            lstBarSolic.Add(itemGroup);
+                        }
+                        if (itemGroup.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                        {
+                            qtdCozinha += 1;
+                            lstBarCozi.Add(itemGroup);
+                        }
+                        if (itemGroup.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
+                        {
+                            qtdPronto += 1;
+                            lstBarPronto.Add(itemGroup);
+                        }
+                        if (itemGroup.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado)
+                        {
+                            qtdCancelado += 1;
+                            lstBarCancelado.Add(itemGroup);
+                        }
                     }
                 }
             }
@@ -120,6 +134,7 @@
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-solicitado" role="tabpanel" aria-labelledby="nav-solicitado-tab">
                         @*solicitado inicio*@
+                        @*cozinha solicitado*@
                         <div class="table-responsive">
                             <table class="table product-overview">
                                 <thead>
@@ -185,10 +200,20 @@
                                                 </tr>
                                             }
                                         }
-
                                     }
-
-                                    @if (lstItensBar.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado).Count() == 0)
+                                </tbody>
+                            </table>
+                        </div>
+                        @*bar solicitado*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
+                                    <tr style=" background-color: burlywood;">
+                                        <th colspan="2">Bar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (lstBarSolic.Count() == 0)
                                     {
                                         <tr>
                                             <td>
@@ -200,50 +225,65 @@
                                     }
                                     else
                                     {
-                                        <tr>
-                                            <td style=" background-color: burlywood;">
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><b>  Bar  </b></h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @foreach (var item in lstItensBar)
+                                        var listGroupSolic = lstBarSolic.GroupBy(u => u.IdMenu).Select(grp => grp.ToList()).ToList();
+
+                                        int contaLinhas = 1;
+                                        foreach (var item in listGroupSolic)
                                         {
-
-                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Solicitado)
+                                            var objSolic = item.FirstOrDefault();
+                                            int totalSolic = lstBarSolic.Where(x => x.IdMenu == objSolic.IdMenu).Count();
+                                            <tr class="clickable" data-toggle="collapse" id="rowSolcitado_@contaLinhas" data-target=".row_@contaLinhas">
+                                                <td>
+                                                    <i class="glyphicon glyphicon-plus" onclick="mostraFilhos('rowSolcitado_@contaLinhas')"></i>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                        &nbsp;
+                                                        <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@totalSolic @objSolic.Menu.Nome</h6>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            foreach (var itemGroup in lstBarSolic)
                                             {
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
-                                                            &nbsp;
-                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Total.Count() @item.Nome</h6>
-                                                        </div>
-
-
-                                                        <div class="act-btn d-flex justify-content-between">
-
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="cancelarItemBar('@item.Nome',1)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                                <small class="d-block">Cancelar</small>
+                                                if (objSolic.IdMenu == itemGroup.IdMenu)
+                                                {
+                                                    <tr class="collapse rowSolcitado_@contaLinhas" style="background-color:#fff1e4">
+                                                        <td>Item</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                                &nbsp;
+                                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">1 @itemGroup.Menu.Nome</h6>
                                                             </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="duplicarItemBar('@item.Nome')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Duplicar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Solicitado</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
 
-                                                </tr>
+
+                                                            <div class="act-btn d-flex justify-content-between">
+
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" onclick="cancelarItem('@itemGroup.Id',1)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                    <small class="d-block">Cancelar</small>
+                                                                </div>
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" onclick="duplicarItem('@itemGroup.Id')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                    <small class="d-block">Duplicar</small>
+                                                                </div>
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                    <small class="d-block">Solicitado</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
                                             }
+                                            contaLinhas++;
                                         }
                                     }
+
                                 </tbody>
                             </table>
+                            @*bar solicitado*@
 
                             <div class="d-none d-md-block">
                                 @if (Model.CanCancel)
@@ -263,10 +303,7 @@
 
                                 <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                             </div>
-
-
                         </div>
-
                         @*solicitado fim*@
                     </div>
                     <div class="tab-pane fade" id="nav-cozinha" role="tabpanel" aria-labelledby="nav-cozinha-tab">
@@ -337,8 +374,38 @@
                                             }
                                         }
                                     }
+                                </tbody>
+                            </table>
 
-                                    @if (lstItensBar.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado).Count() == 0)
+                           @* <div class="d-none d-md-block">
+                                @if (Model.CanCancel)
+                                {
+                                    <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
+                                }
+
+                                @if (Model.CanSend)
+                                {
+                                    <button class="btn btn-success pull-right "><i class="fa fa fa-shopping-cart"></i> Preparar</button>
+                                }
+
+                                @if (Model.CanFecharPedido && (usuario.Role == Settings.Role.Caixa || usuario.Role == Settings.Role.Gerente))
+                                {
+                                    <button class="btn btn-primary pull-right fechar-pedido"><i class="fa fa fa-dollar"></i> Fechar Conta</button>
+                                }
+
+                                <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
+                            </div>*@
+                        </div>
+                         @*bar cozinha*@
+                        <div class="table-responsive">
+                            <table class="table product-overview">
+                                <thead>
+                                    <tr style=" background-color: burlywood;">
+                                        <th colspan="2">Bar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (lstBarSolic.Count() == 0)
                                     {
                                         <tr>
                                             <td>
@@ -350,52 +417,67 @@
                                     }
                                     else
                                     {
-                                        <tr>
-                                            <td style=" background-color: burlywood;">
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><b>  Bar  </b></h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @foreach (var item in lstItensBar)
+                                        var listGroupCozinha = lstBarCozi.GroupBy(u => u.IdMenu).Select(grp => grp.ToList()).ToList();
+
+                                        int contaLinhasCozinha = 1;
+                                        foreach (var item in listGroupCozinha)
                                         {
-
-                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Enviado)
+                                            var objSolic = item.FirstOrDefault();
+                                            int totalCozinha = lstBarCozi.Where(x => x.IdMenu == objSolic.IdMenu).Count();
+                                            <tr class="clickable" data-toggle="collapse" id="rowCozinha_@contaLinhasCozinha" data-target=".row_@contaLinhasCozinha">
+                                                <td>
+                                                    <i class="glyphicon glyphicon-plus" onclick="mostraFilhos('rowCozinha_@contaLinhasCozinha')"></i>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                        &nbsp;
+                                                        <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@totalCozinha @objSolic.Menu.Nome</h6>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            foreach (var itemGroup in lstBarCozi)
                                             {
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
-                                                            &nbsp;
-                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Total.Count() @item.Nome</h6>
-                                                        </div>
-
-
-                                                        <div class="act-btn d-flex justify-content-between">
-
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="cancelarItemBar('@item.Nome',2)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                                <small class="d-block">Cancelar</small>
+                                                if (objSolic.IdMenu == itemGroup.IdMenu)
+                                                {
+                                                    <tr class="collapse rowCozinha_@contaLinhasCozinha" style="background-color:#fff1e4">
+                                                        <td>Item</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
+                                                                &nbsp;
+                                                                <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">1 @itemGroup.Menu.Nome</h6>
                                                             </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="duplicarItemBar('@item.Nome')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Duplicar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="setItemBarEntregue('@item.Nome')" class=" waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-glass"></i></a>
-                                                                <small class="d-block">Clique quando entregar</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
 
-                                                </tr>
+
+                                                            <div class="act-btn d-flex justify-content-between">
+
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" onclick="cancelarItem('@itemGroup.Id',1)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
+                                                                    <small class="d-block">Cancelar</small>
+                                                                </div>
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" onclick="duplicarItem('@itemGroup.Id')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                    <small class="d-block">Duplicar</small>
+                                                                </div>
+                                                                <div class="text-center mx-5">
+                                                                    <a href="#" onclick="setItemEntregue('@itemGroup.Id')" class=" waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
+                                                                    <small class="d-block">Marca Entrega</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
                                             }
+                                            contaLinhasCozinha++;
                                         }
                                     }
+
                                 </tbody>
                             </table>
+                            @*bar solicitado*@
 
-                            <div class="d-none d-md-block">
+                               <div class="d-none d-md-block">
                                 @if (Model.CanCancel)
                                 {
                                     <button class="btn btn-danger pull-right cancelar-pedido"><i class="fa fa fa-trash"></i> Cancelar</button>
@@ -413,10 +495,7 @@
 
                                 <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                             </div>
-
-
                         </div>
-
                         @*cozinha fim*@
                     </div>
                     <div class="tab-pane fade" id="nav-entregue" role="tabpanel" aria-labelledby="nav-entregue-tab">
@@ -429,6 +508,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     @if (lstItens.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto).Count() == 0)
                                     {
                                         <tr>
@@ -487,60 +567,6 @@
                                         }
                                     }
 
-                                    @if (lstItensBar.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto).Count() == 0)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nenhuma bebida para mostrar</h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td style=" background-color: burlywood;">
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><b>  Bar  </b></h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @foreach (var item in lstItensBar)
-                                        {
-
-                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Pronto)
-                                            {
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
-                                                            &nbsp;
-                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Total.Count() @item.Nome</h6>
-                                                        </div>
-
-
-                                                        <div class="act-btn d-flex justify-content-between">
-
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="cancelarItemBar('@item.Nome',5)" class="waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                                <small class="d-block">Cancelar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="duplicarItemBar('@item.Nome')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Duplicar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Entregue</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                </tr>
-                                            }
-                                        }
-                                    }
                                 </tbody>
                             </table>
 
@@ -562,13 +588,10 @@
 
                                 <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                             </div>
-
-
                         </div>
 
                         @*entregue fim*@
                     </div>
-
                     <div class="tab-pane fade" id="nav-cancelado" role="tabpanel" aria-labelledby="nav-cancelado-tab">
                         @*cancelado inicio*@
                         <div class="table-responsive">
@@ -637,60 +660,6 @@
                                         }
                                     }
 
-                                    @if (lstItensBar.Where(x => x.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado).Count() == 0)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> Nenhuma bebida para mostrar</h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td style=" background-color: burlywood;">
-                                                <div class="d-flex align-items-center">
-                                                    <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><b>  Bar  </b></h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @foreach (var item in lstItensBar)
-                                        {
-
-                                            if (item.IdStatusPedidoItem == (int)Settings.Status.PedidoItem.Cancelado)
-                                            {
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fa fa-cutlery" style="margin-top: -8px;color: red;"></i>
-                                                            &nbsp;
-                                                            <h6 style="max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Total.Count() @item.Nome</h6>
-                                                        </div>
-
-
-                                                        <div class="act-btn d-flex justify-content-between">
-
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="" class="disabled waves-effect waves-circle btn btn-circle btn-danger-light btn-xs mb-5"><i class="fa fa-trash"></i></a>
-                                                                <small class="d-block">Cancelar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" onclick="duplicarItemBar('@item.Nome')" class="waves-effect waves-circle btn btn-circle btn-info-light btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Duplicar</small>
-                                                            </div>
-                                                            <div class="text-center mx-5">
-                                                                <a href="#" class="disabled waves-effect waves-circle btn btn-circle btn-success btn-xs mb-5"><i class="fa fa-plus-square-o"></i></a>
-                                                                <small class="d-block">Cancelado</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-
-                                                </tr>
-                                            }
-                                        }
-                                    }
                                 </tbody>
                             </table>
 
@@ -712,17 +681,14 @@
 
                                 <a href="#menu" class="btn btn-default"><i class="fa fa-arrow-up"></i> Menu</a>
                             </div>
-
-
                         </div>
 
                         @*cancelado fim*@
                     </div>
                 </div>
-
-
-
             </div>
         </div>
     </div>
 </div>
+
+

@@ -260,6 +260,7 @@ function cancelarItem(id) {
 }
 
 function cancelarItemBar(nome, status) {
+    //statusFase=status para cancelar no status certo
     var idOrder = 0;
     var url_string = window.location.href
     var url = new URL(url_string);
@@ -386,7 +387,8 @@ function setItemEntregue(id) {
 }
 
 
-function setItemBarEntregue(nome) {
+function setItemBarEntregue(nome, status) {
+    //statusFase=status para cancelar no status certo
     var idOrder = 0;
     var url_string = window.location.href
     var url = new URL(url_string);
@@ -406,7 +408,7 @@ function setItemBarEntregue(nome) {
                         type: "post",
                         dataType: 'html',
                         data: {
-                            'nomePedidoitem': nome, 'status': 5, 'idorder': idOrder
+                            'nomePedidoitem': nome, 'status': 5, 'idorder': idOrder, 'statusFase': status
                         },
                         url: hostSite() + "Admin/Sales/ChangeStatusItemBar",
                         success: function (data) {
@@ -510,6 +512,13 @@ function duplicarItemBar(nome) {
     });
 }
 
+function mostraFilhos(item) {
+
+    if ($("." + item).hasClass("classRowDisplay"))
+        $("." + item).removeClass("classRowDisplay");
+    else
+        $("." + item).addClass("classRowDisplay");
+}
 
 function fecharConta() {
     $.confirm({
@@ -593,4 +602,6 @@ function sucesso(msg) {
         stack: 6
     });
 }
+
+
 

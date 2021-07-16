@@ -178,7 +178,7 @@ namespace Infrastructure.Repository
             }
         }
 
-        //cancela item do bar 1 por 1
+        
         internal async Task ChangeStateItemBar(string nomePedidoitem, long idPedido, int status, string statusFase, IDbConnection conn, IDbTransaction transaction)
         {
             PedidoItemRepository repository = new PedidoItemRepository(_userSession);
@@ -194,6 +194,7 @@ namespace Infrastructure.Repository
                 }
             }
 
+            //cancela item do bar 1 por 1
             long idPedidoItem = 0;
             if (listPedidoBar.Count > 1)
             {
