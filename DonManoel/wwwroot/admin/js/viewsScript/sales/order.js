@@ -1,4 +1,4 @@
-﻿//const { stat } = require("fs");
+﻿
 
 var MENUSELECIONADO = [];
 var PEDIDO = null;
@@ -30,8 +30,6 @@ $(document).ready(function () {
     $(".fechar-pedido").click(function () {
         fecharConta();
     });
-
-
 });
 
 function getParams() {
@@ -167,6 +165,8 @@ function enviarPedido() {
                         }
 
                     });
+
+                    pedidoEnviadoImpressorasCozinhaBar();
                 }
             },
             Não: function () {
@@ -554,6 +554,41 @@ function fecharConta() {
                 aviso("Conta não foi fechada.");
             }
         }
+    });
+}
+
+function pedidoEnviadoImpressorasCozinhaBar() {
+    debugger;
+    $.ajax({
+        type: "post",
+        dataType: 'json',
+        data: {
+            'idpedido': $("#hdIdPedido").val(), 'status': 3
+        },
+        url: hostSite() + "Admin/Sales/DadosImpressaoCozinha",
+        async: false,
+        success: function (data) {
+            var urlPrint = $("#urlPrintCozinha").val();
+            $.ajax({
+                type: "post",
+                dataType: 'json',
+                data: data.obj,
+                url: urlPrint,
+                success: function (result) {
+                    console.log("sucesso enviado para " + $("#urlPrintCozinha").val());
+                    console.log(result)
+                }
+                , error: function (request, status, error) {
+                    console.log("erro ao enviar para " + $("#urlPrintCozinha").val());
+                    erro(request.responseText);
+                }
+
+            });
+        }
+        , error: function (request, status, error) {
+            erro(request.responseText);
+        }
+
     });
 }
 

@@ -9,6 +9,7 @@ using CrossCutting;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace DonManoel.Areas.Admin.Controllers
 {
@@ -24,7 +25,16 @@ namespace DonManoel.Areas.Admin.Controllers
         private readonly IMesaRepository serviceMesa;
         private readonly IUsuarioRepository serviceUsuario;
         private readonly IDashBoardRepository serviceDashBoard;
-        public SalesController(IUserSession userSession, IPedidoRepository service, IPedidoItemRepository serviceItem, IMesaRepository serviceMesa, IUsuarioRepository serviceUsuario, IDashBoardRepository serviceDashBoard) : base(userSession, service, serviceMesa, serviceDashBoard)
+        public IConfiguration configuration { get; }
+
+
+        public SalesController(IUserSession userSession,
+            IPedidoRepository service,
+            IPedidoItemRepository serviceItem,
+            IMesaRepository serviceMesa,
+            IUsuarioRepository serviceUsuario,
+            IDashBoardRepository serviceDashBoard,
+            IConfiguration configuration) : base(userSession, service, serviceMesa, serviceDashBoard)
         {
             _userSession = userSession;
             this.service = service;
@@ -32,6 +42,7 @@ namespace DonManoel.Areas.Admin.Controllers
             this.serviceMesa = serviceMesa;
             this.serviceUsuario = serviceUsuario;
             this.serviceDashBoard = serviceDashBoard;
+            this.configuration = configuration;
         }
         public IActionResult Index()
         {
@@ -79,6 +90,9 @@ namespace DonManoel.Areas.Admin.Controllers
 
             ViewBag.IdMesa = idmesa;
             ViewBag.IdPedido = model.Id;
+
+            ViewBag.urlPrintCozinha = configuration.GetSection("UrlPrint:ImpressoraCozinha").Value;
+            ViewBag.urlPrintCaixa = configuration.GetSection("UrlPrint:ImpressoraBar").Value;
 
             return View(model);
         }
@@ -244,7 +258,7 @@ namespace DonManoel.Areas.Admin.Controllers
         }
 
         [HttpPost("ChangeStatusItemBar")]
-        public async Task<PartialViewResult> ChangeStatusItemBar(string nomePedidoitem,long idPedido, int status, long idorder,string statusFase)
+        public async Task<PartialViewResult> ChangeStatusItemBar(string nomePedidoitem, long idPedido, int status, long idorder, string statusFase)
         {
             try
             {
@@ -262,6 +276,25 @@ namespace DonManoel.Areas.Admin.Controllers
             {
                 // return Json(new { success = false, message = ex.Message });
                 return PartialView("_ListaItens", new Pedido());
+            }
+        }
+
+        [HttpPost("DadosImpressaoCozinha")]
+        public async Task<JsonResult> DadosImpressaoCozinha(long idPedido, int status)
+        {
+            try
+            {
+                Pedido model = new Pedido();
+
+                if (idPedido > 0)
+                {
+                    model =await service.GetPedidoById(idPedido);
+                }
+                return Json(new { success = true, message = "" , obj = model});
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
