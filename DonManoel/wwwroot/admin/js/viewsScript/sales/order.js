@@ -576,11 +576,13 @@ function pedidoEnviadoImpressorasCozinhaBar() {
                 url: urlPrint,
                 success: function (result) {
                     console.log("sucesso enviado para " + $("#urlPrintCozinha").val());
-                    console.log(result)
+                    console.log(result);
+                    console.log($("#urlPrintCozinha").val());
                 }
                 , error: function (request, status, error) {
                     console.log("erro ao enviar para " + $("#urlPrintCozinha").val());
                     erro(request.responseText);
+                    console.log($("#urlPrintCozinha").val());
                 }
 
             });

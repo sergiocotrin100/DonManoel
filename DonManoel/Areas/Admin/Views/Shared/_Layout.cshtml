@@ -784,6 +784,7 @@
         }
 
         function printOrderPreparacaoById(idpedido) {
+            //item não finalizado pelo sergio cotrim da silva
             let model = [];
             $.each(LISTAPEDIDOSIMPRESSAO, function (idx, mesa) {
                 if (!isNullOrEmpty(mesa.IdPedido) && mesa.IdPedido == idpedido) {
