@@ -137,6 +137,7 @@ function enviarPedido() {
     var url_string = window.location.href
     var url = new URL(url_string);
     idOrder = url.searchParams.get("idorder");
+ 
     $.confirm({
         title: 'Atenção!',
         icon: 'fa fa-user',
@@ -148,6 +149,11 @@ function enviarPedido() {
                 btnClass: 'btn-danger',
                 keys: ['enter', 'shift'],
                 action: function () {
+
+                    //pega os dados com status atual para poder imprimir
+                    pedidoEnviadoImpressorasCozinhaBar();
+
+
                     $.ajax({
                         type: "post",
                         dataType: 'html',
@@ -166,7 +172,7 @@ function enviarPedido() {
 
                     });
 
-                    pedidoEnviadoImpressorasCozinhaBar();
+                   
                 }
             },
             Não: function () {
@@ -574,6 +580,7 @@ function pedidoEnviadoImpressorasCozinhaBar() {
                 dataType: 'json',
                 data: data.obj,
                 url: urlPrint,
+                async: false,
                 success: function (result) {
                     console.log("sucesso enviado para " + $("#urlPrintCozinha").val());
                     console.log(result);
@@ -590,7 +597,6 @@ function pedidoEnviadoImpressorasCozinhaBar() {
         , error: function (request, status, error) {
             erro(request.responseText);
         }
-
     });
 }
 
